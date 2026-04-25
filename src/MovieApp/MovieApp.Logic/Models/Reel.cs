@@ -1,13 +1,10 @@
-using CommunityToolkit.Mvvm.ComponentModel;
-using System;
+//using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MovieApp.Logic.Models
 {
-    public partial class Reel : ObservableObject
+    public partial class Reel //: ObservableObject
     {
         public int Id { get; set; }
-        public Movie Movie { get; set; }
-        public User CreatorUser { get; set; }
         public string VideoUrl { get; set; } = string.Empty;
         public string ThumbnailUrl { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
@@ -20,11 +17,18 @@ namespace MovieApp.Logic.Models
         public DateTime CreatedAt { get; set; }
         public DateTime? LastEditedAt { get; set; }
 
+        public Movie Movie { get; set; }
+        public User CreatorUser { get; set; }
+
+        public ICollection<UserMoviePreference> MoviePreferences { get; set; } = new List<UserMoviePreference>();
+
+        /*
         // ── Client-side state (changes at runtime, needs UI notification) ──
         [ObservableProperty]
         private bool isLiked;
 
         [ObservableProperty]
         private int likeCount;
+        */
     }
 }

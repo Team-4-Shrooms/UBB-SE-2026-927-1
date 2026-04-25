@@ -1,5 +1,3 @@
-using System;
-
 namespace MovieApp.Logic.Models
 {
     public class ScrapeJob
@@ -13,5 +11,7 @@ namespace MovieApp.Logic.Models
         public DateTime StartedAt { get; set; }
         public DateTime? CompletedAt { get; set; }
         public string? ErrorMessage { get; set; }
+
+        public ICollection<ScrapeJobLog> Logs { get; set; } = new List<ScrapeJobLog>();
     }
 }
