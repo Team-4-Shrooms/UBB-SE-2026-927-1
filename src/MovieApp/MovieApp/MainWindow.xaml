@@ -25,11 +25,11 @@
             <NavigationViewItem Content="Movie Tournament" Tag="MovieTournament"  Icon="FourBars" />
             <NavigationViewItem Content="Personality Match" Tag="PersonalityMatch" Icon="People" />
             <NavigationViewItem Content="Reels Feed"     Tag="ReelsFeed"          Icon="Video" />
-            <NavigationViewItem Content="Movie Catalog" Tag="MovieCatalog" Icon="People"/>
-            <NavigationViewItem Content="Marketplace" Tag="Marketplace" Icon="People"/>
-            <NavigationViewItem Content="Events" Tag="Events" Icon="People"/>
-            <NavigationViewItem Content="Inventory" Tag="Inventory" Icon="People"/>
-            <NavigationViewItem Content="Wallet" Tag="Wallet" Icon="People"/>
+            <NavigationViewItem Content="Movie Catalog" Tag="MovieCatalog" Icon="Library"/>
+            <NavigationViewItem Content="Marketplace" Tag="Marketplace" Icon="Shop"/>
+            <NavigationViewItem Content="Events" Tag="Events" Icon="Calendar"/>
+            <NavigationViewItem Content="Inventory" Tag="Inventory" Icon="AllApps"/>
+            <NavigationViewItem Content="Wallet" Tag="Wallet" Icon="PreviewLink"/>
         </NavigationView.MenuItems>
 
         <Frame x:Name="ContentFrame" />

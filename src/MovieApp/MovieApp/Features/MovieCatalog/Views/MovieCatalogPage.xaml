@@ -11,7 +11,8 @@
 
     <Grid>
         <StackPanel Spacing="10">
-            <TextBlock Text="MovieCatalog" Style="{StaticResource PageHeaderStyle}"/>
+            <TextBlock Text="Movie Catalog Page" Style="{StaticResource PageHeaderStyle}"/>
         </StackPanel>
     </Grid>
+
 </Page>
