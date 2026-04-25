@@ -9,7 +9,7 @@ namespace MovieApp.Logic.Models
     public sealed class MovieEvent
     {
         public int Id { get; set; }
-        public MovieModel Movie { get; set; }
+        public Movie Movie { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public DateTime Date { get; set; }

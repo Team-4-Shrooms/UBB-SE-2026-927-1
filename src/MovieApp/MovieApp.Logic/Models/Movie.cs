@@ -2,7 +2,7 @@ using System;
 
 namespace MovieApp.Logic.Models
 {
-    public class MovieModel
+    public class Movie
     {
         public int Id { get; set; }
 

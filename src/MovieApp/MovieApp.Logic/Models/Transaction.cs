@@ -15,7 +15,7 @@ namespace MovieApp.Logic.Models
         public User? Seller { get; set; } // ?
 
         public Equipment? Equipment { get; set; }
-        public MovieModel? Movie { get; set; }
+        public Movie? Movie { get; set; }
         public MovieEvent? Event { get; set; } // ?
 
         public decimal Amount { get; set; }
