@@ -2,7 +2,7 @@ using System;
 
 namespace MovieApp.Logic.Models
 {
-    public class ScrapeJobModel
+    public class ScrapeJob
     {
         public int Id { get; set; }
         public string SearchQuery { get; set; } = string.Empty;

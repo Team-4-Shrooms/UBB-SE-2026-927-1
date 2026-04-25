@@ -3,10 +3,10 @@ using System;
 
 namespace MovieApp.Logic.Models
 {
-    public partial class ReelModel : ObservableObject
+    public partial class Reel : ObservableObject
     {
         public int Id { get; set; }
-        public MovieModel Movie { get; set; }
+        public Movie Movie { get; set; }
         public User CreatorUser { get; set; }
         public string VideoUrl { get; set; } = string.Empty;
         public string ThumbnailUrl { get; set; } = string.Empty;

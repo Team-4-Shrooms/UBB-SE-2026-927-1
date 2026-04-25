@@ -9,7 +9,7 @@ namespace MovieApp.Logic.Models
     public sealed class MovieReview
     {
         public int Id { get; set; }
-        public MovieModel Movie { get; set; }
+        public Movie Movie { get; set; }
         public User User { get; set; }
         public string Username { get; set; } = string.Empty;
         public decimal StarRating { get; set; }

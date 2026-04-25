@@ -10,7 +10,7 @@ namespace MovieApp.Logic.Models
     {
         public int Id { get; set; }
 
-        public MovieModel Movie { get; set; }
+        public Movie Movie { get; set; }
 
         public decimal DiscountPercentage { get; set; }
 

@@ -6,7 +6,7 @@ namespace MovieApp.Logic.Models
     /// Represents a user's stored preference score for a specific movie,
     /// including when it was last updated and how much it changed.
     /// </summary>
-    public class UserMoviePreferenceModel
+    public class UserMoviePreference
     {
         /// <summary>
         /// Gets or sets the unique identifier for this user-movie preference record.
@@ -21,7 +21,7 @@ namespace MovieApp.Logic.Models
         /// <summary>
         /// Gets or sets the identifier of the movie this preference refers to.
         /// </summary>
-        public MovieModel Movie { get; set; }
+        public Movie Movie { get; set; }
 
         /// <summary>
         /// Gets or sets the preference score assigned to this movie by the user.

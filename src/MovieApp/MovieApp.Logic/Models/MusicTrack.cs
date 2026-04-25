@@ -2,7 +2,7 @@ using System;
 
 namespace MovieApp.Logic.Models
 {
-    public class MusicTrackModel
+    public class MusicTrack
     {
         public int Id { get; set; }
         public string TrackName { get; set; } = string.Empty;
