@@ -1,4 +1,4 @@
-using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MovieApp.Logic.Models
 {
@@ -10,6 +10,7 @@ namespace MovieApp.Logic.Models
         public string AudioUrl { get; set; } = string.Empty;
         public double DurationSeconds { get; set; }
 
+        [NotMapped]
         public string FormattedDuration
         {
             get
