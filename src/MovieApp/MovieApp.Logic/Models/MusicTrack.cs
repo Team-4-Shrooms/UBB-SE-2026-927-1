@@ -15,7 +15,7 @@ namespace MovieApp.Logic.Models
         {
             get
             {
-                var ts = TimeSpan.FromSeconds(DurationSeconds);
+                TimeSpan ts = TimeSpan.FromSeconds(DurationSeconds);
                 return ts.TotalMinutes >= 1
                     ? $"{(int)ts.TotalMinutes}:{ts.Seconds:D2}"
                     : $"0:{ts.Seconds:D2}";
