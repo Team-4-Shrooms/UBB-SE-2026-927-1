@@ -18,7 +18,6 @@ No line may end with spaces or tabs after the last non-whitespace character. Tra
 **Rule 5. Encode all files in UTF-8.**
 Every file in the project must be saved with UTF-8 character encoding. Other encodings (UTF-16, Latin-1, etc.) are not allowed.
 
----
 
 ## Naming
 
@@ -37,7 +36,6 @@ Private and private-protected instance fields must start with an underscore, fol
 **Rule 10. Use camelCase for parameters and local variables.**
 Method parameters and local variables inside method bodies must be named in plain camelCase, with no prefix. Example: `orderCount`, `isValid`, `httpClient`.
 
----
 
 ## Types and var
 
@@ -47,7 +45,6 @@ The `var` keyword is banned in all contexts: for built-in types, when the type i
 **Rule 12. Use language keywords instead of BCL type names.**
 Prefer C# keywords over their .NET Framework equivalents in all contexts — locals, parameters, and member access alike. Write `int`, `string`, `bool`, `object`, not `Int32`, `String`, `Boolean`, `Object`.
 
----
 
 ## Null Handling and Expressions
 
@@ -63,7 +60,6 @@ Replace the pattern of checking type with `is` and then casting separately. Use 
 **Rule 16. Prefer ternary expressions over if/else for simple assignments and returns.**
 When a variable is assigned one of two values, or when a method returns one of two values based on a condition, use the conditional (ternary) expression. Reserve if/else blocks for logic with side effects or multiple statements.
 
----
 
 ## Collections and Object Initialization
 
@@ -73,7 +69,6 @@ Initialize collections inline at the point of construction. Write `new List<stri
 **Rule 18. Use object initializers instead of property assignments after construction.**
 Set object properties inline using object initializer syntax. Write `new Order { Id = 1, Total = 99 }` rather than constructing the object first and assigning properties on separate lines.
 
----
 
 ## Member Declarations
 
@@ -89,7 +84,6 @@ Single-expression properties, getters, setters, and indexers may use the `=>` ar
 **Rule 22. Prefer static local functions and static anonymous functions.**
 Local functions and lambda expressions that do not capture any instance state should be declared `static`. This makes the absence of captured state explicit and avoids unintended allocations.
 
----
 
 ## Code Structure and Layout
 
@@ -98,5 +92,3 @@ Local functions and lambda expressions that do not capture any instance state sh
 
 **Rule 24. Place opening braces on their own line (Allman style).**
 The opening curly brace of every block — methods, classes, if statements, loops, object initializers — must appear on a new line, not at the end of the preceding line. `else`, `catch`, and `finally` also each begin on their own line.
-
----

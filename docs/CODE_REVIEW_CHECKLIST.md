@@ -2,7 +2,6 @@
 
 Use this checklist on every pull request before requesting a review, and when reviewing someone else's code. Work through each section top to bottom. A PR is ready to merge only when every applicable item is checked.
 
----
 
 ## 1. Correctness
 
@@ -12,7 +11,6 @@ Use this checklist on every pull request before requesting a review, and when re
 - [ ] No existing tests are broken.
 - [ ] New behaviour is covered by new or updated tests.
 
----
 
 ## 2. Readability
 
@@ -22,7 +20,6 @@ Use this checklist on every pull request before requesting a review, and when re
 - [ ] No dead code, commented-out blocks, or leftover debug statements.
 - [ ] TODOs left in the code reference a ticket or issue number.
 
----
 
 ## 3. File Formatting (Rules 1–5)
 
@@ -32,7 +29,6 @@ Use this checklist on every pull request before requesting a review, and when re
 - [ ] No trailing whitespace on any line.
 - [ ] All files are UTF-8 encoded.
 
----
 
 ## 4. Naming Conventions (Rules 6–10)
 
@@ -42,14 +38,12 @@ Use this checklist on every pull request before requesting a review, and when re
 - [ ] Private and private-protected instance fields use the `_` prefix — e.g. `_userId`.
 - [ ] Parameters and local variables use plain `camelCase` with no prefix.
 
----
 
 ## 5. Types and var (Rules 11–12)
 
 - [ ] `var` is not used anywhere — all types are written out explicitly.
 - [ ] C# language keywords are used instead of BCL names everywhere (`int` not `Int32`, `string` not `String`, `bool` not `Boolean`).
 
----
 
 ## 6. Null Handling and Expressions (Rules 13–16)
 
@@ -58,14 +52,12 @@ Use this checklist on every pull request before requesting a review, and when re
 - [ ] Type checks use pattern matching (`is Type variable`, `is not null`) rather than `is` + separate cast.
 - [ ] Simple conditional assignments and returns use a ternary expression, not an `if/else` block.
 
----
 
 ## 7. Collections and Object Initialization (Rules 17–18)
 
 - [ ] Collections are initialized inline using initializer syntax or collection expressions — no `Add()` calls after an empty constructor.
 - [ ] Objects are initialized inline using object initializer syntax — no property assignments on separate lines after construction.
 
----
 
 ## 8. Member Declarations (Rules 19–22)
 
@@ -74,14 +66,12 @@ Use this checklist on every pull request before requesting a review, and when re
 - [ ] Expression bodies (`=>`) are only used on properties, accessors, and indexers — not on methods or constructors.
 - [ ] Local functions and lambdas that capture no instance state are declared `static`.
 
----
 
 ## 9. Code Structure and Layout (Rules 23–24)
 
 - [ ] All control-flow blocks (`if`, `else`, `for`, `foreach`, `while`, `do`, `using`) use curly braces — no braceless single-line bodies.
 - [ ] Opening braces are on their own line (Allman style). `else`, `catch`, and `finally` each start on a new line.
 
----
 
 ## 10. Design and Architecture
 
@@ -90,12 +80,9 @@ Use this checklist on every pull request before requesting a review, and when re
 - [ ] Public API surface (public methods, types, properties) is intentional — nothing is made public just for convenience or testability.
 - [ ] The change does not introduce circular dependencies between namespaces or layers.
 
----
 
 ## 11. Security and Safety
 
 - [ ] User-supplied input is validated before use.
 - [ ] No secrets, credentials, or personal data are hardcoded or logged.
 - [ ] Disposable resources (`IDisposable`) are wrapped in `using` statements or blocks.
-
----
