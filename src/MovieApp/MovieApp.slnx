@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="MovieApp.Logic/MovieApp.Logic.csproj" />
+  <Project Path="MovieApp.Tests/MovieApp.Tests.csproj" />
+  <Project Path="MovieApp.WebApi/MovieApp.WebApi.csproj" />
+  <Project Path="MovieApp/MovieApp.csproj">
+    <Platform Project="x64" />
+    <Deploy />
+  </Project>
+</Solution>
