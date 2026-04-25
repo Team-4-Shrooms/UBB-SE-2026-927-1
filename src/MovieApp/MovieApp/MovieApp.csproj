@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
@@ -13,6 +13,56 @@
     <EnableMsixTooling>true</EnableMsixTooling>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Features\Events - Copy\**" />
+    <Compile Remove="Features\Inventory - Copy\**" />
+    <Compile Remove="Features\Marketplace - Copy\**" />
+    <Compile Remove="Features\MovieCatalog - Copy\**" />
+    <Compile Remove="Features\MovieSwipe - Copy\**" />
+    <Compile Remove="Features\MovieTournament - Copy\**" />
+    <Compile Remove="Features\PersonalityMatch - Copy\**" />
+    <Compile Remove="Features\ReelsEditing - Copy\**" />
+    <Compile Remove="Features\ReelsFeed - Copy\**" />
+    <Compile Remove="Features\ReelsUpload - Copy\**" />
+    <Compile Remove="Features\TrailerScraping - Copy\**" />
+    <Compile Remove="Features\Wallet - Copy\**" />
+    <EmbeddedResource Remove="Features\Events - Copy\**" />
+    <EmbeddedResource Remove="Features\Inventory - Copy\**" />
+    <EmbeddedResource Remove="Features\Marketplace - Copy\**" />
+    <EmbeddedResource Remove="Features\MovieCatalog - Copy\**" />
+    <EmbeddedResource Remove="Features\MovieSwipe - Copy\**" />
+    <EmbeddedResource Remove="Features\MovieTournament - Copy\**" />
+    <EmbeddedResource Remove="Features\PersonalityMatch - Copy\**" />
+    <EmbeddedResource Remove="Features\ReelsEditing - Copy\**" />
+    <EmbeddedResource Remove="Features\ReelsFeed - Copy\**" />
+    <EmbeddedResource Remove="Features\ReelsUpload - Copy\**" />
+    <EmbeddedResource Remove="Features\TrailerScraping - Copy\**" />
+    <EmbeddedResource Remove="Features\Wallet - Copy\**" />
+    <None Remove="Features\Events - Copy\**" />
+    <None Remove="Features\Inventory - Copy\**" />
+    <None Remove="Features\Marketplace - Copy\**" />
+    <None Remove="Features\MovieCatalog - Copy\**" />
+    <None Remove="Features\MovieSwipe - Copy\**" />
+    <None Remove="Features\MovieTournament - Copy\**" />
+    <None Remove="Features\PersonalityMatch - Copy\**" />
+    <None Remove="Features\ReelsEditing - Copy\**" />
+    <None Remove="Features\ReelsFeed - Copy\**" />
+    <None Remove="Features\ReelsUpload - Copy\**" />
+    <None Remove="Features\TrailerScraping - Copy\**" />
+    <None Remove="Features\Wallet - Copy\**" />
+    <Page Remove="Features\Events - Copy\**" />
+    <Page Remove="Features\Inventory - Copy\**" />
+    <Page Remove="Features\Marketplace - Copy\**" />
+    <Page Remove="Features\MovieCatalog - Copy\**" />
+    <Page Remove="Features\MovieSwipe - Copy\**" />
+    <Page Remove="Features\MovieTournament - Copy\**" />
+    <Page Remove="Features\PersonalityMatch - Copy\**" />
+    <Page Remove="Features\ReelsEditing - Copy\**" />
+    <Page Remove="Features\ReelsFeed - Copy\**" />
+    <Page Remove="Features\ReelsUpload - Copy\**" />
+    <Page Remove="Features\TrailerScraping - Copy\**" />
+    <Page Remove="Features\Wallet - Copy\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -43,6 +93,32 @@
   <ItemGroup>
     <ProjectReference Include="..\MovieApp.Logic\MovieApp.Logic.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Features\Events\Services\" />
+    <Folder Include="Features\Events\ViewModels\" />
+    <Folder Include="Features\Inventory\Services\" />
+    <Folder Include="Features\Inventory\ViewModels\" />
+    <Folder Include="Features\Marketplace\Services\" />
+    <Folder Include="Features\Marketplace\ViewModels\" />
+    <Folder Include="Features\MovieCatalog\Services\" />
+    <Folder Include="Features\MovieCatalog\ViewModels\" />
+    <Folder Include="Features\MovieSwipe\Services\" />
+    <Folder Include="Features\MovieSwipe\ViewModels\" />
+    <Folder Include="Features\MovieTournament\Services\" />
+    <Folder Include="Features\MovieTournament\ViewModels\" />
+    <Folder Include="Features\PersonalityMatch\Services\" />
+    <Folder Include="Features\PersonalityMatch\ViewModels\" />
+    <Folder Include="Features\ReelsEditing\Services\" />
+    <Folder Include="Features\ReelsEditing\ViewModels\" />
+    <Folder Include="Features\ReelsFeed\Services\" />
+    <Folder Include="Features\ReelsFeed\ViewModels\" />
+    <Folder Include="Features\ReelsUpload\Services\" />
+    <Folder Include="Features\ReelsUpload\ViewModels\" />
+    <Folder Include="Features\TrailerScraping\Services\" />
+    <Folder Include="Features\TrailerScraping\ViewModels\" />
+    <Folder Include="Features\Wallet\Services\" />
+    <Folder Include="Features\Wallet\ViewModels\" />
+  </ItemGroup>
 
   <!--
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution
@@ -60,4 +136,114 @@
     <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
     <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
   </PropertyGroup>
+  <ItemGroup>
+    <PRIResource Remove="Features\Events - Copy\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Remove="Features\Inventory - Copy\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Remove="Features\Marketplace - Copy\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Remove="Features\MovieCatalog - Copy\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Remove="Features\MovieSwipe - Copy\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Remove="Features\MovieTournament - Copy\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Remove="Features\PersonalityMatch - Copy\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Remove="Features\ReelsEditing - Copy\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Remove="Features\ReelsFeed - Copy\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Remove="Features\ReelsUpload - Copy\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Remove="Features\TrailerScraping - Copy\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Remove="Features\Wallet - Copy\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Features\Events\Views\EventsPage.xaml" />
+    <None Remove="Features\Inventory\Views\InventoryPage.xaml" />
+    <None Remove="Features\Marketplace\Views\MarketplacePage.xaml" />
+    <None Remove="Features\MovieCatalog\Views\MovieCatalogPage.xaml" />
+    <None Remove="Features\MovieSwipe\Views\MovieSwipePage.xaml" />
+    <None Remove="Features\MovieTournament\Views\MovieTournamentPage.xaml" />
+    <None Remove="Features\PersonalityMatch\Views\PersonalityMatchPage.xaml" />
+    <None Remove="Features\ReelsEditing\Views\ReelsEditingPage.xaml" />
+    <None Remove="Features\ReelsFeed\Views\ReelsFeedPage.xaml" />
+    <None Remove="Features\ReelsUpload\Views\ReelsUploadPage.xaml" />
+    <None Remove="Features\TrailerScraping\Views\TrailerScrapingPage.xaml" />
+    <None Remove="Features\Wallet\Views\WalletPage.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\MovieCatalog\Views\MovieCatalogPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\Wallet\Views\WalletPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\TrailerScraping\Views\TrailerScrapingPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\ReelsUpload\Views\ReelsUploadPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\ReelsFeed\Views\ReelsFeedPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\ReelsEditing\Views\ReelsEditingPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\PersonalityMatch\Views\PersonalityMatchPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\MovieTournament\Views\MovieTournamentPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\Marketplace\Views\MarketplacePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\Inventory\Views\InventoryPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\Events\Views\EventsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\MovieSwipe\Views\MovieSwipePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
 </Project>
