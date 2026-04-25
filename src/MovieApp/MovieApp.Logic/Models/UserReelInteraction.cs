@@ -1,5 +1,3 @@
-using MovieApp.Logic.Data;
-
 namespace MovieApp.Logic.Models
 {
     public class UserReelInteraction
