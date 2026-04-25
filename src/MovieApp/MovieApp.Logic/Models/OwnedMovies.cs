@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-namespace MovieApp.Logic.Models
+﻿namespace MovieApp.Logic.Models
 {
     public class OwnedMovie
     {
