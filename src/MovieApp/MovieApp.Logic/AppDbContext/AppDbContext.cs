@@ -7,7 +7,9 @@ namespace MovieApp.Logic.Data
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) 
+        { 
+        }
 
         // Core
         public DbSet<User> Users { get; set; }
@@ -22,7 +24,7 @@ namespace MovieApp.Logic.Data
         public DbSet<OwnedMovie> OwnedMovies { get; set; }
         public DbSet<OwnedTicket> OwnedTickets { get; set; }
 
-        // Social / PureCaffeine
+        // Social
         public DbSet<Reel> Reels { get; set; }
         public DbSet<MusicTrack> MusicTracks { get; set; }
         public DbSet<ScrapeJob> ScrapeJobs { get; set; }

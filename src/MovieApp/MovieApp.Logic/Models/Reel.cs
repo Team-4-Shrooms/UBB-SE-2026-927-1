@@ -25,10 +25,10 @@ namespace MovieApp.Logic.Models
         /*
         // ── Client-side state (changes at runtime, needs UI notification) ──
         [ObservableProperty]
-        private bool isLiked;
+        private bool _isLiked;
 
         [ObservableProperty]
-        private int likeCount;
+        private int _likeCount;
         */
     }
 }

@@ -26,8 +26,17 @@ namespace MovieApp.Logic.Models
         public string DiscountedPriceText => GetEffectivePrice().ToString("0.00");
 
         public bool HasActiveSale => ActiveSaleDiscountPercent is decimal d && d > 0;
-        public decimal GetEffectivePrice() => HasActiveSale ? decimal.Round(Price * (1 - (ActiveSaleDiscountPercent!.Value / 100m)), 2, MidpointRounding.AwayFromZero) : Price;
-        public decimal GetDiscountedPrice(double discountPercentage) => Price * (1 - (decimal)(discountPercentage / 100.0));
-        public override string ToString() => $"{Title} ({ReleaseYear}) — {Genre}";
+        public decimal GetEffectivePrice()
+        {
+            return HasActiveSale ? decimal.Round(Price * (1 - (ActiveSaleDiscountPercent!.Value / 100m)), 2, MidpointRounding.AwayFromZero) : Price;
+        }
+        public decimal GetDiscountedPrice(double discountPercentage)
+        { 
+            return Price * (1 - (decimal)(discountPercentage / 100.0)); 
+        }
+        public override string ToString()
+        {
+            return $"{Title} ({ReleaseYear}) — {Genre}";
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace MovieApp.Logic.Data
     {
         public AppDbContext CreateDbContext(string[] args)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            DbContextOptionsBuilder<AppDbContext> optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
 
             // Tell it we are using SQL Server. 
             // Note: This connection string is ONLY used to generate the migration files. 

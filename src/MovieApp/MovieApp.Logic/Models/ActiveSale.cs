@@ -9,6 +9,9 @@
 
         public Movie Movie { get; set; }
 
-        public bool IsExpired() => DateTime.Now > EndTime;
+        public bool IsExpired()
+        { 
+            return DateTime.Now > EndTime; 
+        }
     }
 }
