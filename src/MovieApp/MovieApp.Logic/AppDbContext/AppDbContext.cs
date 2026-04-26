@@ -107,6 +107,10 @@ namespace MovieApp.Logic.Data
                 .Property(movieEvent => movieEvent.TicketPrice)
                 .HasPrecision(18, 2);
 
+            modelBuilder.Entity<Movie>()
+                .Property(movie => movie.Rating)
+                .HasPrecision(3, 1);
+
             modelBuilder.Entity<ActiveSale>()
                 .Property(activeSale => activeSale.DiscountPercentage)
                 .HasPrecision(5, 2);

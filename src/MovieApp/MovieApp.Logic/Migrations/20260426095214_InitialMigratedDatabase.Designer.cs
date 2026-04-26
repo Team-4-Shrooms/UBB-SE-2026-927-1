@@ -12,8 +12,8 @@ using MovieApp.Logic.Data;
 namespace MovieApp.Logic.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260425165710_InitialMergedDomain")]
-    partial class InitialMergedDomain
+    [Migration("20260426095214_InitialMigratedDatabase")]
+    partial class InitialMigratedDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -129,8 +129,9 @@ namespace MovieApp.Logic.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("Rating")
-                        .HasColumnType("float");
+                    b.Property<decimal>("Rating")
+                        .HasPrecision(3, 1)
+                        .HasColumnType("decimal(3,1)");
 
                     b.Property<int>("ReleaseYear")
                         .HasColumnType("int");
