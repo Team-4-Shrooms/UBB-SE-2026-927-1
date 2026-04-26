@@ -18,6 +18,6 @@
         public string ImageUrl { get; set; } = string.Empty;
         public EquipmentStatus Status { get; set; } = EquipmentStatus.Available;
 
-        public User Seller { get; set; } // ?
+        public User Seller { get; set; }
     }
 }

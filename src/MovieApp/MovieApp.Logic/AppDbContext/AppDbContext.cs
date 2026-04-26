@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MovieApp.Logic.Models;
-using System.Collections.Generic;
-using System.Reflection.Emit;
 
 namespace MovieApp.Logic.Data
 {
@@ -39,40 +37,83 @@ namespace MovieApp.Logic.Data
 
             // 1-to-1 Relationships
             modelBuilder.Entity<User>()
-                .HasOne(u => u.Profile)
-                .WithOne(p => p.User)
+                .HasOne(user => user.Profile)
+                .WithOne(userProfile => userProfile.User)
                 .HasForeignKey<UserProfile>("UserId");
 
             modelBuilder.Entity<Movie>()
-                .HasOne(m => m.ActiveSale)
-                .WithOne(a => a.Movie)
+                .HasOne(movie => movie.ActiveSale)
+                .WithOne(activeSale => activeSale.Movie)
                 .HasForeignKey<ActiveSale>("MovieId");
 
             // Prevent Multiple Cascade Delete Paths
 
             // Transactions
-            modelBuilder.Entity<Transaction>().HasOne(t => t.Buyer).WithMany(u => u.Purchases).OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<Transaction>().HasOne(t => t.Seller).WithMany(u => u.Sales).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Transaction>()
+                .HasOne(transaction => transaction.Buyer)
+                .WithMany(user => user.Purchases)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Transaction>()
+                .HasOne(transaction => transaction.Seller)
+                .WithMany(user => user.Sales)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Reviews (Restrict deleting a User from wiping out the Movie's review history)
-            modelBuilder.Entity<MovieReview>().HasOne(r => r.User).WithMany().OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<MovieReview>()
+                .HasOne(movieReview => movieReview.User)
+                .WithMany().OnDelete(DeleteBehavior.Restrict);
 
             // Reel Interactions (Restrict User deletion from breaking Reel stats)
-            modelBuilder.Entity<UserReelInteraction>().HasOne(i => i.User).WithMany(u => u.ReelInteractions).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<UserReelInteraction>()
+                .HasOne(userReelInteraction => userReelInteraction.User)
+                .WithMany(user => user.ReelInteractions)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Owned Items
-            modelBuilder.Entity<OwnedMovie>().HasOne(o => o.User).WithMany(u => u.OwnedMovies).OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<OwnedTicket>().HasOne(o => o.User).WithMany(u => u.OwnedTickets).OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<UserMoviePreference>().HasOne(p => p.User).WithMany(u => u.MoviePreferences).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<OwnedMovie>()
+                .HasOne(ownedMovie => ownedMovie.User)
+                .WithMany(user => user.OwnedMovies)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OwnedTicket>()
+                .HasOne(ownedTicket => ownedTicket.User)
+                .WithMany(user => user.OwnedTickets)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<UserMoviePreference>()
+                .HasOne(userMoviePreference => userMoviePreference.User)
+                .WithMany(user => user.MoviePreferences)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Decimal Precisions (Avoid Truncation/Warnings)
-            modelBuilder.Entity<User>().Property(u => u.Balance).HasPrecision(18, 2);
-            modelBuilder.Entity<Movie>().Property(m => m.Price).HasPrecision(18, 2);
-            modelBuilder.Entity<Movie>().Property(m => m.ActiveSaleDiscountPercent).HasPrecision(5, 2);
-            modelBuilder.Entity<Equipment>().Property(e => e.Price).HasPrecision(18, 2);
-            modelBuilder.Entity<MovieEvent>().Property(e => e.TicketPrice).HasPrecision(18, 2);
-            modelBuilder.Entity<ActiveSale>().Property(a => a.DiscountPercentage).HasPrecision(5, 2);
-            modelBuilder.Entity<Transaction>().Property(t => t.Amount).HasPrecision(18, 2);
+            modelBuilder.Entity<User>()
+                .Property(user => user.Balance)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Movie>()
+                .Property(movie => movie.Price)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Movie>()
+                .Property(movie => movie.ActiveSaleDiscountPercent)
+                .HasPrecision(5, 2);
+
+            modelBuilder.Entity<Equipment>()
+                .Property(equipment => equipment.Price)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<MovieEvent>()
+                .Property(movieEvent => movieEvent.TicketPrice)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<ActiveSale>()
+                .Property(activeSale => activeSale.DiscountPercentage)
+                .HasPrecision(5, 2);
+
+            modelBuilder.Entity<Transaction>()
+                .Property(transaction => transaction.Amount)
+                .HasPrecision(18, 2);
         }
     }
 }

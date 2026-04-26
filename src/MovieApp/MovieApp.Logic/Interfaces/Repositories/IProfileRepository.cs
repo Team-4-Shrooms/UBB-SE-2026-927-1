@@ -8,13 +8,17 @@ namespace MovieApp.Logic.Interfaces.Repositories
     public interface IProfileRepository
     {
         /// <summary>
-        /// Retrieves the cached engagement profile for a user.
+        /// Retrieves the engagement profile for a user.
         /// </summary>
         /// <param name="userId">The ID of the user.</param>
         /// <returns>The user's engagement profile, or null if no profile exists.</returns>
         Task<UserProfile?> GetProfileAsync(int userId);
 
-        /// <summary>Builds an engagement profile by aggregating user interaction data.</summary>
+        /// <summary>
+        /// Builds an engagement profile by aggregating user interaction data.
+        /// </summary>
+        /// <param name="userId">The ID of the user for whom to build the profile.</param>
+        /// <returns>The constructed user profile based on interactions, or null if no interactions exist.</returns>
         Task<UserProfile> BuildProfileFromInteractionsAsync(int userId);
 
         /// <summary>
