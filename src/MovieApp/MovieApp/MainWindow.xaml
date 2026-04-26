@@ -9,11 +9,34 @@
     mc:Ignorable="d"
     Title="MovieApp">
 
+    <NavigationView
+        x:Name="NavView"
+        IsBackButtonVisible="Collapsed"
+        IsSettingsVisible="False"
+        PaneDisplayMode="Left"
+        SelectionChanged="NavView_SelectionChanged"
+        >
+
+        <NavigationView.MenuItems>
+            <NavigationViewItem Content="Reels Upload" Tag="ReelsUpload" Icon="Upload"/>
+            <NavigationViewItem Content="Trailer Scraping" Tag="TrailerScraping" Icon="Globe"/>
+            <NavigationViewItem Content="Reels Editing" Tag="ReelsEditing" Icon="Edit"/>
+            <NavigationViewItem Content="Movie Swipe" Tag="MovieSwipe" Icon="Shuffle"/>
+            <NavigationViewItem Content="Movie Tournament" Tag="MovieTournament" Icon="FourBars"/>
+            <NavigationViewItem Content="Personality Match" Tag="PersonalityMatch" Icon="People"/>
+            <NavigationViewItem Content="Reels Feed" Tag="ReelsFeed" Icon="Video"/>
+            <NavigationViewItem Content="Movie Catalog" Tag="MovieCatalog" Icon="Library"/>
+            <NavigationViewItem Content="Marketplace" Tag="Marketplace" Icon="Shop"/>
+            <NavigationViewItem Content="Events" Tag="Events" Icon="Calendar"/>
+            <NavigationViewItem Content="Inventory" Tag="Inventory" Icon="AllApps"/>
+            <NavigationViewItem Content="Wallet" Tag="Wallet" Icon="PreviewLink"/>
+        </NavigationView.MenuItems>
+
+        <Frame x:Name="ContentFrame" />
+    </NavigationView>
+
     <Window.SystemBackdrop>
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid>
-
-    </Grid>
 </Window>

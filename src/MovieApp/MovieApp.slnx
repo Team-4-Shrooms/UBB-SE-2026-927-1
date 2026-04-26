@@ -1,7 +1,17 @@
 <Solution>
-  <Project Path="MovieApp.Logic/MovieApp.Logic.csproj" />
-  <Project Path="MovieApp.Tests/MovieApp.Tests.csproj" />
-  <Project Path="MovieApp.WebApi/MovieApp.WebApi.csproj" />
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="MovieApp.Logic/MovieApp.Logic.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+  <Project Path="MovieApp.Tests/MovieApp.Tests.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+  <Project Path="MovieApp.WebApi/MovieApp.WebApi.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
   <Project Path="MovieApp/MovieApp.csproj">
     <Platform Project="x64" />
     <Deploy />
