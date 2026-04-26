@@ -1,6 +1,6 @@
-﻿namespace MovieApp.Logic
+namespace MovieApp.Logic
 {
-    public class Class1
+    public sealed class Class1
     {
 
     }
