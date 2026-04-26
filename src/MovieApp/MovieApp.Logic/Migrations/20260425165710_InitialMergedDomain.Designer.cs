@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MovieApp.Logic.Data;
 
@@ -11,9 +12,11 @@ using MovieApp.Logic.Data;
 namespace MovieApp.Logic.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260425165710_InitialMergedDomain")]
+    partial class InitialMergedDomain
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -126,9 +129,8 @@ namespace MovieApp.Logic.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Rating")
-                        .HasPrecision(3, 1)
-                        .HasColumnType("decimal(3,1)");
+                    b.Property<double>("Rating")
+                        .HasColumnType("float");
 
                     b.Property<int>("ReleaseYear")
                         .HasColumnType("int");
@@ -235,9 +237,8 @@ namespace MovieApp.Logic.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("DurationSeconds")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("DurationSeconds")
+                        .HasColumnType("float");
 
                     b.Property<string>("TrackName")
                         .IsRequired()
@@ -324,9 +325,8 @@ namespace MovieApp.Logic.Migrations
                     b.Property<string>("CropDataJson")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("FeatureDurationSeconds")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("FeatureDurationSeconds")
+                        .HasColumnType("float");
 
                     b.Property<string>("Genre")
                         .HasColumnType("nvarchar(max)");
@@ -535,9 +535,8 @@ namespace MovieApp.Logic.Migrations
                     b.Property<int?>("ReelId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Score")
-                        .HasPrecision(8, 4)
-                        .HasColumnType("decimal(8,4)");
+                    b.Property<double>("Score")
+                        .HasColumnType("float");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -561,16 +560,14 @@ namespace MovieApp.Logic.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("AverageWatchTimeSeconds")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("AvgWatchTimeSec")
+                        .HasColumnType("float");
 
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("LikeToViewRatio")
-                        .HasPrecision(8, 4)
-                        .HasColumnType("decimal(8,4)");
+                    b.Property<double>("LikeToViewRatio")
+                        .HasColumnType("float");
 
                     b.Property<int>("TotalClipsViewed")
                         .HasColumnType("int");
@@ -578,7 +575,7 @@ namespace MovieApp.Logic.Migrations
                     b.Property<int>("TotalLikes")
                         .HasColumnType("int");
 
-                    b.Property<long>("TotalWatchTimeSeconds")
+                    b.Property<long>("TotalWatchTimeSec")
                         .HasColumnType("bigint");
 
                     b.Property<int>("UserId")
@@ -612,12 +609,11 @@ namespace MovieApp.Logic.Migrations
                     b.Property<DateTime>("ViewedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("WatchDurationSeconds")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("WatchDurationSec")
+                        .HasColumnType("float");
 
-                    b.Property<decimal>("WatchPercentage")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("WatchPercentage")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 

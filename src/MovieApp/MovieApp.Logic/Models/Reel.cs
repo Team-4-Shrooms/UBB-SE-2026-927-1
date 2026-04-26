@@ -9,7 +9,7 @@ namespace MovieApp.Logic.Models
         public string ThumbnailUrl { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
         public string Caption { get; set; } = string.Empty;
-        public double FeatureDurationSeconds { get; set; }
+        public decimal FeatureDurationSeconds { get; set; }
         public string? CropDataJson { get; set; }
         public int? BackgroundMusicId { get; set; }
         public string Source { get; set; } = string.Empty;

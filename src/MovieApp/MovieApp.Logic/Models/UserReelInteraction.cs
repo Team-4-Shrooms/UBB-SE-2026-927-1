@@ -4,8 +4,8 @@ namespace MovieApp.Logic.Models
     {
         public long Id { get; set; }
         public bool IsLiked { get; set; }
-        public double WatchDurationSec { get; set; }
-        public double WatchPercentage { get; set; }
+        public decimal WatchDurationSeconds { get; set; }
+        public decimal WatchPercentage { get; set; }
         public DateTime ViewedAt { get; set; }
 
         public User User { get; set; }

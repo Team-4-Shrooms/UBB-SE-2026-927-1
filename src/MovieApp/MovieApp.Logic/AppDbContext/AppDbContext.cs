@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MovieApp.Logic.Models;
 
 namespace MovieApp.Logic.Data
@@ -117,6 +117,30 @@ namespace MovieApp.Logic.Data
 
             modelBuilder.Entity<Transaction>()
                 .Property(transaction => transaction.Amount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<MusicTrack>()
+                .Property(musicTrack => musicTrack.DurationSeconds)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Reel>()
+                .Property(reel => reel.FeatureDurationSeconds)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<UserMoviePreference>()
+                .Property(preference => preference.Score)
+                .HasPrecision(8, 4);
+
+            modelBuilder.Entity<UserProfile>()
+                .Property(profile => profile.AverageWatchTimeSeconds)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<UserProfile>()
+                .Property(profile => profile.LikeToViewRatio)
+                .HasPrecision(8, 4);
+
+            modelBuilder.Entity<UserReelInteraction>()
+                .Property(interaction => interaction.WatchDurationSeconds)
                 .HasPrecision(18, 2);
         }
     }
