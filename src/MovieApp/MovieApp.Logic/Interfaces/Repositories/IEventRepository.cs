@@ -13,7 +13,7 @@ namespace MovieApp.Logic.Interfaces.Repositories
         /// </summary>
         /// <param name="movieId">The unique identifier of the movie for which to retrieve events. 
         /// Must correspond to an existing movie.</param>
-        /// <returns>List of <see cref="MovieEvent"/> objects representing the events for the specified movie.
+        /// <returns>List of <see cref="MovieEvent"/> objects representing the events for the specified movie.</returns>
         List<MovieEvent> GetEventsForMovie(int movieId);
 
         /// <summary>

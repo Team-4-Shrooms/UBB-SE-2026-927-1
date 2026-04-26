@@ -23,7 +23,7 @@ namespace MovieApp.Logic.Interfaces.Repositories
         /// Purchases a piece of equipment from the marketplace, transferring ownership to the buyer and removing it from the list of available items.
         /// </summary>
         /// <param name="equipmentId">The unique identifier of the equipment being purchased. Must correspond to an available item in the marketplace.</param>
-        /// <param name="buyerId">The unique identifier of the user making the purchase. Must correspond to an existing user.</param>`
+        /// <param name="buyerId">The unique identifier of the user making the purchase. Must correspond to an existing user.</param>
         /// <param name="price">The price at which the equipment is being purchased. Must be a non-negative value and should match the listed price of the equipment.</param>
         /// <param name="address">The address to which the equipment should be shipped. Must be a valid shipping address.</param>
         void PurchaseEquipment(int equipmentId, int buyerId, decimal price, string address);
