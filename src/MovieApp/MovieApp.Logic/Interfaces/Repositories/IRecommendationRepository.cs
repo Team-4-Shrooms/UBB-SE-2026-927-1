@@ -1,4 +1,4 @@
-﻿using MovieApp.Logic.Models;
+using MovieApp.Logic.Models;
 
 namespace MovieApp.Logic.Interfaces.Repositories
 {
@@ -26,7 +26,7 @@ namespace MovieApp.Logic.Interfaces.Repositories
         /// </summary>
         /// <param name="userId">The unique identifier of the user for whom to retrieve preference scores. Must correspond to an existing user.</param>
         /// <returns>A dictionary where the key is the movie ID and the value is the user's preference score for that movie.</returns>
-        Task<Dictionary<int, double>> GetUserPreferenceScoresAsync(int userId);
+        Task<Dictionary<int, decimal>> GetUserPreferenceScoresAsync(int userId);
 
         /// <summary>
         /// Retrieves all like counts grouped by reel (no date filtering).

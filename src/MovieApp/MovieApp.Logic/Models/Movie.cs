@@ -30,9 +30,9 @@ namespace MovieApp.Logic.Models
         {
             return HasActiveSale ? decimal.Round(Price * (1 - (ActiveSaleDiscountPercent!.Value / 100m)), 2, MidpointRounding.AwayFromZero) : Price;
         }
-        public decimal GetDiscountedPrice(double discountPercentage)
+        public decimal GetDiscountedPrice(decimal discountPercentage)
         { 
-            return Price * (1 - (decimal)(discountPercentage / 100.0)); 
+            return Price * (1 - (discountPercentage / 100.0m)); 
         }
         public override string ToString()
         {

@@ -1,4 +1,4 @@
-﻿namespace MovieApp.Logic.Interfaces.Repositories
+namespace MovieApp.Logic.Interfaces.Repositories
 {
     /// <summary>
     /// Repository for managing user movie preferences in the reels feed context.
@@ -14,11 +14,11 @@
         /// <summary>
         /// Inserts a new preference with the provided initial score.
         /// </summary>
-        Task InsertPreferenceAsync(int userId, int movieId, double score);
+        Task InsertPreferenceAsync(int userId, int movieId, decimal score);
 
         /// <summary>
         /// Updates an existing preference by adding the provided boost to the current score.
         /// </summary>
-        Task UpdatePreferenceAsync(int userId, int movieId, double boost);
+        Task UpdatePreferenceAsync(int userId, int movieId, decimal boost);
     }
 }

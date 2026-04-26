@@ -1,4 +1,4 @@
-﻿using MovieApp.Logic.Models;
+using MovieApp.Logic.Models;
 
 namespace MovieApp.Logic.Interfaces.Repositories
 {
@@ -35,10 +35,10 @@ namespace MovieApp.Logic.Interfaces.Repositories
         /// </summary>
         /// <param name="userId">The ID of the user.</param>
         /// <param name="reelId">The ID of the reel.</param>
-        /// <param name="watchDurationSec">The duration watched in seconds.</param>
+        /// <param name="watchDurationSeconds">The duration watched in seconds.</param>
         /// <param name="watchPercentage">The percentage of the reel watched (0-100).</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        Task UpdateViewDataAsync(int userId, int reelId, double watchDurationSec, double watchPercentage);
+        Task UpdateViewDataAsync(int userId, int reelId, decimal watchDurationSeconds, decimal watchPercentage);
 
         /// <summary>
         /// Retrieves the interaction between a user and a reel.
