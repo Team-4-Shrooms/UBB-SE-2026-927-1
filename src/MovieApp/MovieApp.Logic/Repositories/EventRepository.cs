@@ -55,21 +55,18 @@ namespace MovieApp.Logic.Repositories
             {
                 throw new InvalidOperationException("User not found.");
             }
-
             MovieEvent? movieEvent = _context.MovieEvents
                 .FirstOrDefault(candidate => candidate.Id == eventId);
             if (movieEvent is null)
             {
                 throw new InvalidOperationException("Event not found.");
             }
-
             bool alreadyOwned = _context.OwnedTickets
                 .Any(ownedTicket => ownedTicket.User.Id == userId && ownedTicket.Event.Id == eventId);
             if (alreadyOwned)
             {
                 throw new InvalidOperationException("You already own a ticket for this event.");
             }
-
             decimal price = movieEvent.TicketPrice;
             if (user.Balance < price)
             {

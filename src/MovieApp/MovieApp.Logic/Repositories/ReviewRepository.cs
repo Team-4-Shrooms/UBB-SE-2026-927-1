@@ -36,13 +36,11 @@ namespace MovieApp.Logic.Repositories
             {
                 throw new InvalidOperationException("Movie not found.");
             }
-
             User? user = _context.Users.FirstOrDefault(candidate => candidate.Id == userId);
             if (user is null)
             {
                 throw new InvalidOperationException("User not found.");
             }
-
             string? sanitizedComment = string.IsNullOrWhiteSpace(comment) ? null : comment;
 
             MovieReview review = new MovieReview
@@ -98,7 +96,6 @@ namespace MovieApp.Logic.Repositories
                 {
                     bucket = MinStarRating;
                 }
-
                 if (bucket > MaxStarRating)
                 {
                     bucket = MaxStarRating;

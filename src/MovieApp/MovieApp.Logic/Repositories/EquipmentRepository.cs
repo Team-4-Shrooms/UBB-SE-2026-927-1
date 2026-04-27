@@ -51,7 +51,6 @@ namespace MovieApp.Logic.Repositories
             {
                 throw new InvalidOperationException("Equipment not found.");
             }
-
             User? buyer = _context.Users.FirstOrDefault(candidate => candidate.Id == buyerId);
             if (buyer is null)
             {

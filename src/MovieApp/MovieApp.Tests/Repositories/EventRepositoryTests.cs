@@ -16,7 +16,7 @@ namespace MovieApp.Tests.Repositories
         }
 
         [Fact]
-        public void GetAllEvents_ReturnsOrderedByDate()
+        public void GetAllEvents_ReturnsCorrectCount()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             Movie movie = BuildMovie();
@@ -30,12 +30,29 @@ namespace MovieApp.Tests.Repositories
             List<MovieEvent> result = repository.GetAllEvents();
 
             Assert.Equal(2, result.Count);
-            Assert.Equal("Early", result[0].Title);
-            Assert.Equal("Late", result[1].Title);
         }
 
         [Fact]
-        public void GetEventsForMovie_FiltersByMovieId()
+        public void GetAllEvents_OrdersByDateAscending()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            Movie movie = BuildMovie();
+            context.Movies.Add(movie);
+            context.MovieEvents.AddRange(
+                BuildEvent(movie, "Late", DateTime.UtcNow.AddDays(10)),
+                BuildEvent(movie, "Early", DateTime.UtcNow.AddDays(1)));
+            context.SaveChanges();
+
+            EventRepository repository = new EventRepository(context);
+            List<string> titles = repository.GetAllEvents()
+                .Select(movieEvent => movieEvent.Title)
+                .ToList();
+
+            Assert.Equal(new[] { "Early", "Late" }, titles);
+        }
+
+        [Fact]
+        public void GetEventsForMovie_ReturnsOnlyEventsForRequestedMovie()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             Movie movieA = BuildMovie();
@@ -50,11 +67,28 @@ namespace MovieApp.Tests.Repositories
             List<MovieEvent> result = repository.GetEventsForMovie(movieA.Id);
 
             Assert.Single(result);
+        }
+
+        [Fact]
+        public void GetEventsForMovie_ResultMatchesRequestedMovieTitle()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            Movie movieA = BuildMovie();
+            Movie movieB = BuildMovie();
+            context.Movies.AddRange(movieA, movieB);
+            context.MovieEvents.AddRange(
+                BuildEvent(movieA, "A1", DateTime.UtcNow.AddDays(1)),
+                BuildEvent(movieB, "B1", DateTime.UtcNow.AddDays(2)));
+            context.SaveChanges();
+
+            EventRepository repository = new EventRepository(context);
+            List<MovieEvent> result = repository.GetEventsForMovie(movieA.Id);
+
             Assert.Equal("A1", result[0].Title);
         }
 
         [Fact]
-        public void GetEventById_ExistingId_ReturnsEvent()
+        public void GetEventById_ExistingId_ReturnsEventWithMatchingTitle()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             Movie movie = BuildMovie();
@@ -66,7 +100,6 @@ namespace MovieApp.Tests.Repositories
             EventRepository repository = new EventRepository(context);
             MovieEvent? result = repository.GetEventById(movieEvent.Id);
 
-            Assert.NotNull(result);
             Assert.Equal("Show", result!.Title);
         }
 
@@ -80,17 +113,25 @@ namespace MovieApp.Tests.Repositories
         }
 
         [Fact]
-        public void PurchaseTicket_InvalidUserId_Throws()
+        public void PurchaseTicket_ZeroUserId_Throws()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             EventRepository repository = new EventRepository(context);
 
             Assert.Throws<InvalidOperationException>(() => repository.PurchaseTicket(0, 1));
+        }
+
+        [Fact]
+        public void PurchaseTicket_NegativeUserId_Throws()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            EventRepository repository = new EventRepository(context);
+
             Assert.Throws<InvalidOperationException>(() => repository.PurchaseTicket(-1, 1));
         }
 
         [Fact]
-        public void PurchaseTicket_HappyPath_DeductsBalanceAndCreatesOwnership()
+        public void PurchaseTicket_HappyPath_DeductsBalance()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             User user = BuildUser(100m);
@@ -106,7 +147,43 @@ namespace MovieApp.Tests.Repositories
             repository.PurchaseTicket(user.Id, movieEvent.Id);
 
             Assert.Equal(75m, context.Users.Single().Balance);
+        }
+
+        [Fact]
+        public void PurchaseTicket_HappyPath_CreatesOwnership()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            User user = BuildUser(100m);
+            Movie movie = BuildMovie();
+            MovieEvent movieEvent = BuildEvent(movie, "Show", DateTime.UtcNow.AddDays(1));
+            movieEvent.TicketPrice = 25m;
+            context.Users.Add(user);
+            context.Movies.Add(movie);
+            context.MovieEvents.Add(movieEvent);
+            context.SaveChanges();
+
+            EventRepository repository = new EventRepository(context);
+            repository.PurchaseTicket(user.Id, movieEvent.Id);
+
             Assert.Single(context.OwnedTickets);
+        }
+
+        [Fact]
+        public void PurchaseTicket_HappyPath_LogsTransaction()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            User user = BuildUser(100m);
+            Movie movie = BuildMovie();
+            MovieEvent movieEvent = BuildEvent(movie, "Show", DateTime.UtcNow.AddDays(1));
+            movieEvent.TicketPrice = 25m;
+            context.Users.Add(user);
+            context.Movies.Add(movie);
+            context.MovieEvents.Add(movieEvent);
+            context.SaveChanges();
+
+            EventRepository repository = new EventRepository(context);
+            repository.PurchaseTicket(user.Id, movieEvent.Id);
+
             Assert.Single(context.Transactions);
         }
 

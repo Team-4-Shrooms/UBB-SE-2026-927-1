@@ -46,47 +46,47 @@ namespace MovieApp.Tests.Repositories
         }
 
         [Fact]
-        public void GetOwnedEquipment_ReturnsEquipmentBoughtByUser()
+        public void GetOwnedEquipment_ReturnsEquipmentBoughtByUser_ReturnsSingleItem()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             User buyer = BuildUser();
             User seller = BuildUser();
             seller.Username = "seller";
             seller.Email = "seller@example.com";
-            Equipment equipment = new Equipment
-            {
-                Title = "Camera",
-                Category = "Cameras",
-                Description = "desc",
-                Condition = "New",
-                Price = 100m,
-                ImageUrl = "https://example.com/camera.jpg",
-                Status = EquipmentStatus.Sold,
-                Seller = seller
-            };
+            Equipment equipment = BuildEquipment(seller);
             context.Users.AddRange(buyer, seller);
             context.Equipment.Add(equipment);
-            context.Transactions.Add(new Transaction
-            {
-                Buyer = buyer,
-                Seller = seller,
-                Equipment = equipment,
-                Amount = -100m,
-                Type = "EquipmentPurchase",
-                Status = "Completed",
-                Timestamp = DateTime.UtcNow
-            });
+            context.Transactions.Add(BuildEquipmentPurchase(buyer, seller, equipment));
             context.SaveChanges();
 
             InventoryRepository repository = new InventoryRepository(context);
             List<Equipment> result = repository.GetOwnedEquipment(buyer.Id);
 
             Assert.Single(result);
+        }
+
+        [Fact]
+        public void GetOwnedEquipment_ReturnsEquipmentBoughtByUser_ResultHasMatchingTitle()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            User buyer = BuildUser();
+            User seller = BuildUser();
+            seller.Username = "seller";
+            seller.Email = "seller@example.com";
+            Equipment equipment = BuildEquipment(seller);
+            context.Users.AddRange(buyer, seller);
+            context.Equipment.Add(equipment);
+            context.Transactions.Add(BuildEquipmentPurchase(buyer, seller, equipment));
+            context.SaveChanges();
+
+            InventoryRepository repository = new InventoryRepository(context);
+            List<Equipment> result = repository.GetOwnedEquipment(buyer.Id);
+
             Assert.Equal("Camera", result[0].Title);
         }
 
         [Fact]
-        public void RemoveOwnedMovie_RemovesOwnershipAndLogsTransaction()
+        public void RemoveOwnedMovie_RemovesOwnership()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             User user = BuildUser();
@@ -100,8 +100,40 @@ namespace MovieApp.Tests.Repositories
             repository.RemoveOwnedMovie(user.Id, movie.Id);
 
             Assert.Empty(context.OwnedMovies);
-            Transaction transaction = Assert.Single(context.Transactions);
-            Assert.Equal("RemoveOwnedMovie", transaction.Type);
+        }
+
+        [Fact]
+        public void RemoveOwnedMovie_LogsSingleTransaction()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            User user = BuildUser();
+            Movie movie = BuildMovie("M");
+            context.Users.Add(user);
+            context.Movies.Add(movie);
+            context.OwnedMovies.Add(new OwnedMovie { User = user, Movie = movie });
+            context.SaveChanges();
+
+            InventoryRepository repository = new InventoryRepository(context);
+            repository.RemoveOwnedMovie(user.Id, movie.Id);
+
+            Assert.Single(context.Transactions);
+        }
+
+        [Fact]
+        public void RemoveOwnedMovie_LogsTransactionWithRemoveType()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            User user = BuildUser();
+            Movie movie = BuildMovie("M");
+            context.Users.Add(user);
+            context.Movies.Add(movie);
+            context.OwnedMovies.Add(new OwnedMovie { User = user, Movie = movie });
+            context.SaveChanges();
+
+            InventoryRepository repository = new InventoryRepository(context);
+            repository.RemoveOwnedMovie(user.Id, movie.Id);
+
+            Assert.Equal("RemoveOwnedMovie", context.Transactions.Single().Type);
         }
 
         [Fact]
@@ -111,11 +143,12 @@ namespace MovieApp.Tests.Repositories
             InventoryRepository repository = new InventoryRepository(context);
 
             Exception? exception = Record.Exception(() => repository.RemoveOwnedMovie(0, 1));
+
             Assert.Null(exception);
         }
 
         [Fact]
-        public void RemoveOwnedTicket_RemovesOwnershipAndLogsTransaction()
+        public void RemoveOwnedTicket_RemovesOwnership()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             User user = BuildUser();
@@ -131,8 +164,44 @@ namespace MovieApp.Tests.Repositories
             repository.RemoveOwnedTicket(user.Id, movieEvent.Id);
 
             Assert.Empty(context.OwnedTickets);
-            Transaction transaction = Assert.Single(context.Transactions);
-            Assert.Equal("RemoveOwnedTicket", transaction.Type);
+        }
+
+        [Fact]
+        public void RemoveOwnedTicket_LogsSingleTransaction()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            User user = BuildUser();
+            Movie movie = BuildMovie("M");
+            MovieEvent movieEvent = BuildEvent(movie);
+            context.Users.Add(user);
+            context.Movies.Add(movie);
+            context.MovieEvents.Add(movieEvent);
+            context.OwnedTickets.Add(new OwnedTicket { User = user, Event = movieEvent });
+            context.SaveChanges();
+
+            InventoryRepository repository = new InventoryRepository(context);
+            repository.RemoveOwnedTicket(user.Id, movieEvent.Id);
+
+            Assert.Single(context.Transactions);
+        }
+
+        [Fact]
+        public void RemoveOwnedTicket_LogsTransactionWithRemoveType()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            User user = BuildUser();
+            Movie movie = BuildMovie("M");
+            MovieEvent movieEvent = BuildEvent(movie);
+            context.Users.Add(user);
+            context.Movies.Add(movie);
+            context.MovieEvents.Add(movieEvent);
+            context.OwnedTickets.Add(new OwnedTicket { User = user, Event = movieEvent });
+            context.SaveChanges();
+
+            InventoryRepository repository = new InventoryRepository(context);
+            repository.RemoveOwnedTicket(user.Id, movieEvent.Id);
+
+            Assert.Equal("RemoveOwnedTicket", context.Transactions.Single().Type);
         }
 
         [Fact]
@@ -142,7 +211,37 @@ namespace MovieApp.Tests.Repositories
             InventoryRepository repository = new InventoryRepository(context);
 
             Exception? exception = Record.Exception(() => repository.RemoveOwnedTicket(-1, 1));
+
             Assert.Null(exception);
+        }
+
+        private static Equipment BuildEquipment(User seller)
+        {
+            return new Equipment
+            {
+                Title = "Camera",
+                Category = "Cameras",
+                Description = "desc",
+                Condition = "New",
+                Price = 100m,
+                ImageUrl = "https://example.com/camera.jpg",
+                Status = EquipmentStatus.Sold,
+                Seller = seller
+            };
+        }
+
+        private static Transaction BuildEquipmentPurchase(User buyer, User seller, Equipment equipment)
+        {
+            return new Transaction
+            {
+                Buyer = buyer,
+                Seller = seller,
+                Equipment = equipment,
+                Amount = -100m,
+                Type = "EquipmentPurchase",
+                Status = "Completed",
+                Timestamp = DateTime.UtcNow
+            };
         }
 
         private static User BuildUser()

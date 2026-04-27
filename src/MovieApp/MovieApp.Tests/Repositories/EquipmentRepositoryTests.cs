@@ -14,12 +14,11 @@ namespace MovieApp.Tests.Repositories
 
             List<Equipment> result = repository.FetchAvailableEquipment();
 
-            Assert.NotNull(result);
             Assert.Empty(result);
         }
 
         [Fact]
-        public void FetchAvailableEquipment_OnlyReturnsAvailable()
+        public void FetchAvailableEquipment_OnlyReturnsAvailable_ReturnsCorrectCount()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             User seller = BuildSeller();
@@ -34,11 +33,30 @@ namespace MovieApp.Tests.Repositories
             List<Equipment> result = repository.FetchAvailableEquipment();
 
             Assert.Equal(2, result.Count);
-            Assert.All(result, item => Assert.Equal(EquipmentStatus.Available, item.Status));
         }
 
         [Fact]
-        public void ListItem_AddsItemAsAvailable()
+        public void FetchAvailableEquipment_OnlyReturnsAvailable_AllStatusesAreAvailable()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            User seller = BuildSeller();
+            context.Users.Add(seller);
+            context.Equipment.AddRange(
+                BuildEquipment(seller, "Camera", EquipmentStatus.Available),
+                BuildEquipment(seller, "Mic", EquipmentStatus.Sold),
+                BuildEquipment(seller, "Tripod", EquipmentStatus.Available));
+            context.SaveChanges();
+
+            EquipmentRepository repository = new EquipmentRepository(context);
+            List<Equipment> result = repository.FetchAvailableEquipment();
+
+            bool allAvailable = result.All(item => item.Status == EquipmentStatus.Available);
+
+            Assert.True(allAvailable);
+        }
+
+        [Fact]
+        public void ListItem_StoresItemWithMatchingTitle()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             User seller = BuildSeller();
@@ -49,23 +67,30 @@ namespace MovieApp.Tests.Repositories
             Equipment item = BuildEquipment(seller, "Lens", EquipmentStatus.Sold);
             repository.ListItem(item);
 
-            Equipment stored = context.Equipment.Single();
-            Assert.Equal("Lens", stored.Title);
-            Assert.Equal(EquipmentStatus.Available, stored.Status);
+            Assert.Equal("Lens", context.Equipment.Single().Title);
         }
 
         [Fact]
-        public void PurchaseEquipment_HappyPath_MarksSoldAndLogsTransaction()
+        public void ListItem_ForcesStatusToAvailable()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             User seller = BuildSeller();
-            User buyer = new User
-            {
-                Username = "buyer",
-                Email = "buyer@example.com",
-                PasswordHash = "hash",
-                Balance = 500m
-            };
+            context.Users.Add(seller);
+            context.SaveChanges();
+
+            EquipmentRepository repository = new EquipmentRepository(context);
+            Equipment item = BuildEquipment(seller, "Lens", EquipmentStatus.Sold);
+            repository.ListItem(item);
+
+            Assert.Equal(EquipmentStatus.Available, context.Equipment.Single().Status);
+        }
+
+        [Fact]
+        public void PurchaseEquipment_HappyPath_MarksItemAsSold()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            User seller = BuildSeller();
+            User buyer = BuildBuyer(500m);
             context.Users.AddRange(seller, buyer);
             Equipment item = BuildEquipment(seller, "Camera", EquipmentStatus.Available);
             item.Price = 200m;
@@ -76,10 +101,60 @@ namespace MovieApp.Tests.Repositories
             repository.PurchaseEquipment(item.Id, buyer.Id, 200m, "1 Test Street");
 
             Assert.Equal(EquipmentStatus.Sold, context.Equipment.Single().Status);
+        }
+
+        [Fact]
+        public void PurchaseEquipment_HappyPath_DeductsBuyerBalance()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            User seller = BuildSeller();
+            User buyer = BuildBuyer(500m);
+            context.Users.AddRange(seller, buyer);
+            Equipment item = BuildEquipment(seller, "Camera", EquipmentStatus.Available);
+            item.Price = 200m;
+            context.Equipment.Add(item);
+            context.SaveChanges();
+
+            EquipmentRepository repository = new EquipmentRepository(context);
+            repository.PurchaseEquipment(item.Id, buyer.Id, 200m, "1 Test Street");
+
             Assert.Equal(300m, context.Users.Single(user => user.Id == buyer.Id).Balance);
-            Transaction transaction = Assert.Single(context.Transactions);
-            Assert.Equal(-200m, transaction.Amount);
-            Assert.Equal("1 Test Street", transaction.ShippingAddress);
+        }
+
+        [Fact]
+        public void PurchaseEquipment_HappyPath_LogsNegativeTransactionAmount()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            User seller = BuildSeller();
+            User buyer = BuildBuyer(500m);
+            context.Users.AddRange(seller, buyer);
+            Equipment item = BuildEquipment(seller, "Camera", EquipmentStatus.Available);
+            item.Price = 200m;
+            context.Equipment.Add(item);
+            context.SaveChanges();
+
+            EquipmentRepository repository = new EquipmentRepository(context);
+            repository.PurchaseEquipment(item.Id, buyer.Id, 200m, "1 Test Street");
+
+            Assert.Equal(-200m, context.Transactions.Single().Amount);
+        }
+
+        [Fact]
+        public void PurchaseEquipment_HappyPath_StoresShippingAddress()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            User seller = BuildSeller();
+            User buyer = BuildBuyer(500m);
+            context.Users.AddRange(seller, buyer);
+            Equipment item = BuildEquipment(seller, "Camera", EquipmentStatus.Available);
+            item.Price = 200m;
+            context.Equipment.Add(item);
+            context.SaveChanges();
+
+            EquipmentRepository repository = new EquipmentRepository(context);
+            repository.PurchaseEquipment(item.Id, buyer.Id, 200m, "1 Test Street");
+
+            Assert.Equal("1 Test Street", context.Transactions.Single().ShippingAddress);
         }
 
         [Fact]
@@ -100,6 +175,17 @@ namespace MovieApp.Tests.Repositories
                 Email = "seller@example.com",
                 PasswordHash = "hash",
                 Balance = 0m
+            };
+        }
+
+        private static User BuildBuyer(decimal balance)
+        {
+            return new User
+            {
+                Username = "buyer",
+                Email = "buyer@example.com",
+                PasswordHash = "hash",
+                Balance = balance
             };
         }
 

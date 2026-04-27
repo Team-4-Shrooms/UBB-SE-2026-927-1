@@ -55,20 +55,17 @@ namespace MovieApp.Logic.Repositories
             {
                 throw new InvalidOperationException("User not found.");
             }
-
             Movie? movie = _context.Movies.FirstOrDefault(candidate => candidate.Id == movieId);
             if (movie is null)
             {
                 throw new InvalidOperationException("Movie not found.");
             }
-
             bool alreadyOwned = _context.OwnedMovies
                 .Any(ownedMovie => ownedMovie.User.Id == userId && ownedMovie.Movie.Id == movieId);
             if (alreadyOwned)
             {
                 throw new InvalidOperationException("You already own this movie.");
             }
-
             if (user.Balance < finalPrice)
             {
                 throw new InvalidOperationException("Insufficient balance.");

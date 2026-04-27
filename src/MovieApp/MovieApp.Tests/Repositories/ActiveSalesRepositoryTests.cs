@@ -16,7 +16,7 @@ namespace MovieApp.Tests.Repositories
         }
 
         [Fact]
-        public void GetCurrentSales_OnlyReturnsSalesWithinWindow()
+        public void GetCurrentSales_OnlyReturnsSalesWithinWindow_ReturnsSingleSale()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             DateTime now = DateTime.UtcNow;
@@ -32,11 +32,29 @@ namespace MovieApp.Tests.Repositories
             List<ActiveSale> sales = repository.GetCurrentSales();
 
             Assert.Single(sales);
+        }
+
+        [Fact]
+        public void GetCurrentSales_OnlyReturnsSalesWithinWindow_ReturnsSaleWithCorrectDiscount()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            DateTime now = DateTime.UtcNow;
+            Movie currentMovie = BuildMovie();
+            Movie expiredMovie = BuildMovie();
+            context.Movies.AddRange(currentMovie, expiredMovie);
+            context.ActiveSales.AddRange(
+                BuildSale(currentMovie, 20m, now.AddDays(-1), now.AddDays(1)),
+                BuildSale(expiredMovie, 50m, now.AddDays(-10), now.AddDays(-2)));
+            context.SaveChanges();
+
+            ActiveSalesRepository repository = new ActiveSalesRepository(context);
+            List<ActiveSale> sales = repository.GetCurrentSales();
+
             Assert.Equal(20m, sales[0].DiscountPercentage);
         }
 
         [Fact]
-        public void GetBestDiscountPercentByMovieId_PicksHighestDiscount()
+        public void GetBestDiscountPercentByMovieId_ReturnsEntryPerMovie()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             DateTime now = DateTime.UtcNow;
@@ -53,7 +71,45 @@ namespace MovieApp.Tests.Repositories
             Dictionary<int, decimal> result = repository.GetBestDiscountPercentByMovieId();
 
             Assert.Equal(2, result.Count);
+        }
+
+        [Fact]
+        public void GetBestDiscountPercentByMovieId_PicksHighestDiscountForMovieWithMultipleSales()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            DateTime now = DateTime.UtcNow;
+            Movie movieA = BuildMovie();
+            Movie movieB = BuildMovie();
+            context.Movies.AddRange(movieA, movieB);
+            context.ActiveSales.AddRange(
+                BuildSale(movieA, 20m, now.AddDays(-1), now.AddDays(1)),
+                BuildSale(movieA, 35m, now.AddDays(-1), now.AddDays(2)),
+                BuildSale(movieB, 10m, now.AddDays(-1), now.AddDays(1)));
+            context.SaveChanges();
+
+            ActiveSalesRepository repository = new ActiveSalesRepository(context);
+            Dictionary<int, decimal> result = repository.GetBestDiscountPercentByMovieId();
+
             Assert.Equal(35m, result[movieA.Id]);
+        }
+
+        [Fact]
+        public void GetBestDiscountPercentByMovieId_ReturnsCorrectDiscountForSingleSaleMovie()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            DateTime now = DateTime.UtcNow;
+            Movie movieA = BuildMovie();
+            Movie movieB = BuildMovie();
+            context.Movies.AddRange(movieA, movieB);
+            context.ActiveSales.AddRange(
+                BuildSale(movieA, 20m, now.AddDays(-1), now.AddDays(1)),
+                BuildSale(movieA, 35m, now.AddDays(-1), now.AddDays(2)),
+                BuildSale(movieB, 10m, now.AddDays(-1), now.AddDays(1)));
+            context.SaveChanges();
+
+            ActiveSalesRepository repository = new ActiveSalesRepository(context);
+            Dictionary<int, decimal> result = repository.GetBestDiscountPercentByMovieId();
+
             Assert.Equal(10m, result[movieB.Id]);
         }
 

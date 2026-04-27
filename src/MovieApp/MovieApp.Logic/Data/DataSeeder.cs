@@ -37,6 +37,11 @@ namespace MovieApp.Logic.Data
             await SeedReelsAsync();
             await SeedUserMoviePreferencesAsync();
             await SeedUserProfilesAsync();
+            await SeedShroomsSellersAsync();
+            await SeedActiveSalesAsync();
+            await SeedMovieEventsAsync();
+            await SeedMovieReviewsAsync();
+            await SeedEquipmentAsync();
         }
 
         private async Task SeedUsersAsync()
@@ -1148,6 +1153,337 @@ namespace MovieApp.Logic.Data
                     TotalClipsViewed = 109,
                     LikeToViewRatio = 0.23m,
                     LastUpdated = DateTime.UtcNow,
+                });
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task SeedShroomsSellersAsync()
+        {
+            bool dummy1Exists = await _context.Users.AnyAsync(user => user.Username == "dummy1");
+            bool dummy2Exists = await _context.Users.AnyAsync(user => user.Username == "dummy2");
+
+            if (dummy1Exists && dummy2Exists)
+            {
+                return;
+            }
+
+            if (!dummy1Exists)
+            {
+                _context.Users.Add(new User
+                {
+                    Username = "dummy1",
+                    Email = "dummy1@gmail.com",
+                    PasswordHash = "pass1",
+                    Balance = 0m,
+                });
+            }
+
+            if (!dummy2Exists)
+            {
+                _context.Users.Add(new User
+                {
+                    Username = "dummy2",
+                    Email = "dummy2@gmail.com",
+                    PasswordHash = "pass2",
+                    Balance = 50m,
+                });
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task SeedActiveSalesAsync()
+        {
+            if (await _context.ActiveSales.AnyAsync())
+            {
+                return;
+            }
+
+            Movie? inception = await _context.Movies.FirstOrDefaultAsync(movie => movie.Title == "Inception");
+            Movie? matrix = await _context.Movies.FirstOrDefaultAsync(movie => movie.Title == "The Matrix");
+            Movie? interstellar = await _context.Movies.FirstOrDefaultAsync(movie => movie.Title == "Interstellar");
+
+            if (inception is null || matrix is null || interstellar is null)
+            {
+                return;
+            }
+
+            DateTime now = DateTime.UtcNow;
+
+            _context.ActiveSales.AddRange(
+                new ActiveSale
+                {
+                    Movie = inception,
+                    DiscountPercentage = 20.00m,
+                    StartTime = now.AddDays(-1),
+                    EndTime = now.AddDays(5),
+                },
+                new ActiveSale
+                {
+                    Movie = matrix,
+                    DiscountPercentage = 20.00m,
+                    StartTime = now.AddDays(-1),
+                    EndTime = now.AddDays(5),
+                },
+                new ActiveSale
+                {
+                    Movie = interstellar,
+                    DiscountPercentage = 35.00m,
+                    StartTime = now.AddDays(-1),
+                    EndTime = now.AddDays(5),
+                });
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task SeedMovieEventsAsync()
+        {
+            if (await _context.MovieEvents.AnyAsync())
+            {
+                return;
+            }
+
+            Movie? inception = await _context.Movies.FirstOrDefaultAsync(movie => movie.Title == "Inception");
+            Movie? matrix = await _context.Movies.FirstOrDefaultAsync(movie => movie.Title == "The Matrix");
+            Movie? interstellar = await _context.Movies.FirstOrDefaultAsync(movie => movie.Title == "Interstellar");
+            Movie? whiplash = await _context.Movies.FirstOrDefaultAsync(movie => movie.Title == "Whiplash");
+
+            if (inception is null || matrix is null || interstellar is null || whiplash is null)
+            {
+                return;
+            }
+
+            DateTime now = DateTime.UtcNow;
+
+            _context.MovieEvents.AddRange(
+                new MovieEvent
+                {
+                    Movie = inception,
+                    Title = "Inception - Midnight Screening",
+                    Description = "One-night-only midnight screening with a short pre-show talk.",
+                    Date = now.AddDays(7),
+                    Location = "Cinema Hall A",
+                    TicketPrice = 12.50m,
+                    PosterUrl = "https://m.media-amazon.com/images/I/71DwIcSgFcS._AC_UF894,1000_QL80_.jpg",
+                },
+                new MovieEvent
+                {
+                    Movie = matrix,
+                    Title = "The Matrix - Fan Marathon",
+                    Description = "Back-to-back screening + trivia. Doors open 18:00.",
+                    Date = now.AddDays(14),
+                    Location = "Retro Theater",
+                    TicketPrice = 18.00m,
+                    PosterUrl = "https://m.media-amazon.com/images/I/51EG732BV3L.jpg",
+                },
+                new MovieEvent
+                {
+                    Movie = interstellar,
+                    Title = "Interstellar - Space Night",
+                    Description = "Screening followed by a small astronomy Q&A.",
+                    Date = now.AddDays(21),
+                    Location = "Science Center Auditorium",
+                    TicketPrice = 15.00m,
+                    PosterUrl = "https://m.media-amazon.com/images/I/91vIHsL-zjL._AC_UF894,1000_QL80_.jpg",
+                },
+                new MovieEvent
+                {
+                    Movie = whiplash,
+                    Title = "Whiplash - Live Jazz Intro",
+                    Description = "Short live jazz set before the movie.",
+                    Date = now.AddDays(10),
+                    Location = "Downtown Arts Cinema",
+                    TicketPrice = 14.00m,
+                    PosterUrl = "https://m.media-amazon.com/images/I/81hKZ6oTqUL._AC_UF894,1000_QL80_.jpg",
+                });
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task SeedMovieReviewsAsync()
+        {
+            if (await _context.MovieReviews.AnyAsync())
+            {
+                return;
+            }
+
+            User? seller1 = await _context.Users.FirstOrDefaultAsync(user => user.Username == "dummy1");
+            User? seller2 = await _context.Users.FirstOrDefaultAsync(user => user.Username == "dummy2");
+
+            if (seller1 is null || seller2 is null)
+            {
+                return;
+            }
+
+            Movie? matrix = await _context.Movies.FirstOrDefaultAsync(movie => movie.Title == "The Matrix");
+            Movie? interstellar = await _context.Movies.FirstOrDefaultAsync(movie => movie.Title == "Interstellar");
+            Movie? parasite = await _context.Movies.FirstOrDefaultAsync(movie => movie.Title == "Parasite");
+            Movie? johnWick = await _context.Movies.FirstOrDefaultAsync(movie => movie.Title == "John Wick");
+            Movie? whiplash = await _context.Movies.FirstOrDefaultAsync(movie => movie.Title == "Whiplash");
+
+            if (matrix is null || interstellar is null || parasite is null || johnWick is null || whiplash is null)
+            {
+                return;
+            }
+
+            DateTime now = DateTime.UtcNow;
+
+            _context.MovieReviews.AddRange(
+                new MovieReview
+                {
+                    Movie = matrix,
+                    User = seller1,
+                    StarRating = 9m,
+                    Comment = "A mind-bending classic with unforgettable world-building.",
+                    CreatedAt = now,
+                },
+                new MovieReview
+                {
+                    Movie = matrix,
+                    User = seller2,
+                    StarRating = 7m,
+                    Comment = "Great action and ideas, but definitely not for everyone.",
+                    CreatedAt = now,
+                },
+                new MovieReview
+                {
+                    Movie = interstellar,
+                    User = seller1,
+                    StarRating = 10m,
+                    Comment = "Epic, emotional, and incredibly thought-provoking.",
+                    CreatedAt = now,
+                },
+                new MovieReview
+                {
+                    Movie = interstellar,
+                    User = seller2,
+                    StarRating = 8m,
+                    Comment = "Beautiful visuals and a satisfying emotional payoff.",
+                    CreatedAt = now,
+                },
+                new MovieReview
+                {
+                    Movie = parasite,
+                    User = seller1,
+                    StarRating = 9m,
+                    Comment = "Smart, tense, and darkly funny all the way through.",
+                    CreatedAt = now,
+                },
+                new MovieReview
+                {
+                    Movie = parasite,
+                    User = seller2,
+                    StarRating = 6m,
+                    Comment = "Surprisingly entertaining, but the pacing felt uneven.",
+                    CreatedAt = now,
+                },
+                new MovieReview
+                {
+                    Movie = johnWick,
+                    User = seller1,
+                    StarRating = 8m,
+                    Comment = "Non-stop style and killer action choreography.",
+                    CreatedAt = now,
+                },
+                new MovieReview
+                {
+                    Movie = johnWick,
+                    User = seller2,
+                    StarRating = 7m,
+                    Comment = "Solid thrills and great atmosphere; easy to binge.",
+                    CreatedAt = now,
+                },
+                new MovieReview
+                {
+                    Movie = whiplash,
+                    User = seller1,
+                    StarRating = 9m,
+                    Comment = "A brutal, addictive rivalry that stays with you.",
+                    CreatedAt = now,
+                },
+                new MovieReview
+                {
+                    Movie = whiplash,
+                    User = seller2,
+                    StarRating = 8m,
+                    Comment = "Fantastic performances and a soundtrack that demands attention.",
+                    CreatedAt = now,
+                });
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task SeedEquipmentAsync()
+        {
+            if (await _context.Equipment.AnyAsync())
+            {
+                return;
+            }
+
+            User? seller1 = await _context.Users.FirstOrDefaultAsync(user => user.Username == "dummy1");
+            User? seller2 = await _context.Users.FirstOrDefaultAsync(user => user.Username == "dummy2");
+
+            if (seller1 is null || seller2 is null)
+            {
+                return;
+            }
+
+            _context.Equipment.AddRange(
+                new Equipment
+                {
+                    Seller = seller1,
+                    Title = "Canon EOS 2000D Kit",
+                    Category = "Cameras",
+                    Description = "24.1 MP APS-C CMOS sensor. Perfect entry-level DSLR for student films, includes 18-55mm IS II Lens and 1080p cinematic video mode.",
+                    Condition = "Good",
+                    Price = 1200.00m,
+                    ImageUrl = "https://static0.pocketlintimages.com/wordpress/wp-content/uploads/wm/143700-cameras-review-hands-on-canon-eos-2000d-review-image1-xploy5pbva.jpg",
+                    Status = EquipmentStatus.Available,
+                },
+                new Equipment
+                {
+                    Seller = seller1,
+                    Title = "Rode NTG Shotgun Mic",
+                    Category = "Audio",
+                    Description = "Professional directional condenser microphone. Super-cardioid polar pattern, ideal for isolating dialogue on noisy film sets.",
+                    Condition = "New",
+                    Price = 1200.00m,
+                    ImageUrl = "https://fstudio.vtexassets.com/arquivos/ids/750303-1200-1200",
+                    Status = EquipmentStatus.Sold,
+                },
+                new Equipment
+                {
+                    Seller = seller2,
+                    Title = "Blackmagic Pocket Cinema 6K",
+                    Category = "Cameras",
+                    Description = "EF Mount, Super 35 HDR sensor, 13 stops of dynamic range and dual native ISO up to 25,600 for incredible low light performance.",
+                    Condition = "Like New",
+                    Price = 9500.00m,
+                    ImageUrl = "https://images.blackmagicdesign.com/images/products/blackmagicpocketcinemacamera/main/pocket-6k-g2-xl.jpg",
+                    Status = EquipmentStatus.Available,
+                },
+                new Equipment
+                {
+                    Seller = seller1,
+                    Title = "DJI RS 3 Pro Gimbal",
+                    Category = "Stabilization",
+                    Description = "Carbon fiber construction, 4.5kg (10lbs) tested payload. Automated axis locks and LiDAR focusing for professional solo cinematographers.",
+                    Condition = "New",
+                    Price = 4200.00m,
+                    ImageUrl = "https://m.media-amazon.com/images/I/61S6h1S-z3L._AC_SL1500_.jpg",
+                    Status = EquipmentStatus.Available,
+                },
+                new Equipment
+                {
+                    Seller = seller2,
+                    Title = "Atomos Ninja V+ Monitor",
+                    Category = "Monitoring",
+                    Description = "5-inch 4K HDMI Recording Monitor. 1000 nits brightness for outdoor use, supports ProRes RAW recording directly from camera sensor.",
+                    Condition = "Used",
+                    Price = 2800.00m,
+                    ImageUrl = "https://m.media-amazon.com/images/I/71N-W-vV6NL._AC_SL1500_.jpg",
+                    Status = EquipmentStatus.Available,
                 });
 
             await _context.SaveChangesAsync();

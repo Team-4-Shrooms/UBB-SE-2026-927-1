@@ -37,7 +37,6 @@ namespace MovieApp.Logic.Repositories
             {
                 return;
             }
-
             Movie? movie = _context.Movies.FirstOrDefault(candidate => candidate.Id == movieId);
             List<OwnedMovie> ownerships = _context.OwnedMovies
                 .Where(ownedMovie => ownedMovie.User.Id == userId && ownedMovie.Movie.Id == movieId)
@@ -70,7 +69,6 @@ namespace MovieApp.Logic.Repositories
             {
                 return;
             }
-
             MovieEvent? movieEvent = _context.MovieEvents.FirstOrDefault(candidate => candidate.Id == eventId);
             List<OwnedTicket> ownerships = _context.OwnedTickets
                 .Where(ownedTicket => ownedTicket.User.Id == userId && ownedTicket.Event.Id == eventId)

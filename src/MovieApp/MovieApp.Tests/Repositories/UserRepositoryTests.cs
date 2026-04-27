@@ -29,12 +29,20 @@ namespace MovieApp.Tests.Repositories
         }
 
         [Fact]
-        public void GetBalance_InvalidUserId_ReturnsZero()
+        public void GetBalance_ZeroUserId_ReturnsZero()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             UserRepository repository = new UserRepository(context);
 
             Assert.Equal(0m, repository.GetBalance(0));
+        }
+
+        [Fact]
+        public void GetBalance_NegativeUserId_ReturnsZero()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            UserRepository repository = new UserRepository(context);
+
             Assert.Equal(0m, repository.GetBalance(-5));
         }
 
