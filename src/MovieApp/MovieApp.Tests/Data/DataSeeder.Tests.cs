@@ -18,14 +18,14 @@ namespace MovieApp.Tests.Data
         }
 
         [Fact]
-        public async Task SeedAsync_emptyDatabase_seedsSixUsers()
+        public async Task SeedAsync_emptyDatabase_seedsSixCoreUsers()
         {
-            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_seedsSixUsers));
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_seedsSixCoreUsers));
 
             DataSeeder seeder = new DataSeeder(context);
             await seeder.SeedAsync();
 
-            int userCount = await context.Users.CountAsync();
+            int userCount = await context.Users.CountAsync(user => user.Username != "dummy1" && user.Username != "dummy2");
 
             Assert.Equal(6, userCount);
         }
@@ -402,22 +402,18 @@ namespace MovieApp.Tests.Data
         }
 
         [Fact]
-        public async Task SeedAsync_emptyDatabase_eachUserHasOneProfile()
+        public async Task SeedAsync_emptyDatabase_eachCoreUserHasOneProfile()
         {
-            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_eachUserHasOneProfile));
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_eachCoreUserHasOneProfile));
 
             DataSeeder seeder = new DataSeeder(context);
             await seeder.SeedAsync();
 
-            List<User> users = await context.Users.ToListAsync();
+            int orphanCoreUsers = await context.Users
+                .Where(user => user.Username != "dummy1" && user.Username != "dummy2")
+                .CountAsync(user => !context.UserProfiles.Any(profile => profile.User.Id == user.Id));
 
-            foreach (User user in users)
-            {
-                int profileCount = await context.UserProfiles
-                    .CountAsync(profile => profile.User.Id == user.Id);
-
-                Assert.Equal(1, profileCount);
-            }
+            Assert.Equal(0, orphanCoreUsers);
         }
 
         [Fact]
@@ -431,7 +427,7 @@ namespace MovieApp.Tests.Data
 
             int userCount = await context.Users.CountAsync();
 
-            Assert.Equal(6, userCount);
+            Assert.Equal(8, userCount);
         }
 
         [Fact]
@@ -529,6 +525,297 @@ namespace MovieApp.Tests.Data
             bool anyMissingUrl = await context.Reels.AnyAsync(reel => reel.VideoUrl == null || reel.VideoUrl == string.Empty);
 
             Assert.False(anyMissingUrl);
+        }
+
+        [Fact]
+        public async Task SeedAsync_emptyDatabase_seedsDummy1Seller()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_seedsDummy1Seller));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+
+            bool exists = await context.Users.AnyAsync(user => user.Username == "dummy1");
+
+            Assert.True(exists);
+        }
+
+        [Fact]
+        public async Task SeedAsync_emptyDatabase_seedsDummy2Seller()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_seedsDummy2Seller));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+
+            bool exists = await context.Users.AnyAsync(user => user.Username == "dummy2");
+
+            Assert.True(exists);
+        }
+
+        [Fact]
+        public async Task SeedAsync_emptyDatabase_dummy1HasZeroBalance()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_dummy1HasZeroBalance));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+
+            User? dummy1 = await context.Users.FirstOrDefaultAsync(user => user.Username == "dummy1");
+
+            Assert.Equal(0m, dummy1!.Balance);
+        }
+
+        [Fact]
+        public async Task SeedAsync_emptyDatabase_dummy2HasFiftyBalance()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_dummy2HasFiftyBalance));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+
+            User? dummy2 = await context.Users.FirstOrDefaultAsync(user => user.Username == "dummy2");
+
+            Assert.Equal(50m, dummy2!.Balance);
+        }
+
+        [Fact]
+        public async Task SeedAsync_emptyDatabase_seedsThreeActiveSales()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_seedsThreeActiveSales));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+
+            int salesCount = await context.ActiveSales.CountAsync();
+
+            Assert.Equal(3, salesCount);
+        }
+
+        [Fact]
+        public async Task SeedAsync_emptyDatabase_inceptionHasActiveSale()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_inceptionHasActiveSale));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+
+            bool exists = await context.ActiveSales.AnyAsync(sale => sale.Movie.Title == "Inception");
+
+            Assert.True(exists);
+        }
+
+        [Fact]
+        public async Task SeedAsync_emptyDatabase_interstellarSaleHasThirtyFivePercent()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_interstellarSaleHasThirtyFivePercent));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+
+            ActiveSale? sale = await context.ActiveSales.FirstOrDefaultAsync(candidate => candidate.Movie.Title == "Interstellar");
+
+            Assert.Equal(35.00m, sale!.DiscountPercentage);
+        }
+
+        [Fact]
+        public async Task SeedAsync_emptyDatabase_seedsFourMovieEvents()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_seedsFourMovieEvents));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+
+            int eventCount = await context.MovieEvents.CountAsync();
+
+            Assert.Equal(4, eventCount);
+        }
+
+        [Fact]
+        public async Task SeedAsync_emptyDatabase_containsInceptionMidnightScreening()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_containsInceptionMidnightScreening));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+
+            bool exists = await context.MovieEvents.AnyAsync(movieEvent => movieEvent.Title == "Inception - Midnight Screening");
+
+            Assert.True(exists);
+        }
+
+        [Fact]
+        public async Task SeedAsync_emptyDatabase_containsMatrixFanMarathon()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_containsMatrixFanMarathon));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+
+            bool exists = await context.MovieEvents.AnyAsync(movieEvent => movieEvent.Title == "The Matrix - Fan Marathon");
+
+            Assert.True(exists);
+        }
+
+        [Fact]
+        public async Task SeedAsync_emptyDatabase_seedsTenMovieReviews()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_seedsTenMovieReviews));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+
+            int reviewCount = await context.MovieReviews.CountAsync();
+
+            Assert.Equal(10, reviewCount);
+        }
+
+        [Fact]
+        public async Task SeedAsync_emptyDatabase_matrixHasTwoReviews()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_matrixHasTwoReviews));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+
+            int reviewCount = await context.MovieReviews.CountAsync(review => review.Movie.Title == "The Matrix");
+
+            Assert.Equal(2, reviewCount);
+        }
+
+        [Fact]
+        public async Task SeedAsync_emptyDatabase_interstellarHasPerfectScoreReview()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_interstellarHasPerfectScoreReview));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+
+            bool exists = await context.MovieReviews.AnyAsync(review => review.Movie.Title == "Interstellar" && review.StarRating == 10m);
+
+            Assert.True(exists);
+        }
+
+        [Fact]
+        public async Task SeedAsync_emptyDatabase_seedsFiveEquipmentItems()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_seedsFiveEquipmentItems));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+
+            int equipmentCount = await context.Equipment.CountAsync();
+
+            Assert.Equal(5, equipmentCount);
+        }
+
+        [Fact]
+        public async Task SeedAsync_emptyDatabase_containsCanonCameraEquipment()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_containsCanonCameraEquipment));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+
+            bool exists = await context.Equipment.AnyAsync(item => item.Title == "Canon EOS 2000D Kit");
+
+            Assert.True(exists);
+        }
+
+        [Fact]
+        public async Task SeedAsync_emptyDatabase_rodeShotgunMicIsSold()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_rodeShotgunMicIsSold));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+
+            Equipment? mic = await context.Equipment.FirstOrDefaultAsync(item => item.Title == "Rode NTG Shotgun Mic");
+
+            Assert.Equal(EquipmentStatus.Sold, mic!.Status);
+        }
+
+        [Fact]
+        public async Task SeedAsync_emptyDatabase_blackmagicCameraCostsNineThousandFiveHundred()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_blackmagicCameraCostsNineThousandFiveHundred));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+
+            Equipment? camera = await context.Equipment.FirstOrDefaultAsync(item => item.Title == "Blackmagic Pocket Cinema 6K");
+
+            Assert.Equal(9500.00m, camera!.Price);
+        }
+
+        [Fact]
+        public async Task SeedAsync_calledTwice_doesNotDuplicateActiveSales()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_calledTwice_doesNotDuplicateActiveSales));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+            await seeder.SeedAsync();
+
+            int salesCount = await context.ActiveSales.CountAsync();
+
+            Assert.Equal(3, salesCount);
+        }
+
+        [Fact]
+        public async Task SeedAsync_calledTwice_doesNotDuplicateMovieEvents()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_calledTwice_doesNotDuplicateMovieEvents));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+            await seeder.SeedAsync();
+
+            int eventCount = await context.MovieEvents.CountAsync();
+
+            Assert.Equal(4, eventCount);
+        }
+
+        [Fact]
+        public async Task SeedAsync_calledTwice_doesNotDuplicateMovieReviews()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_calledTwice_doesNotDuplicateMovieReviews));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+            await seeder.SeedAsync();
+
+            int reviewCount = await context.MovieReviews.CountAsync();
+
+            Assert.Equal(10, reviewCount);
+        }
+
+        [Fact]
+        public async Task SeedAsync_calledTwice_doesNotDuplicateEquipment()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_calledTwice_doesNotDuplicateEquipment));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+            await seeder.SeedAsync();
+
+            int equipmentCount = await context.Equipment.CountAsync();
+
+            Assert.Equal(5, equipmentCount);
+        }
+
+        [Fact]
+        public async Task SeedAsync_calledTwice_doesNotDuplicateSellers()
+        {
+            await using AppDbContext context = CreateContext(nameof(SeedAsync_calledTwice_doesNotDuplicateSellers));
+
+            DataSeeder seeder = new DataSeeder(context);
+            await seeder.SeedAsync();
+            await seeder.SeedAsync();
+
+            int sellerCount = await context.Users.CountAsync(user => user.Username == "dummy1" || user.Username == "dummy2");
+
+            Assert.Equal(2, sellerCount);
         }
     }
 }
