@@ -8,19 +8,19 @@ namespace MovieApp.Tests.Data
 {
     public class DataSeederTests
     {
-        private static AppDbContext CreateContext(string dbName)
+        private static WebAPIDbContext CreateContext(string dbName)
         {
-            DbContextOptions<AppDbContext> options = new DbContextOptionsBuilder<AppDbContext>()
+            DbContextOptions<WebAPIDbContext> options = new DbContextOptionsBuilder<WebAPIDbContext>()
                 .UseInMemoryDatabase(dbName)
                 .Options;
 
-            return new AppDbContext(options);
+            return new WebAPIDbContext(options);
         }
 
         [Fact]
         public async Task SeedAsync_emptyDatabase_seedsSixCoreUsers()
         {
-            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_seedsSixCoreUsers));
+            await using WebAPIDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_seedsSixCoreUsers));
 
             DataSeeder seeder = new DataSeeder(context);
             await seeder.SeedAsync();
@@ -33,7 +33,7 @@ namespace MovieApp.Tests.Data
         [Fact]
         public async Task SeedAsync_emptyDatabase_containsUser1()
         {
-            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_containsUser1));
+            await using WebAPIDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_containsUser1));
 
             DataSeeder seeder = new DataSeeder(context);
             await seeder.SeedAsync();
@@ -46,7 +46,7 @@ namespace MovieApp.Tests.Data
         [Fact]
         public async Task SeedAsync_emptyDatabase_containsAlice()
         {
-            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_containsAlice));
+            await using WebAPIDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_containsAlice));
 
             DataSeeder seeder = new DataSeeder(context);
             await seeder.SeedAsync();
@@ -59,7 +59,7 @@ namespace MovieApp.Tests.Data
         [Fact]
         public async Task SeedAsync_emptyDatabase_containsBob()
         {
-            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_containsBob));
+            await using WebAPIDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_containsBob));
 
             DataSeeder seeder = new DataSeeder(context);
             await seeder.SeedAsync();
@@ -72,7 +72,7 @@ namespace MovieApp.Tests.Data
         [Fact]
         public async Task SeedAsync_emptyDatabase_containsCarol()
         {
-            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_containsCarol));
+            await using WebAPIDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_containsCarol));
 
             DataSeeder seeder = new DataSeeder(context);
             await seeder.SeedAsync();
@@ -85,7 +85,7 @@ namespace MovieApp.Tests.Data
         [Fact]
         public async Task SeedAsync_emptyDatabase_containsDave()
         {
-            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_containsDave));
+            await using WebAPIDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_containsDave));
 
             DataSeeder seeder = new DataSeeder(context);
             await seeder.SeedAsync();
@@ -98,7 +98,7 @@ namespace MovieApp.Tests.Data
         [Fact]
         public async Task SeedAsync_emptyDatabase_containsEve()
         {
-            await using AppDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_containsEve));
+            await using WebAPIDbContext context = CreateContext(nameof(SeedAsync_emptyDatabase_containsEve));
 
             DataSeeder seeder = new DataSeeder(context);
             await seeder.SeedAsync();

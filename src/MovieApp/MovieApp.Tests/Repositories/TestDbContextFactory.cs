@@ -6,14 +6,14 @@ namespace MovieApp.Tests.Repositories
 {
     internal static class TestDbContextFactory
     {
-        public static AppDbContext Create()
+        public static WebAPIDbContext Create()
         {
-            DbContextOptions<AppDbContext> options = new DbContextOptionsBuilder<AppDbContext>()
+            DbContextOptions<WebAPIDbContext> options = new DbContextOptionsBuilder<WebAPIDbContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
                 .ConfigureWarnings(builder => builder.Ignore(InMemoryEventId.TransactionIgnoredWarning))
                 .Options;
 
-            return new AppDbContext(options);
+            return new WebAPIDbContext(options);
         }
     }
 }
