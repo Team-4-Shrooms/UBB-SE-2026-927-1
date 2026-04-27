@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using MovieApp.Logic.Data;
+using MovieApp.WebApi.Data;
 using MovieApp.Logic.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;

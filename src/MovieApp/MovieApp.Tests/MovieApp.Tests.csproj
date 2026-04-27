@@ -21,11 +21,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MovieApp.Logic\MovieApp.Logic.csproj" />
+    <ProjectReference Include="..\MovieApp.DataLayer\MovieApp.DataLayer.csproj" />
     <ProjectReference Include="..\MovieApp.WebApi\MovieApp.WebApi.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <Using Include="MovieApp.WebApi.Data" />
   </ItemGroup>
 
 </Project>
