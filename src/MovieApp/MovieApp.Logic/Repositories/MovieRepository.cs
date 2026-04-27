@@ -9,6 +9,7 @@ namespace MovieApp.Logic.Repositories
     {
         private const string MoviePurchaseTransactionType = "MoviePurchase";
         private const string CompletedTransactionStatus = "Completed";
+        private const int MaxSearchResults = 10;
 
         private readonly AppDbContext _context;
 
@@ -103,7 +104,7 @@ namespace MovieApp.Logic.Repositories
                 .AsNoTracking()
                 .Where(movie => movie.Title.Contains(pattern))
                 .OrderBy(movie => movie.Title)
-                .Take(10)
+                .Take(MaxSearchResults)
                 .ToListAsync();
         }
     }

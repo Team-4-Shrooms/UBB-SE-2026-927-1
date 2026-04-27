@@ -614,8 +614,7 @@ namespace MovieApp.Tests.Data
             DataSeeder seeder = new DataSeeder(context);
             await seeder.SeedAsync();
 
-            ActiveSale? sale = await context.ActiveSales
-                .FirstOrDefaultAsync(candidate => candidate.Movie.Title == "Interstellar");
+            ActiveSale? sale = await context.ActiveSales.FirstOrDefaultAsync(candidate => candidate.Movie.Title == "Interstellar");
 
             Assert.Equal(35.00m, sale!.DiscountPercentage);
         }
@@ -641,8 +640,7 @@ namespace MovieApp.Tests.Data
             DataSeeder seeder = new DataSeeder(context);
             await seeder.SeedAsync();
 
-            bool exists = await context.MovieEvents
-                .AnyAsync(movieEvent => movieEvent.Title == "Inception - Midnight Screening");
+            bool exists = await context.MovieEvents.AnyAsync(movieEvent => movieEvent.Title == "Inception - Midnight Screening");
 
             Assert.True(exists);
         }
@@ -655,8 +653,7 @@ namespace MovieApp.Tests.Data
             DataSeeder seeder = new DataSeeder(context);
             await seeder.SeedAsync();
 
-            bool exists = await context.MovieEvents
-                .AnyAsync(movieEvent => movieEvent.Title == "The Matrix - Fan Marathon");
+            bool exists = await context.MovieEvents.AnyAsync(movieEvent => movieEvent.Title == "The Matrix - Fan Marathon");
 
             Assert.True(exists);
         }
@@ -682,8 +679,7 @@ namespace MovieApp.Tests.Data
             DataSeeder seeder = new DataSeeder(context);
             await seeder.SeedAsync();
 
-            int reviewCount = await context.MovieReviews
-                .CountAsync(review => review.Movie.Title == "The Matrix");
+            int reviewCount = await context.MovieReviews.CountAsync(review => review.Movie.Title == "The Matrix");
 
             Assert.Equal(2, reviewCount);
         }
@@ -696,8 +692,7 @@ namespace MovieApp.Tests.Data
             DataSeeder seeder = new DataSeeder(context);
             await seeder.SeedAsync();
 
-            bool exists = await context.MovieReviews
-                .AnyAsync(review => review.Movie.Title == "Interstellar" && review.StarRating == 10m);
+            bool exists = await context.MovieReviews.AnyAsync(review => review.Movie.Title == "Interstellar" && review.StarRating == 10m);
 
             Assert.True(exists);
         }
@@ -736,8 +731,7 @@ namespace MovieApp.Tests.Data
             DataSeeder seeder = new DataSeeder(context);
             await seeder.SeedAsync();
 
-            Equipment? mic = await context.Equipment
-                .FirstOrDefaultAsync(item => item.Title == "Rode NTG Shotgun Mic");
+            Equipment? mic = await context.Equipment.FirstOrDefaultAsync(item => item.Title == "Rode NTG Shotgun Mic");
 
             Assert.Equal(EquipmentStatus.Sold, mic!.Status);
         }
@@ -750,8 +744,7 @@ namespace MovieApp.Tests.Data
             DataSeeder seeder = new DataSeeder(context);
             await seeder.SeedAsync();
 
-            Equipment? camera = await context.Equipment
-                .FirstOrDefaultAsync(item => item.Title == "Blackmagic Pocket Cinema 6K");
+            Equipment? camera = await context.Equipment.FirstOrDefaultAsync(item => item.Title == "Blackmagic Pocket Cinema 6K");
 
             Assert.Equal(9500.00m, camera!.Price);
         }
@@ -821,8 +814,7 @@ namespace MovieApp.Tests.Data
             await seeder.SeedAsync();
             await seeder.SeedAsync();
 
-            int sellerCount = await context.Users
-                .CountAsync(user => user.Username == "dummy1" || user.Username == "dummy2");
+            int sellerCount = await context.Users.CountAsync(user => user.Username == "dummy1" || user.Username == "dummy2");
 
             Assert.Equal(2, sellerCount);
         }

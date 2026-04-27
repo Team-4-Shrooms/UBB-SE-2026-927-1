@@ -55,8 +55,7 @@ namespace MovieApp.Logic.Repositories
             {
                 throw new InvalidOperationException("User not found.");
             }
-            MovieEvent? movieEvent = _context.MovieEvents
-                .FirstOrDefault(candidate => candidate.Id == eventId);
+            MovieEvent? movieEvent = _context.MovieEvents.FirstOrDefault(candidate => candidate.Id == eventId);
             if (movieEvent is null)
             {
                 throw new InvalidOperationException("Event not found.");

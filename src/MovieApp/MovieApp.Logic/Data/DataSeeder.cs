@@ -37,7 +37,7 @@ namespace MovieApp.Logic.Data
             await SeedReelsAsync();
             await SeedUserMoviePreferencesAsync();
             await SeedUserProfilesAsync();
-            await SeedShroomsSellersAsync();
+            await SeedSellersAsync();
             await SeedActiveSalesAsync();
             await SeedMovieEventsAsync();
             await SeedMovieReviewsAsync();
@@ -1158,7 +1158,7 @@ namespace MovieApp.Logic.Data
             await _context.SaveChangesAsync();
         }
 
-        private async Task SeedShroomsSellersAsync()
+        private async Task SeedSellersAsync()
         {
             bool dummy1Exists = await _context.Users.AnyAsync(user => user.Username == "dummy1");
             bool dummy2Exists = await _context.Users.AnyAsync(user => user.Username == "dummy2");
@@ -1209,29 +1209,29 @@ namespace MovieApp.Logic.Data
                 return;
             }
 
-            DateTime now = DateTime.UtcNow;
+            DateTime currentDate = DateTime.UtcNow;
 
             _context.ActiveSales.AddRange(
                 new ActiveSale
                 {
                     Movie = inception,
                     DiscountPercentage = 20.00m,
-                    StartTime = now.AddDays(-1),
-                    EndTime = now.AddDays(5),
+                    StartTime = currentDate.AddDays(-1),
+                    EndTime = currentDate.AddDays(5),
                 },
                 new ActiveSale
                 {
                     Movie = matrix,
                     DiscountPercentage = 20.00m,
-                    StartTime = now.AddDays(-1),
-                    EndTime = now.AddDays(5),
+                    StartTime = currentDate.AddDays(-1),
+                    EndTime = currentDate.AddDays(5),
                 },
                 new ActiveSale
                 {
                     Movie = interstellar,
                     DiscountPercentage = 35.00m,
-                    StartTime = now.AddDays(-1),
-                    EndTime = now.AddDays(5),
+                    StartTime = currentDate.AddDays(-1),
+                    EndTime = currentDate.AddDays(5),
                 });
 
             await _context.SaveChangesAsync();
@@ -1254,7 +1254,7 @@ namespace MovieApp.Logic.Data
                 return;
             }
 
-            DateTime now = DateTime.UtcNow;
+            DateTime currentDate = DateTime.UtcNow;
 
             _context.MovieEvents.AddRange(
                 new MovieEvent
@@ -1262,7 +1262,7 @@ namespace MovieApp.Logic.Data
                     Movie = inception,
                     Title = "Inception - Midnight Screening",
                     Description = "One-night-only midnight screening with a short pre-show talk.",
-                    Date = now.AddDays(7),
+                    Date = currentDate.AddDays(7),
                     Location = "Cinema Hall A",
                     TicketPrice = 12.50m,
                     PosterUrl = "https://m.media-amazon.com/images/I/71DwIcSgFcS._AC_UF894,1000_QL80_.jpg",
@@ -1272,7 +1272,7 @@ namespace MovieApp.Logic.Data
                     Movie = matrix,
                     Title = "The Matrix - Fan Marathon",
                     Description = "Back-to-back screening + trivia. Doors open 18:00.",
-                    Date = now.AddDays(14),
+                    Date = currentDate.AddDays(14),
                     Location = "Retro Theater",
                     TicketPrice = 18.00m,
                     PosterUrl = "https://m.media-amazon.com/images/I/51EG732BV3L.jpg",
@@ -1282,7 +1282,7 @@ namespace MovieApp.Logic.Data
                     Movie = interstellar,
                     Title = "Interstellar - Space Night",
                     Description = "Screening followed by a small astronomy Q&A.",
-                    Date = now.AddDays(21),
+                    Date = currentDate.AddDays(21),
                     Location = "Science Center Auditorium",
                     TicketPrice = 15.00m,
                     PosterUrl = "https://m.media-amazon.com/images/I/91vIHsL-zjL._AC_UF894,1000_QL80_.jpg",
@@ -1292,7 +1292,7 @@ namespace MovieApp.Logic.Data
                     Movie = whiplash,
                     Title = "Whiplash - Live Jazz Intro",
                     Description = "Short live jazz set before the movie.",
-                    Date = now.AddDays(10),
+                    Date = currentDate.AddDays(10),
                     Location = "Downtown Arts Cinema",
                     TicketPrice = 14.00m,
                     PosterUrl = "https://m.media-amazon.com/images/I/81hKZ6oTqUL._AC_UF894,1000_QL80_.jpg",
@@ -1327,7 +1327,7 @@ namespace MovieApp.Logic.Data
                 return;
             }
 
-            DateTime now = DateTime.UtcNow;
+            DateTime currentDate = DateTime.UtcNow;
 
             _context.MovieReviews.AddRange(
                 new MovieReview
@@ -1336,7 +1336,7 @@ namespace MovieApp.Logic.Data
                     User = seller1,
                     StarRating = 9m,
                     Comment = "A mind-bending classic with unforgettable world-building.",
-                    CreatedAt = now,
+                    CreatedAt = currentDate,
                 },
                 new MovieReview
                 {
@@ -1344,7 +1344,7 @@ namespace MovieApp.Logic.Data
                     User = seller2,
                     StarRating = 7m,
                     Comment = "Great action and ideas, but definitely not for everyone.",
-                    CreatedAt = now,
+                    CreatedAt = currentDate,
                 },
                 new MovieReview
                 {
@@ -1352,7 +1352,7 @@ namespace MovieApp.Logic.Data
                     User = seller1,
                     StarRating = 10m,
                     Comment = "Epic, emotional, and incredibly thought-provoking.",
-                    CreatedAt = now,
+                    CreatedAt = currentDate,
                 },
                 new MovieReview
                 {
@@ -1360,7 +1360,7 @@ namespace MovieApp.Logic.Data
                     User = seller2,
                     StarRating = 8m,
                     Comment = "Beautiful visuals and a satisfying emotional payoff.",
-                    CreatedAt = now,
+                    CreatedAt = currentDate,
                 },
                 new MovieReview
                 {
@@ -1368,7 +1368,7 @@ namespace MovieApp.Logic.Data
                     User = seller1,
                     StarRating = 9m,
                     Comment = "Smart, tense, and darkly funny all the way through.",
-                    CreatedAt = now,
+                    CreatedAt = currentDate,
                 },
                 new MovieReview
                 {
@@ -1376,7 +1376,7 @@ namespace MovieApp.Logic.Data
                     User = seller2,
                     StarRating = 6m,
                     Comment = "Surprisingly entertaining, but the pacing felt uneven.",
-                    CreatedAt = now,
+                    CreatedAt = currentDate,
                 },
                 new MovieReview
                 {
@@ -1384,7 +1384,7 @@ namespace MovieApp.Logic.Data
                     User = seller1,
                     StarRating = 8m,
                     Comment = "Non-stop style and killer action choreography.",
-                    CreatedAt = now,
+                    CreatedAt = currentDate,
                 },
                 new MovieReview
                 {
@@ -1392,7 +1392,7 @@ namespace MovieApp.Logic.Data
                     User = seller2,
                     StarRating = 7m,
                     Comment = "Solid thrills and great atmosphere; easy to binge.",
-                    CreatedAt = now,
+                    CreatedAt = currentDate,
                 },
                 new MovieReview
                 {
@@ -1400,7 +1400,7 @@ namespace MovieApp.Logic.Data
                     User = seller1,
                     StarRating = 9m,
                     Comment = "A brutal, addictive rivalry that stays with you.",
-                    CreatedAt = now,
+                    CreatedAt = currentDate,
                 },
                 new MovieReview
                 {
@@ -1408,7 +1408,7 @@ namespace MovieApp.Logic.Data
                     User = seller2,
                     StarRating = 8m,
                     Comment = "Fantastic performances and a soundtrack that demands attention.",
-                    CreatedAt = now,
+                    CreatedAt = currentDate,
                 });
 
             await _context.SaveChangesAsync();
