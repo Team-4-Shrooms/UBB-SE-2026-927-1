@@ -25,8 +25,7 @@ namespace MovieApp.Tests.Data
             DataSeeder seeder = new DataSeeder(context);
             await seeder.SeedAsync();
 
-            int userCount = await context.Users
-                .CountAsync(user => user.Username != "dummy1" && user.Username != "dummy2");
+            int userCount = await context.Users.CountAsync(user => user.Username != "dummy1" && user.Username != "dummy2");
 
             Assert.Equal(6, userCount);
         }
