@@ -5,6 +5,7 @@ using MovieApp.Logic.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
+using System.Linq;
 
 namespace MovieApp.Logic.Repositories
 {
@@ -52,10 +53,14 @@ namespace MovieApp.Logic.Repositories
         /// <inheritdoc />
         public async Task<Dictionary<int, int>> GetAllLikeCountsAsync()
         {
-            return await _context.UserReelInteractions
+            List<UserReelInteraction> likedInteractions = await _context.UserReelInteractions
+                .Include(interaction => interaction.Reel)
                 .Where(interaction => interaction.IsLiked)
+                .ToListAsync();                           
+
+            return likedInteractions
                 .GroupBy(interaction => interaction.Reel.Id)
-                .ToDictionaryAsync(
+                .ToDictionary(
                     group => group.Key,
                     group => group.Count());
         }

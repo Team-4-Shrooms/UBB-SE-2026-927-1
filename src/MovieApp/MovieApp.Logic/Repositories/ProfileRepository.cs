@@ -62,7 +62,7 @@ namespace MovieApp.Logic.Repositories
         public async Task UpsertProfileAsync(UserProfile profile)
         {
             UserProfile? existingProfile = await _context.UserProfiles
-                .FirstOrDefaultAsync(p => p.User.Id == profile.User.Id);
+                .FirstOrDefaultAsync(currentProfile => currentProfile.User.Id == profile.User.Id);
 
             if (existingProfile is null)
             {

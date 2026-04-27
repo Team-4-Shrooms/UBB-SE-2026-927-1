@@ -52,9 +52,9 @@ namespace MovieApp.Logic.Repositories
         public async Task BoostMovieScoreAsync(int userId, int movieId, decimal scoreBoost)
         {
             UserMoviePreference? preference = await _context.UserMoviePreferences
-                .FirstOrDefaultAsync(p =>
-                    p.User.Id == userId &&
-                    p.Movie.Id == movieId);
+                .FirstOrDefaultAsync(currentPreference =>
+                    currentPreference.User.Id == userId &&
+                    currentPreference.Movie.Id == movieId);
 
             if (preference is null)
             {

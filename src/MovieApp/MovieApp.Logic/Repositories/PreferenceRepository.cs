@@ -50,7 +50,7 @@ namespace MovieApp.Logic.Repositories
         public async Task UpdatePreferenceAsync(int userId, int movieId, decimal boost)
         {
             UserMoviePreference? preference = await _context.UserMoviePreferences
-                .FirstOrDefaultAsync(p => p.User.Id == userId && p.Movie.Id == movieId);
+                .FirstOrDefaultAsync(currentPreference => currentPreference.User.Id == userId && currentPreference.Movie.Id == movieId);
 
             if (preference is null)
             {

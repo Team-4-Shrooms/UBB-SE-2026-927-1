@@ -1,80 +1,414 @@
 using Microsoft.EntityFrameworkCore;
 using MovieApp.Logic.Data;
-using MovieApp.Logic.Interfaces.Repositories;
 using MovieApp.Logic.Models;
+using MovieApp.Logic.Repositories;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 
-namespace MovieApp.Logic.Repositories
+namespace MovieApp.Tests.Repositories
 {
-    /// <summary>
-    /// EF Core data access for recommendation inputs.
-    /// </summary>
-    public class RecommendationRepository : IRecommendationRepository
+    public class RecommendationRepositoryTests
     {
-        private readonly AppDbContext _context;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RecommendationRepository"/> class.
-        /// </summary>
-        /// <param name="context">The EF Core database context.</param>
-        public RecommendationRepository(AppDbContext context)
+        private static AppDbContext CreateContext(string dbName)
         {
-            _context = context;
+            DbContextOptions<AppDbContext> options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase(dbName)
+                .Options;
+
+            return new AppDbContext(options);
         }
 
-        /// <inheritdoc />
-        public async Task<bool> UserHasPreferencesAsync(int userId)
+        private static async Task<(User user, Movie movie, Reel reel)> SeedUserMovieAndReel(AppDbContext context)
         {
-            return await _context.UserMoviePreferences
-                .AnyAsync(preference => preference.User.Id == userId);
+            User user = new User
+            {
+                Username = "testuser",
+                Email = "test@test.com",
+                PasswordHash = "hash",
+                Balance = 0m,
+            };
+
+            Movie movie = new Movie
+            {
+                Title = "Test Movie",
+                Description = "desc",
+                Rating = 8m,
+                Price = 10m,
+                PrimaryGenre = "Action",
+                ReleaseYear = 2020,
+                Synopsis = "synopsis",
+            };
+
+            context.Users.Add(user);
+            context.Movies.Add(movie);
+            await context.SaveChangesAsync();
+
+            Reel reel = new Reel
+            {
+                VideoUrl = "http://video.url",
+                ThumbnailUrl = "http://thumb.url",
+                Title = "Test Reel",
+                Caption = "caption",
+                FeatureDurationSeconds = 30m,
+                Source = "upload",
+                CreatedAt = DateTime.UtcNow,
+                Movie = movie,
+                CreatorUser = user,
+            };
+
+            context.Reels.Add(reel);
+            await context.SaveChangesAsync();
+
+            return (user, movie, reel);
         }
 
-        /// <inheritdoc />
-        public async Task<IList<Reel>> GetAllReelsAsync()
+        [Fact]
+        public async Task UserHasPreferencesAsync_noPreferences_returnsFalse()
         {
-            return await _context.Reels
-                .Include(reel => reel.Movie)
-                .ToListAsync();
+            await using AppDbContext context = CreateContext(nameof(UserHasPreferencesAsync_noPreferences_returnsFalse));
+            (User user, Movie movie, Reel reel) = await SeedUserMovieAndReel(context);
+
+            RecommendationRepository repository = new RecommendationRepository(context);
+
+            bool result = await repository.UserHasPreferencesAsync(user.Id);
+
+            Assert.False(result);
         }
 
-        /// <inheritdoc />
-        public async Task<Dictionary<int, decimal>> GetUserPreferenceScoresAsync(int userId)
+        [Fact]
+        public async Task UserHasPreferencesAsync_preferencesExist_returnsTrue()
         {
-            List<UserMoviePreference> preferences = await _context.UserMoviePreferences
-                .Include(preference => preference.Movie)
-                .Where(preference => preference.User.Id == userId)
-                .ToListAsync();
+            await using AppDbContext context = CreateContext(nameof(UserHasPreferencesAsync_preferencesExist_returnsTrue));
+            (User user, Movie movie, Reel reel) = await SeedUserMovieAndReel(context);
 
-            return preferences.ToDictionary(
-                preference => preference.Movie.Id,
-                preference => preference.Score);
+            context.UserMoviePreferences.Add(new UserMoviePreference
+            {
+                User = user,
+                Movie = movie,
+                Score = 7m,
+                LastModified = DateTime.UtcNow,
+                ChangeFromPreviousValue = 1,
+            });
+            await context.SaveChangesAsync();
+
+            RecommendationRepository repository = new RecommendationRepository(context);
+
+            bool result = await repository.UserHasPreferencesAsync(user.Id);
+
+            Assert.True(result);
         }
 
-        /// <inheritdoc />
-        public async Task<Dictionary<int, int>> GetAllLikeCountsAsync()
+        [Fact]
+        public async Task UserHasPreferencesAsync_wrongUserId_returnsFalse()
         {
-            List<UserReelInteraction> likedInteractions = await _context.UserReelInteractions
-                .Include(interaction => interaction.Reel)
-                .Where(interaction => interaction.IsLiked)
-                .ToListAsync();
+            await using AppDbContext context = CreateContext(nameof(UserHasPreferencesAsync_wrongUserId_returnsFalse));
+            (User user, Movie movie, Reel reel) = await SeedUserMovieAndReel(context);
 
-            return likedInteractions
-                .GroupBy(interaction => interaction.Reel.Id)
-                .ToDictionary(
-                    group => group.Key,
-                    group => group.Count());
+            context.UserMoviePreferences.Add(new UserMoviePreference
+            {
+                User = user,
+                Movie = movie,
+                Score = 7m,
+                LastModified = DateTime.UtcNow,
+                ChangeFromPreviousValue = 1,
+            });
+            await context.SaveChangesAsync();
+
+            RecommendationRepository repository = new RecommendationRepository(context);
+
+            bool result = await repository.UserHasPreferencesAsync(999);
+
+            Assert.False(result);
         }
 
-        /// <inheritdoc />
-        public async Task<List<UserReelInteraction>> GetLikesWithinDaysAsync(int days)
+        [Fact]
+        public async Task GetAllReelsAsync_noReels_returnsEmpty()
         {
-            DateTime cutoff = DateTime.UtcNow.AddDays(-days);
+            await using AppDbContext context = CreateContext(nameof(GetAllReelsAsync_noReels_returnsEmpty));
 
-            return await _context.UserReelInteractions
-                .Where(interaction => interaction.IsLiked && interaction.ViewedAt >= cutoff)
-                .ToListAsync();
+            RecommendationRepository repository = new RecommendationRepository(context);
+
+            IList<Reel> result = await repository.GetAllReelsAsync();
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetAllReelsAsync_reelsExist_returnsCorrectCount()
+        {
+            await using AppDbContext context = CreateContext(nameof(GetAllReelsAsync_reelsExist_returnsCorrectCount));
+            (User user, Movie movie, Reel reel) = await SeedUserMovieAndReel(context);
+
+            RecommendationRepository repository = new RecommendationRepository(context);
+
+            IList<Reel> result = await repository.GetAllReelsAsync();
+
+            Assert.Single(result);
+        }
+
+        [Fact]
+        public async Task GetAllReelsAsync_reelsExist_returnsCorrectReelId()
+        {
+            await using AppDbContext context = CreateContext(nameof(GetAllReelsAsync_reelsExist_returnsCorrectReelId));
+            (User user, Movie movie, Reel reel) = await SeedUserMovieAndReel(context);
+
+            RecommendationRepository repository = new RecommendationRepository(context);
+
+            IList<Reel> result = await repository.GetAllReelsAsync();
+
+            Assert.Equal(reel.Id, result[0].Id);
+        }
+
+        [Fact]
+        public async Task GetAllReelsAsync_reelsExist_includesMovie()
+        {
+            await using AppDbContext context = CreateContext(nameof(GetAllReelsAsync_reelsExist_includesMovie));
+            (User user, Movie movie, Reel reel) = await SeedUserMovieAndReel(context);
+
+            RecommendationRepository repository = new RecommendationRepository(context);
+
+            IList<Reel> result = await repository.GetAllReelsAsync();
+
+            Assert.NotNull(result[0].Movie);
+        }
+
+        [Fact]
+        public async Task GetUserPreferenceScoresAsync_noPreferences_returnsEmptyDictionary()
+        {
+            await using AppDbContext context = CreateContext(nameof(GetUserPreferenceScoresAsync_noPreferences_returnsEmptyDictionary));
+            (User user, Movie movie, Reel reel) = await SeedUserMovieAndReel(context);
+
+            RecommendationRepository repository = new RecommendationRepository(context);
+
+            Dictionary<int, decimal> result = await repository.GetUserPreferenceScoresAsync(user.Id);
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetUserPreferenceScoresAsync_preferencesExist_returnsCorrectCount()
+        {
+            await using AppDbContext context = CreateContext(nameof(GetUserPreferenceScoresAsync_preferencesExist_returnsCorrectCount));
+            (User user, Movie movie, Reel reel) = await SeedUserMovieAndReel(context);
+
+            context.UserMoviePreferences.Add(new UserMoviePreference
+            {
+                User = user,
+                Movie = movie,
+                Score = 7m,
+                LastModified = DateTime.UtcNow,
+                ChangeFromPreviousValue = 1,
+            });
+            await context.SaveChangesAsync();
+
+            RecommendationRepository repository = new RecommendationRepository(context);
+
+            Dictionary<int, decimal> result = await repository.GetUserPreferenceScoresAsync(user.Id);
+
+            Assert.Single(result);
+        }
+
+        [Fact]
+        public async Task GetUserPreferenceScoresAsync_preferencesExist_returnsCorrectScore()
+        {
+            await using AppDbContext context = CreateContext(nameof(GetUserPreferenceScoresAsync_preferencesExist_returnsCorrectScore));
+            (User user, Movie movie, Reel reel) = await SeedUserMovieAndReel(context);
+
+            context.UserMoviePreferences.Add(new UserMoviePreference
+            {
+                User = user,
+                Movie = movie,
+                Score = 7m,
+                LastModified = DateTime.UtcNow,
+                ChangeFromPreviousValue = 1,
+            });
+            await context.SaveChangesAsync();
+
+            RecommendationRepository repository = new RecommendationRepository(context);
+
+            Dictionary<int, decimal> result = await repository.GetUserPreferenceScoresAsync(user.Id);
+
+            Assert.Equal(7m, result[movie.Id]);
+        }
+
+        [Fact]
+        public async Task GetUserPreferenceScoresAsync_wrongUserId_returnsEmptyDictionary()
+        {
+            await using AppDbContext context = CreateContext(nameof(GetUserPreferenceScoresAsync_wrongUserId_returnsEmptyDictionary));
+            (User user, Movie movie, Reel reel) = await SeedUserMovieAndReel(context);
+
+            context.UserMoviePreferences.Add(new UserMoviePreference
+            {
+                User = user,
+                Movie = movie,
+                Score = 7m,
+                LastModified = DateTime.UtcNow,
+                ChangeFromPreviousValue = 1,
+            });
+            await context.SaveChangesAsync();
+
+            RecommendationRepository repository = new RecommendationRepository(context);
+
+            Dictionary<int, decimal> result = await repository.GetUserPreferenceScoresAsync(999);
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetAllLikeCountsAsync_noLikes_returnsEmptyDictionary()
+        {
+            await using AppDbContext context = CreateContext(nameof(GetAllLikeCountsAsync_noLikes_returnsEmptyDictionary));
+            (User user, Movie movie, Reel reel) = await SeedUserMovieAndReel(context);
+
+            context.UserReelInteractions.Add(new UserReelInteraction
+            {
+                User = user,
+                Reel = reel,
+                IsLiked = false,
+                WatchDurationSeconds = 10m,
+                WatchPercentage = 33m,
+                ViewedAt = DateTime.UtcNow,
+            });
+            await context.SaveChangesAsync();
+
+            RecommendationRepository repository = new RecommendationRepository(context);
+
+            Dictionary<int, int> result = await repository.GetAllLikeCountsAsync();
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetAllLikeCountsAsync_oneLike_returnsCorrectCount()
+        {
+            await using AppDbContext context = CreateContext(nameof(GetAllLikeCountsAsync_oneLike_returnsCorrectCount));
+            (User user, Movie movie, Reel reel) = await SeedUserMovieAndReel(context);
+
+            context.UserReelInteractions.Add(new UserReelInteraction
+            {
+                User = user,
+                Reel = reel,
+                IsLiked = true,
+                WatchDurationSeconds = 10m,
+                WatchPercentage = 33m,
+                ViewedAt = DateTime.UtcNow,
+            });
+            await context.SaveChangesAsync();
+
+            RecommendationRepository repository = new RecommendationRepository(context);
+
+            Dictionary<int, int> result = await repository.GetAllLikeCountsAsync();
+
+            Assert.Equal(1, result[reel.Id]);
+        }
+
+        [Fact]
+        public async Task GetAllLikeCountsAsync_oneLike_returnsSingleEntry()
+        {
+            await using AppDbContext context = CreateContext(nameof(GetAllLikeCountsAsync_oneLike_returnsSingleEntry));
+            (User user, Movie movie, Reel reel) = await SeedUserMovieAndReel(context);
+
+            context.UserReelInteractions.Add(new UserReelInteraction
+            {
+                User = user,
+                Reel = reel,
+                IsLiked = true,
+                WatchDurationSeconds = 10m,
+                WatchPercentage = 33m,
+                ViewedAt = DateTime.UtcNow,
+            });
+            await context.SaveChangesAsync();
+
+            RecommendationRepository repository = new RecommendationRepository(context);
+
+            Dictionary<int, int> result = await repository.GetAllLikeCountsAsync();
+
+            Assert.Single(result);
+        }
+
+        [Fact]
+        public async Task GetLikesWithinDaysAsync_likeWithinRange_returnsInteraction()
+        {
+            await using AppDbContext context = CreateContext(nameof(GetLikesWithinDaysAsync_likeWithinRange_returnsInteraction));
+            (User user, Movie movie, Reel reel) = await SeedUserMovieAndReel(context);
+
+            context.UserReelInteractions.Add(new UserReelInteraction
+            {
+                User = user,
+                Reel = reel,
+                IsLiked = true,
+                WatchDurationSeconds = 10m,
+                WatchPercentage = 33m,
+                ViewedAt = DateTime.UtcNow,
+            });
+            await context.SaveChangesAsync();
+
+            RecommendationRepository repository = new RecommendationRepository(context);
+
+            List<UserReelInteraction> result = await repository.GetLikesWithinDaysAsync(7);
+
+            Assert.Single(result);
+        }
+
+        [Fact]
+        public async Task GetLikesWithinDaysAsync_likeOutsideRange_returnsEmpty()
+        {
+            await using AppDbContext context = CreateContext(nameof(GetLikesWithinDaysAsync_likeOutsideRange_returnsEmpty));
+            (User user, Movie movie, Reel reel) = await SeedUserMovieAndReel(context);
+
+            context.UserReelInteractions.Add(new UserReelInteraction
+            {
+                User = user,
+                Reel = reel,
+                IsLiked = true,
+                WatchDurationSeconds = 10m,
+                WatchPercentage = 33m,
+                ViewedAt = DateTime.UtcNow.AddDays(-10),
+            });
+            await context.SaveChangesAsync();
+
+            RecommendationRepository repository = new RecommendationRepository(context);
+
+            List<UserReelInteraction> result = await repository.GetLikesWithinDaysAsync(7);
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetLikesWithinDaysAsync_unlikedInteractionWithinRange_returnsEmpty()
+        {
+            await using AppDbContext context = CreateContext(nameof(GetLikesWithinDaysAsync_unlikedInteractionWithinRange_returnsEmpty));
+            (User user, Movie movie, Reel reel) = await SeedUserMovieAndReel(context);
+
+            context.UserReelInteractions.Add(new UserReelInteraction
+            {
+                User = user,
+                Reel = reel,
+                IsLiked = false,
+                WatchDurationSeconds = 10m,
+                WatchPercentage = 33m,
+                ViewedAt = DateTime.UtcNow,
+            });
+            await context.SaveChangesAsync();
+
+            RecommendationRepository repository = new RecommendationRepository(context);
+
+            List<UserReelInteraction> result = await repository.GetLikesWithinDaysAsync(7);
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetLikesWithinDaysAsync_noInteractions_returnsEmpty()
+        {
+            await using AppDbContext context = CreateContext(nameof(GetLikesWithinDaysAsync_noInteractions_returnsEmpty));
+
+            RecommendationRepository repository = new RecommendationRepository(context);
+
+            List<UserReelInteraction> result = await repository.GetLikesWithinDaysAsync(7);
+
+            Assert.Empty(result);
         }
     }
 }

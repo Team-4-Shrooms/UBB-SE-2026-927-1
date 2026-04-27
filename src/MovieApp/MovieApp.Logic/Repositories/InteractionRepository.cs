@@ -146,8 +146,8 @@ namespace MovieApp.Logic.Repositories
         public async Task<int?> GetReelMovieIdAsync(int reelId)
         {
             Reel? reel = await _context.Reels
-                .Include(r => r.Movie)
-                .FirstOrDefaultAsync(r => r.Id == reelId);
+                .Include(currentReel => currentReel.Movie)
+                .FirstOrDefaultAsync(currentReel => currentReel.Id == reelId);
 
             return reel?.Movie.Id;
         }

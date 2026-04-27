@@ -47,9 +47,9 @@ namespace MovieApp.Tests.Repositories
         }
 
         [Fact]
-        public async Task InsertReelAsync_validReel_insertsAndReturnsReelWithId()
+        public async Task InsertReelAsync_validReel_returnsPositiveId()
         {
-            await using AppDbContext context = CreateContext(nameof(InsertReelAsync_validReel_insertsAndReturnsReelWithId));
+            await using AppDbContext context = CreateContext(nameof(InsertReelAsync_validReel_returnsPositiveId));
             (User user, Movie movie) = await SeedUserAndMovie(context);
 
             Reel reel = new Reel
@@ -69,13 +69,39 @@ namespace MovieApp.Tests.Repositories
             Reel result = await repository.InsertReelAsync(reel);
 
             Assert.True(result.Id > 0);
-            Assert.Equal(1, await context.Reels.CountAsync());
         }
 
         [Fact]
-        public async Task InsertReelAsync_validReel_setsCreatedAt()
+        public async Task InsertReelAsync_validReel_insertsOneRecord()
         {
-            await using AppDbContext context = CreateContext(nameof(InsertReelAsync_validReel_setsCreatedAt));
+            await using AppDbContext context = CreateContext(nameof(InsertReelAsync_validReel_insertsOneRecord));
+            (User user, Movie movie) = await SeedUserAndMovie(context);
+
+            Reel reel = new Reel
+            {
+                VideoUrl = "http://video.url",
+                ThumbnailUrl = "http://thumb.url",
+                Title = "New Reel",
+                Caption = "caption",
+                FeatureDurationSeconds = 30m,
+                Source = "upload",
+                Movie = movie,
+                CreatorUser = user,
+            };
+
+            VideoStorageRepository repository = new VideoStorageRepository(context);
+
+            await repository.InsertReelAsync(reel);
+
+            int count = await context.Reels.CountAsync();
+
+            Assert.Equal(1, count);
+        }
+
+        [Fact]
+        public async Task InsertReelAsync_validReel_setsCreatedAtAfterMinValue()
+        {
+            await using AppDbContext context = CreateContext(nameof(InsertReelAsync_validReel_setsCreatedAtAfterMinValue));
             (User user, Movie movie) = await SeedUserAndMovie(context);
 
             Reel reel = new Reel
@@ -95,6 +121,33 @@ namespace MovieApp.Tests.Repositories
             Reel result = await repository.InsertReelAsync(reel);
 
             Assert.True(result.CreatedAt > DateTime.MinValue);
+        }
+
+        [Fact]
+        public async Task InsertReelAsync_validReel_setsCreatedAtToRecent()
+        {
+            await using AppDbContext context = CreateContext(nameof(InsertReelAsync_validReel_setsCreatedAtToRecent));
+            (User user, Movie movie) = await SeedUserAndMovie(context);
+
+            DateTime beforeInsert = DateTime.UtcNow.AddSeconds(-1);
+
+            Reel reel = new Reel
+            {
+                VideoUrl = "http://video.url",
+                ThumbnailUrl = "http://thumb.url",
+                Title = "New Reel",
+                Caption = "caption",
+                FeatureDurationSeconds = 30m,
+                Source = "upload",
+                Movie = movie,
+                CreatorUser = user,
+            };
+
+            VideoStorageRepository repository = new VideoStorageRepository(context);
+
+            Reel result = await repository.InsertReelAsync(reel);
+
+            Assert.True(result.CreatedAt >= beforeInsert);
         }
 
         [Fact]
@@ -120,6 +173,56 @@ namespace MovieApp.Tests.Repositories
             Reel result = await repository.InsertReelAsync(reel);
 
             Assert.Equal("My Special Reel", result.Title);
+        }
+
+        [Fact]
+        public async Task InsertReelAsync_validReel_returnsCorrectVideoUrl()
+        {
+            await using AppDbContext context = CreateContext(nameof(InsertReelAsync_validReel_returnsCorrectVideoUrl));
+            (User user, Movie movie) = await SeedUserAndMovie(context);
+
+            Reel reel = new Reel
+            {
+                VideoUrl = "http://video.url",
+                ThumbnailUrl = "http://thumb.url",
+                Title = "New Reel",
+                Caption = "caption",
+                FeatureDurationSeconds = 30m,
+                Source = "upload",
+                Movie = movie,
+                CreatorUser = user,
+            };
+
+            VideoStorageRepository repository = new VideoStorageRepository(context);
+
+            Reel result = await repository.InsertReelAsync(reel);
+
+            Assert.Equal("http://video.url", result.VideoUrl);
+        }
+
+        [Fact]
+        public async Task InsertReelAsync_validReel_returnsCorrectFeatureDuration()
+        {
+            await using AppDbContext context = CreateContext(nameof(InsertReelAsync_validReel_returnsCorrectFeatureDuration));
+            (User user, Movie movie) = await SeedUserAndMovie(context);
+
+            Reel reel = new Reel
+            {
+                VideoUrl = "http://video.url",
+                ThumbnailUrl = "http://thumb.url",
+                Title = "New Reel",
+                Caption = "caption",
+                FeatureDurationSeconds = 30m,
+                Source = "upload",
+                Movie = movie,
+                CreatorUser = user,
+            };
+
+            VideoStorageRepository repository = new VideoStorageRepository(context);
+
+            Reel result = await repository.InsertReelAsync(reel);
+
+            Assert.Equal(30m, result.FeatureDurationSeconds);
         }
     }
 }

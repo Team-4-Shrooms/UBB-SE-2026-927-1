@@ -64,9 +64,9 @@ namespace MovieApp.Tests.Repositories
         }
 
         [Fact]
-        public async Task GetUserReelsAsync_reelsExist_returnsReelsForUser()
+        public async Task GetUserReelsAsync_reelsExist_returnsSingleReel()
         {
-            await using AppDbContext context = CreateContext(nameof(GetUserReelsAsync_reelsExist_returnsReelsForUser));
+            await using AppDbContext context = CreateContext(nameof(GetUserReelsAsync_reelsExist_returnsSingleReel));
             (User user, Movie movie, Reel reel) = await SeedData(context);
 
             ReelRepository repository = new ReelRepository(context);
@@ -74,6 +74,18 @@ namespace MovieApp.Tests.Repositories
             IList<Reel> result = await repository.GetUserReelsAsync(user.Id);
 
             Assert.Single(result);
+        }
+
+        [Fact]
+        public async Task GetUserReelsAsync_reelsExist_returnsCorrectReelId()
+        {
+            await using AppDbContext context = CreateContext(nameof(GetUserReelsAsync_reelsExist_returnsCorrectReelId));
+            (User user, Movie movie, Reel reel) = await SeedData(context);
+
+            ReelRepository repository = new ReelRepository(context);
+
+            IList<Reel> result = await repository.GetUserReelsAsync(user.Id);
+
             Assert.Equal(reel.Id, result[0].Id);
         }
 
@@ -91,9 +103,9 @@ namespace MovieApp.Tests.Repositories
         }
 
         [Fact]
-        public async Task GetReelByIdAsync_reelExists_returnsReel()
+        public async Task GetReelByIdAsync_reelExists_returnsNotNull()
         {
-            await using AppDbContext context = CreateContext(nameof(GetReelByIdAsync_reelExists_returnsReel));
+            await using AppDbContext context = CreateContext(nameof(GetReelByIdAsync_reelExists_returnsNotNull));
             (User user, Movie movie, Reel reel) = await SeedData(context);
 
             ReelRepository repository = new ReelRepository(context);
@@ -101,7 +113,32 @@ namespace MovieApp.Tests.Repositories
             Reel? result = await repository.GetReelByIdAsync(reel.Id);
 
             Assert.NotNull(result);
-            Assert.Equal(reel.Title, result.Title);
+        }
+
+        [Fact]
+        public async Task GetReelByIdAsync_reelExists_returnsCorrectTitle()
+        {
+            await using AppDbContext context = CreateContext(nameof(GetReelByIdAsync_reelExists_returnsCorrectTitle));
+            (User user, Movie movie, Reel reel) = await SeedData(context);
+
+            ReelRepository repository = new ReelRepository(context);
+
+            Reel? result = await repository.GetReelByIdAsync(reel.Id);
+
+            Assert.Equal(reel.Title, result!.Title);
+        }
+
+        [Fact]
+        public async Task GetReelByIdAsync_reelExists_returnsCorrectVideoUrl()
+        {
+            await using AppDbContext context = CreateContext(nameof(GetReelByIdAsync_reelExists_returnsCorrectVideoUrl));
+            (User user, Movie movie, Reel reel) = await SeedData(context);
+
+            ReelRepository repository = new ReelRepository(context);
+
+            Reel? result = await repository.GetReelByIdAsync(reel.Id);
+
+            Assert.Equal(reel.VideoUrl, result!.VideoUrl);
         }
 
         [Fact]
@@ -117,17 +154,32 @@ namespace MovieApp.Tests.Repositories
         }
 
         [Fact]
-        public async Task UpdateReelEditsAsync_reelExists_updatesCropData()
+        public async Task UpdateReelEditsAsync_reelExists_updatesCropDataJson()
         {
-            await using AppDbContext context = CreateContext(nameof(UpdateReelEditsAsync_reelExists_updatesCropData));
+            await using AppDbContext context = CreateContext(nameof(UpdateReelEditsAsync_reelExists_updatesCropDataJson));
             (User user, Movie movie, Reel reel) = await SeedData(context);
 
             ReelRepository repository = new ReelRepository(context);
 
             await repository.UpdateReelEditsAsync(reel.Id, "{crop:true}", null, string.Empty);
 
-            Reel? updated = await context.Reels.FindAsync(reel.Id);
-            Assert.Equal("{crop:true}", updated!.CropDataJson);
+            Reel? updatedReel = await context.Reels.FindAsync(reel.Id);
+
+            Assert.Equal("{crop:true}", updatedReel!.CropDataJson);
+        }
+
+        [Fact]
+        public async Task UpdateReelEditsAsync_nonExistentReel_doesNotThrow()
+        {
+            await using AppDbContext context = CreateContext(nameof(UpdateReelEditsAsync_nonExistentReel_doesNotThrow));
+
+            ReelRepository repository = new ReelRepository(context);
+
+            await repository.UpdateReelEditsAsync(999, "{crop:true}", null, string.Empty);
+
+            int count = await context.Reels.CountAsync();
+
+            Assert.Equal(0, count);
         }
 
         [Fact]
@@ -141,6 +193,7 @@ namespace MovieApp.Tests.Repositories
             await repository.DeleteReelAsync(reel.Id);
 
             int count = await context.Reels.CountAsync();
+
             Assert.Equal(0, count);
         }
 
@@ -154,7 +207,38 @@ namespace MovieApp.Tests.Repositories
             await repository.DeleteReelAsync(999);
 
             int count = await context.Reels.CountAsync();
+
             Assert.Equal(0, count);
+        }
+
+        [Fact]
+        public async Task DeleteReelAsync_reelExists_doesNotDeleteOtherReels()
+        {
+            await using AppDbContext context = CreateContext(nameof(DeleteReelAsync_reelExists_doesNotDeleteOtherReels));
+            (User user, Movie movie, Reel reel) = await SeedData(context);
+
+            Reel secondReel = new Reel
+            {
+                VideoUrl = "http://second.url",
+                ThumbnailUrl = "http://thumb2.url",
+                Title = "Second Reel",
+                Caption = "caption2",
+                FeatureDurationSeconds = 20m,
+                Source = "upload",
+                CreatedAt = DateTime.UtcNow,
+                Movie = movie,
+                CreatorUser = user,
+            };
+            context.Reels.Add(secondReel);
+            await context.SaveChangesAsync();
+
+            ReelRepository repository = new ReelRepository(context);
+
+            await repository.DeleteReelAsync(reel.Id);
+
+            int count = await context.Reels.CountAsync();
+
+            Assert.Equal(1, count);
         }
     }
 }

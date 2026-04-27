@@ -112,7 +112,7 @@ namespace MovieApp.Logic.Repositories
         public async Task<IList<Movie>> SearchMoviesByNameAsync(string partialName)
         {
             return await _context.Movies
-                .Where(movie => EF.Functions.Like(movie.Title, $"%{partialName}%"))
+                .Where(movie => movie.Title.Contains(partialName))
                 .OrderBy(movie => movie.Title)
                 .Take(MaxMoviesToSearch)
                 .ToListAsync();
@@ -122,7 +122,7 @@ namespace MovieApp.Logic.Repositories
         public async Task<int?> FindMovieByTitleAsync(string title)
         {
             Movie? movie = await _context.Movies
-                .FirstOrDefaultAsync(m => m.Title == title);
+                .FirstOrDefaultAsync(currentMovie => currentMovie.Title == title);
 
             return movie?.Id;
         }
