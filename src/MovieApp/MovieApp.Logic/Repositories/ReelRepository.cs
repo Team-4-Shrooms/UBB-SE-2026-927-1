@@ -15,10 +15,6 @@ namespace MovieApp.Logic.Repositories
     {
         private readonly AppDbContext _context;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReelRepository"/> class.
-        /// </summary>
-        /// <param name="context">The EF Core database context.</param>
         public ReelRepository(AppDbContext context)
         {
             _context = context;
@@ -47,16 +43,12 @@ namespace MovieApp.Logic.Repositories
         /// <inheritdoc />
         public async Task<int> UpdateReelEditsAsync(int reelId, string cropDataJson, int? backgroundMusicId, string videoUrl)
         {
-            Reel? reel = await _context.Reels.FindAsync(reelId);
-
-            if (reel is null)
-            {
-                return 0;
-            }
+            Reel reel = await _context.Reels.FindAsync(reelId)
+                ?? throw new KeyNotFoundException($"Reel {reelId} not found.");
 
             reel.CropDataJson = cropDataJson;
             reel.BackgroundMusicId = backgroundMusicId;
-            reel.VideoUrl = string.IsNullOrEmpty(videoUrl) ? reel.VideoUrl : videoUrl;
+            reel.VideoUrl = videoUrl;
             reel.LastEditedAt = DateTime.UtcNow;
 
             return await _context.SaveChangesAsync();
@@ -65,12 +57,8 @@ namespace MovieApp.Logic.Repositories
         /// <inheritdoc />
         public async Task DeleteReelAsync(int reelId)
         {
-            Reel? reel = await _context.Reels.FindAsync(reelId);
-
-            if (reel is null)
-            {
-                return;
-            }
+            Reel reel = await _context.Reels.FindAsync(reelId)
+                ?? throw new KeyNotFoundException($"Reel {reelId} not found.");
 
             List<UserReelInteraction> interactions = await _context.UserReelInteractions
                 .Where(interaction => interaction.Reel.Id == reelId)

@@ -13,6 +13,16 @@ namespace MovieApp.Logic.Repositories
             _context = context;
         }
 
+        public async Task<User?> GetUserByIdAsync(int id)
+        {
+            return await _context.Users.FindAsync(id);
+        }
+
+        public async Task<int> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync();
+        }
+
         public decimal GetBalance(int userId)
         {
             if (userId <= 0)

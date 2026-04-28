@@ -1,10 +1,15 @@
-﻿namespace MovieApp.Logic.Interfaces.Repositories
+using MovieApp.Logic.Models;
+
+namespace MovieApp.Logic.Interfaces.Repositories
 {
     /// <summary>
     /// Interface for user repository, responsible for managing user-related data such as balance and other user-specific information.
     /// </summary>
     public interface IUserRepository
     {
+        Task<User?> GetUserByIdAsync(int id);
+        Task<int> SaveChangesAsync();
+
         /// <summary>
         /// Retrieves the current balance for a user
         /// </summary>
