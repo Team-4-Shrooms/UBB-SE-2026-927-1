@@ -28,6 +28,11 @@ namespace MovieApp.DataLayer.Repositories
         public List<Transaction> GetTransactionsByUserId(int userId)
         {
             return _context.Transactions
+                .Include(transaction => transaction.Buyer)
+                .Include(transaction => transaction.Seller)
+                .Include(transaction => transaction.Equipment)
+                .Include(transaction => transaction.Movie)
+                .Include(transaction => transaction.Event)
                 .Where(transaction =>
                     transaction.Buyer.Id == userId ||
                     (transaction.Seller != null && transaction.Seller.Id == userId))

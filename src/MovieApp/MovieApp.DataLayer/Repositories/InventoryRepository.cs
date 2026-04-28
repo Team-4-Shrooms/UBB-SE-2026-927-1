@@ -26,6 +26,7 @@ namespace MovieApp.DataLayer.Repositories
         public List<Movie> GetOwnedMovies(int userId)
         {
             return OwnedMovies
+                .Include(ownedMovie => ownedMovie.Movie)
                 .Where(ownedMovie => ownedMovie.User.Id == userId)
                 .Select(ownedMovie => ownedMovie.Movie)
                 .ToList();
@@ -98,6 +99,8 @@ namespace MovieApp.DataLayer.Repositories
         public List<MovieEvent> GetOwnedTickets(int userId)
         {
             return OwnedTickets
+                .Include(ownedTicket => ownedTicket.Event)
+                    .ThenInclude(movieEvent => movieEvent.Movie)
                 .Where(ownedTicket => ownedTicket.User.Id == userId)
                 .Select(ownedTicket => ownedTicket.Event)
                 .ToList();
@@ -106,6 +109,8 @@ namespace MovieApp.DataLayer.Repositories
         public List<Equipment> GetOwnedEquipment(int userId)
         {
             return Transactions
+                .Include(transaction => transaction.Equipment!)
+                    .ThenInclude(equipment => equipment.Seller)
                 .Where(transaction => transaction.Buyer.Id == userId && transaction.Equipment != null)
                 .Select(transaction => transaction.Equipment!)
                 .ToList();

@@ -27,6 +27,7 @@ namespace MovieApp.DataLayer.Repositories
         public async Task<UserProfile?> GetProfileAsync(int userId)
         {
             return await _context.UserProfiles
+                .Include(profile => profile.User)
                 .FirstOrDefaultAsync(profile => profile.User.Id == userId);
         }
 

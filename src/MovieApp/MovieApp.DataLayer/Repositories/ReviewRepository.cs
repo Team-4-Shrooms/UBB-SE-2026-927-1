@@ -21,6 +21,7 @@ namespace MovieApp.DataLayer.Repositories
         {
             return _context.MovieReviews
                 .AsNoTracking()
+                .Include(review => review.Movie)
                 .Include(review => review.User)
                 .Where(review => review.Movie.Id == movieId)
                 .OrderByDescending(review => review.CreatedAt)

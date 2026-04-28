@@ -64,6 +64,7 @@ namespace MovieApp.DataLayer.Repositories
         public async Task<IList<ScrapeJob>> GetAllJobsAsync()
         {
             return await _context.ScrapeJobs
+                .Include(job => job.Logs)
                 .OrderByDescending(job => job.StartedAt)
                 .ToListAsync();
         }
@@ -72,6 +73,7 @@ namespace MovieApp.DataLayer.Repositories
         public async Task<IList<ScrapeJobLog>> GetLogsForJobAsync(int jobId)
         {
             return await _context.ScrapeJobLogs
+                .Include(log => log.ScrapeJob)
                 .Where(log => log.ScrapeJob.Id == jobId)
                 .OrderBy(log => log.Timestamp)
                 .ToListAsync();
@@ -81,6 +83,7 @@ namespace MovieApp.DataLayer.Repositories
         public async Task<IList<ScrapeJobLog>> GetAllLogsAsync()
         {
             return await _context.ScrapeJobLogs
+                .Include(log => log.ScrapeJob)
                 .OrderByDescending(log => log.Timestamp)
                 .Take(MaxLogsToRetrieve)
                 .ToListAsync();
@@ -154,6 +157,8 @@ namespace MovieApp.DataLayer.Repositories
         public async Task<IList<Reel>> GetAllReelsAsync()
         {
             return await _context.Reels
+                .Include(reel => reel.Movie)
+                .Include(reel => reel.CreatorUser)
                 .OrderByDescending(reel => reel.CreatedAt)
                 .ToListAsync();
         }

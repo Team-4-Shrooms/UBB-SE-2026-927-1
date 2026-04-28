@@ -18,9 +18,9 @@ namespace MovieApp.DataLayer.Repositories
 
         public List<MovieEvent> GetEventsForMovie(int movieId)
         {
-            // PROBLEMA: RETURNEAZA MOVIE NULL DE FIECARE DATA
             return _context.MovieEvents
                 .AsNoTracking()
+                .Include(movieEvent => movieEvent.Movie)
                 .Where(movieEvent => movieEvent.Movie.Id == movieId)
                 .OrderBy(movieEvent => movieEvent.Date)
                 .ThenBy(movieEvent => movieEvent.Id)
@@ -31,6 +31,7 @@ namespace MovieApp.DataLayer.Repositories
         {
             return _context.MovieEvents
                 .AsNoTracking()
+                .Include(movieEvent => movieEvent.Movie)
                 .OrderBy(movieEvent => movieEvent.Date)
                 .ThenBy(movieEvent => movieEvent.Id)
                 .ToList();
@@ -40,6 +41,7 @@ namespace MovieApp.DataLayer.Repositories
         {
             return _context.MovieEvents
                 .AsNoTracking()
+                .Include(movieEvent => movieEvent.Movie)
                 .FirstOrDefault(movieEvent => movieEvent.Id == eventId);
         }
 
