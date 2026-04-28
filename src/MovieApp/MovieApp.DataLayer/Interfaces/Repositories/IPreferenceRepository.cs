@@ -1,4 +1,4 @@
-namespace MovieApp.Logic.Interfaces.Repositories
+namespace MovieApp.DataLayer.Interfaces.Repositories
 {
     /// <summary>
     /// Repository for managing user movie preferences in the reels feed context.

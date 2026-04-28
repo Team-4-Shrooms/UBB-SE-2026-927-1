@@ -1,24 +1,24 @@
 using Microsoft.EntityFrameworkCore;
-using MovieApp.Logic.Interfaces.Repositories;
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Interfaces.Repositories;
+using MovieApp.DataLayer.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 
-namespace MovieApp.Logic.Repositories
+namespace MovieApp.DataLayer.Repositories
 {
     /// <summary>
     /// EF Core data access for the Reel table.
     /// </summary>
     public class ReelRepository : IReelRepository
     {
-        private readonly MovieApp.Logic.Data.IMovieAppDbContext _context;
+        private readonly MovieApp.DataLayer.Interfaces.IMovieAppDbContext _context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReelRepository"/> class.
         /// </summary>
         /// <param name="context">The EF Core database context.</param>
-        public ReelRepository(MovieApp.Logic.Data.IMovieAppDbContext context)
+        public ReelRepository(MovieApp.DataLayer.Interfaces.IMovieAppDbContext context)
         {
             _context = context;
         }

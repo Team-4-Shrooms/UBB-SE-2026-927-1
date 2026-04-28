@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MovieApp.Logic.Models
+namespace MovieApp.DataLayer.Models
 {
     public class Transaction
     {

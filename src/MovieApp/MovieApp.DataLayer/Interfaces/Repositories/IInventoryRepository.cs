@@ -1,6 +1,6 @@
-﻿using MovieApp.Logic.Models;
+﻿using MovieApp.DataLayer.Models;
 
-namespace MovieApp.Logic.Interfaces.Repositories
+namespace MovieApp.DataLayer.Interfaces.Repositories
 {
     /// <summary>
     /// Defines methods for accessing and managing a user's owned movies, tickets, and equipment in the inventory

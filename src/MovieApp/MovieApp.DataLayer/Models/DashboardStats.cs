@@ -1,4 +1,4 @@
-namespace MovieApp.Logic.Models
+namespace MovieApp.DataLayer.Models
 {
     /// <summary>
     /// Represents aggregated dashboard statistics for the trailer scraping admin view,

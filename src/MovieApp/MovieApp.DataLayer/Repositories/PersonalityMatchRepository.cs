@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using MovieApp.Logic.Interfaces.Repositories;
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Interfaces.Repositories;
+using MovieApp.DataLayer.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MovieApp.Logic.Repositories
+namespace MovieApp.DataLayer.Repositories
 {
     /// <summary>
     /// EF Core implementation of <see cref="IPersonalityMatchRepository"/>.
@@ -15,13 +15,13 @@ namespace MovieApp.Logic.Repositories
     {
         private const string FallbackUsernamePrefix = "User";
 
-        private readonly MovieApp.Logic.Data.IMovieAppDbContext _context;
+        private readonly MovieApp.DataLayer.Interfaces.IMovieAppDbContext _context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PersonalityMatchRepository"/> class.
         /// </summary>
         /// <param name="context">The EF Core database context.</param>
-        public PersonalityMatchRepository(MovieApp.Logic.Data.IMovieAppDbContext context)
+        public PersonalityMatchRepository(MovieApp.DataLayer.Interfaces.IMovieAppDbContext context)
         {
             _context = context;
         }

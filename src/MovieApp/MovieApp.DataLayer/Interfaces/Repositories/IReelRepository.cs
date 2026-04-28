@@ -1,8 +1,8 @@
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MovieApp.Logic.Interfaces.Repositories
+namespace MovieApp.DataLayer.Interfaces.Repositories
 {
     /// <summary>
     /// Defines the contract for interacting with the reel repository.

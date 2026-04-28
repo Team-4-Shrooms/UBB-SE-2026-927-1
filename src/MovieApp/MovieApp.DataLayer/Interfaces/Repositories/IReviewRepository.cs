@@ -1,6 +1,6 @@
-﻿using MovieApp.Logic.Models;
+﻿using MovieApp.DataLayer.Models;
 
-namespace MovieApp.Logic.Interfaces.Repositories
+namespace MovieApp.DataLayer.Interfaces.Repositories
 {
     /// <summary>
     /// A repository interface for managing movie reviews.

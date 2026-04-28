@@ -1,11 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using MovieApp.WebApi.Data;
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 
-namespace MovieApp.Logic.Data
+namespace MovieApp.DataLayer
 {
     /// <summary>
     /// Provides a single consolidated seed method for the application database.
@@ -14,13 +13,13 @@ namespace MovieApp.Logic.Data
     /// </summary>
     public class DataSeeder
     {
-        private readonly AppDbContext _context;
+        private readonly Interfaces.IMovieAppDbContext _context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataSeeder"/> class.
         /// </summary>
         /// <param name="context">The EF Core database context.</param>
-        public DataSeeder(AppDbContext context)
+        public DataSeeder(Interfaces.IMovieAppDbContext context)
         {
             _context = context;
         }

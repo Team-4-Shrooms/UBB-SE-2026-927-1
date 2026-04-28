@@ -30,7 +30,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\MovieApp.DataLayer\MovieApp.DataLayer.csproj" />
-        <ProjectReference Include="..\MovieApp.WebApi\MovieApp.WebApi.csproj" />
     </ItemGroup>
 
 </Project>

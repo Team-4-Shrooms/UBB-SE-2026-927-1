@@ -1,8 +1,8 @@
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MovieApp.Logic.Interfaces.Repositories
+namespace MovieApp.DataLayer.Interfaces.Repositories
 {
     /// <summary>
     /// Repository interface for accessing and updating movie data used during tournament play.

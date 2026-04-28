@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace MovieApp.Logic.Migrations
+namespace MovieApp.WebApi.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMergedDomain : Migration
+    public partial class _20260428 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,7 +19,7 @@ namespace MovieApp.Logic.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Rating = table.Column<double>(type: "float", nullable: false),
+                    Rating = table.Column<decimal>(type: "decimal(3,1)", precision: 3, scale: 1, nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     PrimaryGenre = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PosterUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -42,7 +42,7 @@ namespace MovieApp.Logic.Migrations
                     TrackName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Author = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AudioUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DurationSeconds = table.Column<double>(type: "float", nullable: false)
+                    DurationSeconds = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -246,7 +246,7 @@ namespace MovieApp.Logic.Migrations
                     ThumbnailUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Caption = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FeatureDurationSeconds = table.Column<double>(type: "float", nullable: false),
+                    FeatureDurationSeconds = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     CropDataJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BackgroundMusicId = table.Column<int>(type: "int", nullable: true),
                     Source = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -280,10 +280,10 @@ namespace MovieApp.Logic.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TotalLikes = table.Column<int>(type: "int", nullable: false),
-                    TotalWatchTimeSec = table.Column<long>(type: "bigint", nullable: false),
-                    AvgWatchTimeSec = table.Column<double>(type: "float", nullable: false),
+                    TotalWatchTimeSeconds = table.Column<long>(type: "bigint", nullable: false),
+                    AverageWatchTimeSeconds = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     TotalClipsViewed = table.Column<int>(type: "int", nullable: false),
-                    LikeToViewRatio = table.Column<double>(type: "float", nullable: false),
+                    LikeToViewRatio = table.Column<decimal>(type: "decimal(8,4)", precision: 8, scale: 4, nullable: false),
                     LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -380,7 +380,7 @@ namespace MovieApp.Logic.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Score = table.Column<double>(type: "float", nullable: false),
+                    Score = table.Column<decimal>(type: "decimal(8,4)", precision: 8, scale: 4, nullable: false),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ChangeFromPreviousValue = table.Column<int>(type: "int", nullable: true),
                     UserId = table.Column<int>(type: "int", nullable: false),
@@ -416,8 +416,8 @@ namespace MovieApp.Logic.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IsLiked = table.Column<bool>(type: "bit", nullable: false),
-                    WatchDurationSec = table.Column<double>(type: "float", nullable: false),
-                    WatchPercentage = table.Column<double>(type: "float", nullable: false),
+                    WatchDurationSeconds = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    WatchPercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     ViewedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     ReelId = table.Column<int>(type: "int", nullable: false)

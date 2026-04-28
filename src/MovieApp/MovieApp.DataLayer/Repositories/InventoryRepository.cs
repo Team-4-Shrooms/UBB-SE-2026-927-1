@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using MovieApp.Logic.Interfaces.Repositories;
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Interfaces.Repositories;
+using MovieApp.DataLayer.Models;
 
-namespace MovieApp.Logic.Repositories
+namespace MovieApp.DataLayer.Repositories
 {
     public sealed class InventoryRepository : IInventoryRepository
     {
@@ -10,7 +10,7 @@ namespace MovieApp.Logic.Repositories
         private const string RemoveOwnedTicketTransactionType = "RemoveOwnedTicket";
         private const string CompletedTransactionStatus = "Completed";
 
-        private readonly MovieApp.Logic.Data.IMovieAppDbContext _context;
+        private readonly MovieApp.DataLayer.Interfaces.IMovieAppDbContext _context;
         private DbSet<User> Users => _context.Users;
         private DbSet<Movie> Movies => _context.Movies;
         private DbSet<MovieEvent> MovieEvents => _context.MovieEvents;
@@ -18,7 +18,7 @@ namespace MovieApp.Logic.Repositories
         private DbSet<OwnedTicket> OwnedTickets => _context.OwnedTickets;
         private DbSet<Transaction> Transactions => _context.Transactions;
 
-        public InventoryRepository(MovieApp.Logic.Data.IMovieAppDbContext context)
+        public InventoryRepository(MovieApp.DataLayer.Interfaces.IMovieAppDbContext context)
         {
             _context = context;
         }

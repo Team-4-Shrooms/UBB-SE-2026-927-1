@@ -1,6 +1,6 @@
-﻿using MovieApp.Logic.Models;
+﻿using MovieApp.DataLayer.Models;
 
-namespace MovieApp.Logic.Interfaces.Repositories
+namespace MovieApp.DataLayer.Interfaces.Repositories
 {
     /// <summary>
     /// The repository interface for managing transactions related to movie purchases, rentals, and event ticket sales.

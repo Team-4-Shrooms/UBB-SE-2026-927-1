@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Models;
 
-namespace MovieApp.Logic.Data
+namespace MovieApp.DataLayer.Interfaces
 {
     public interface IMovieAppDbContext
     {

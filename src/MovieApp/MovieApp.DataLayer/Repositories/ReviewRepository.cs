@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using MovieApp.Logic.Interfaces.Repositories;
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Interfaces.Repositories;
+using MovieApp.DataLayer.Models;
 
-namespace MovieApp.Logic.Repositories
+namespace MovieApp.DataLayer.Repositories
 {
     public sealed class ReviewRepository : IReviewRepository
     {
@@ -10,9 +10,9 @@ namespace MovieApp.Logic.Repositories
         private const int MinStarRating = 1;
         private const int MaxStarRating = 10;
 
-        private readonly MovieApp.Logic.Data.IMovieAppDbContext _context;
+        private readonly MovieApp.DataLayer.Interfaces.IMovieAppDbContext _context;
 
-        public ReviewRepository(MovieApp.Logic.Data.IMovieAppDbContext context)
+        public ReviewRepository(MovieApp.DataLayer.Interfaces.IMovieAppDbContext context)
         {
             _context = context;
         }

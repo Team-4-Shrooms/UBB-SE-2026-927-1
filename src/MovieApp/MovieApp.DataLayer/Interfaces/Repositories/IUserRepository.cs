@@ -1,4 +1,4 @@
-﻿namespace MovieApp.Logic.Interfaces.Repositories
+﻿namespace MovieApp.DataLayer.Interfaces.Repositories
 {
     /// <summary>
     /// Interface for user repository, responsible for managing user-related data such as balance and other user-specific information.
