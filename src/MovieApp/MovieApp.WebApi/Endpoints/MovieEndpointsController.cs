@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MovieApp.DataLayer.DTO.WebAPI;
 using MovieApp.DataLayer.Repositories;
 
 namespace MovieApp.WebApi.Endpoints;
@@ -17,19 +18,21 @@ public sealed class MovieEndpointsController : ControllerBase
     [HttpGet]
     public IActionResult GetAllMovies()
     {
-        return Ok(_repository.GetAllMovies());
+        return Ok(_repository.GetAllMovies().Select(movie => movie.ToDto()));
     }
 
     [HttpGet("{movieId:int}")]
     public IActionResult GetMovieById(int movieId)
     {
-        return Ok(_repository.GetMovieById(movieId));
+        MovieDto? movie = _repository.GetMovieById(movieId)?.ToDto();
+        return Ok(movie);
     }
 
     [HttpGet("search")]
     public async Task<IActionResult> SearchTop10MoviesAsync([FromQuery] string? partialMovieName)
     {
-        return Ok(await _repository.SearchTop10MoviesAsync(partialMovieName ?? string.Empty));
+        var movies = await _repository.SearchTop10MoviesAsync(partialMovieName ?? string.Empty);
+        return Ok(movies.Select(movie => movie.ToDto()));
     }
 
     [HttpGet("{movieId:int}/owned/{userId:int}")]
@@ -39,7 +42,7 @@ public sealed class MovieEndpointsController : ControllerBase
     }
 
     [HttpPost("{movieId:int}/purchase")]
-    public IActionResult PurchaseMovie(int movieId, [FromBody] PurchaseMovieRequest request)
+    public IActionResult PurchaseMovie(int movieId, [FromBody] PurchaseMovieRequestBody request)
     {
         try
         {
@@ -51,6 +54,4 @@ public sealed class MovieEndpointsController : ControllerBase
             return BadRequest(exception.Message);
         }
     }
-
-    public sealed record PurchaseMovieRequest(int UserId, decimal FinalPrice);
 }

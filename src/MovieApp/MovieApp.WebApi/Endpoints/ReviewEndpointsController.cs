@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MovieApp.DataLayer.DTO.WebAPI;
 using MovieApp.DataLayer.Repositories;
 
 namespace MovieApp.WebApi.Endpoints;
@@ -17,11 +18,11 @@ public sealed class ReviewEndpointsController : ControllerBase
     [HttpGet("movie/{movieId:int}")]
     public IActionResult GetReviewsForMovie(int movieId)
     {
-        return Ok(_repository.GetReviewsForMovie(movieId));
+        return Ok(_repository.GetReviewsForMovie(movieId).Select(review => review.ToDto(movieId)));
     }
 
     [HttpPost]
-    public IActionResult AddReview([FromBody] AddReviewRequest request)
+    public IActionResult AddReview([FromBody] AddReviewRequestBody request)
     {
         try
         {
@@ -41,7 +42,7 @@ public sealed class ReviewEndpointsController : ControllerBase
     }
 
     [HttpPost("counts")]
-    public IActionResult GetReviewCounts([FromBody] MovieIdsRequest request)
+    public IActionResult GetReviewCounts([FromBody] GetReviewCountsRequestBody request)
     {
         return Ok(_repository.GetReviewCounts(request.MovieIds));
     }
@@ -51,7 +52,4 @@ public sealed class ReviewEndpointsController : ControllerBase
     {
         return Ok(_repository.GetStarRatingBuckets(movieId));
     }
-
-    public sealed record AddReviewRequest(int MovieId, int UserId, int StarRating, string? Comment);
-    public sealed record MovieIdsRequest(IEnumerable<int> MovieIds);
 }

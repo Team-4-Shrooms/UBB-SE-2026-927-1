@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MovieApp.DataLayer.DTO.WebAPI;
 using MovieApp.DataLayer.Repositories;
 
 namespace MovieApp.WebApi.Endpoints;
@@ -23,15 +24,14 @@ public sealed class MovieTournamentEndpointsController : ControllerBase
     [HttpGet("users/{userId:int}/pool")]
     public async Task<IActionResult> GetTournamentPoolAsync(int userId, [FromQuery] int poolSize)
     {
-        return Ok(await _repository.GetTournamentPoolAsync(userId, poolSize));
+        var pool = await _repository.GetTournamentPoolAsync(userId, poolSize);
+        return Ok(pool.Select(movie => movie.ToDto()));
     }
 
     [HttpPost("users/{userId:int}/movies/{movieId:int}/boost")]
-    public async Task<IActionResult> BoostMovieScoreAsync(int userId, int movieId, [FromBody] BoostMovieScoreRequest request)
+    public async Task<IActionResult> BoostMovieScoreAsync(int userId, int movieId, [FromBody] BoostMovieScoreRequestBody request)
     {
         await _repository.BoostMovieScoreAsync(userId, movieId, request.ScoreBoost);
         return Ok();
     }
-
-    public sealed record BoostMovieScoreRequest(decimal ScoreBoost);
 }
