@@ -18,7 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MovieApp.DataLayer\MovieApp.DataLayer.csproj" />
+      <ProjectReference Include="..\MovieApp.DataLayer\MovieApp.DataLayer.csproj" />
+      <ProjectReference Include="..\MovieApp.Logic\MovieApp.Logic.csproj" />
   </ItemGroup>
 
 </Project>

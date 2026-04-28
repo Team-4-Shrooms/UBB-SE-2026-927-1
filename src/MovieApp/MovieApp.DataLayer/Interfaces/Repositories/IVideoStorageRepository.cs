@@ -1,11 +1,11 @@
-﻿using MovieApp.Logic.Models;
+﻿using MovieApp.DataLayer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MovieApp.Logic.Interfaces.Repositories
+namespace MovieApp.DataLayer.Interfaces.Repositories
 {
     /// <summary>
     /// Defines methods for storing video reels in a storage system.

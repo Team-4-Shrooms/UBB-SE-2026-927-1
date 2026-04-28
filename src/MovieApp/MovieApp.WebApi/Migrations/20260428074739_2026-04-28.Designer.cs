@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MovieApp.Logic.Data;
+using MovieApp.WebApi.Data;
 
 #nullable disable
 
-namespace MovieApp.Logic.Migrations
+namespace MovieApp.WebApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260425165710_InitialMergedDomain")]
-    partial class InitialMergedDomain
+    [Migration("20260428074739_2026-04-28")]
+    partial class _20260428
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace MovieApp.Logic.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("MovieApp.Logic.Models.ActiveSale", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.ActiveSale", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -54,7 +54,7 @@ namespace MovieApp.Logic.Migrations
                     b.ToTable("ActiveSales");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.Equipment", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.Equipment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -99,7 +99,7 @@ namespace MovieApp.Logic.Migrations
                     b.ToTable("Equipment");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.Movie", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.Movie", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -129,8 +129,9 @@ namespace MovieApp.Logic.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("Rating")
-                        .HasColumnType("float");
+                    b.Property<decimal>("Rating")
+                        .HasPrecision(3, 1)
+                        .HasColumnType("decimal(3,1)");
 
                     b.Property<int>("ReleaseYear")
                         .HasColumnType("int");
@@ -148,7 +149,7 @@ namespace MovieApp.Logic.Migrations
                     b.ToTable("Movies");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.MovieEvent", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.MovieEvent", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -189,7 +190,7 @@ namespace MovieApp.Logic.Migrations
                     b.ToTable("MovieEvents");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.MovieReview", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.MovieReview", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -221,7 +222,7 @@ namespace MovieApp.Logic.Migrations
                     b.ToTable("MovieReviews");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.MusicTrack", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.MusicTrack", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -237,8 +238,9 @@ namespace MovieApp.Logic.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("DurationSeconds")
-                        .HasColumnType("float");
+                    b.Property<decimal>("DurationSeconds")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("TrackName")
                         .IsRequired()
@@ -249,7 +251,7 @@ namespace MovieApp.Logic.Migrations
                     b.ToTable("MusicTracks");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.OwnedMovie", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.OwnedMovie", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -275,7 +277,7 @@ namespace MovieApp.Logic.Migrations
                     b.ToTable("OwnedMovies");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.OwnedTicket", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.OwnedTicket", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -301,7 +303,7 @@ namespace MovieApp.Logic.Migrations
                     b.ToTable("OwnedTickets");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.Reel", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.Reel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -325,8 +327,9 @@ namespace MovieApp.Logic.Migrations
                     b.Property<string>("CropDataJson")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("FeatureDurationSeconds")
-                        .HasColumnType("float");
+                    b.Property<decimal>("FeatureDurationSeconds")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Genre")
                         .HasColumnType("nvarchar(max)");
@@ -362,7 +365,7 @@ namespace MovieApp.Logic.Migrations
                     b.ToTable("Reels");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.ScrapeJob", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.ScrapeJob", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -401,7 +404,7 @@ namespace MovieApp.Logic.Migrations
                     b.ToTable("ScrapeJobs");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.ScrapeJobLog", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.ScrapeJobLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -430,7 +433,7 @@ namespace MovieApp.Logic.Migrations
                     b.ToTable("ScrapeJobLogs");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.Transaction", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.Transaction", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -486,7 +489,7 @@ namespace MovieApp.Logic.Migrations
                     b.ToTable("Transactions");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.User", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -515,7 +518,7 @@ namespace MovieApp.Logic.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.UserMoviePreference", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.UserMoviePreference", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -535,8 +538,9 @@ namespace MovieApp.Logic.Migrations
                     b.Property<int?>("ReelId")
                         .HasColumnType("int");
 
-                    b.Property<double>("Score")
-                        .HasColumnType("float");
+                    b.Property<decimal>("Score")
+                        .HasPrecision(8, 4)
+                        .HasColumnType("decimal(8,4)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -552,7 +556,7 @@ namespace MovieApp.Logic.Migrations
                     b.ToTable("UserMoviePreferences");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.UserProfile", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.UserProfile", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -560,14 +564,16 @@ namespace MovieApp.Logic.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<double>("AvgWatchTimeSec")
-                        .HasColumnType("float");
+                    b.Property<decimal>("AverageWatchTimeSeconds")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("datetime2");
 
-                    b.Property<double>("LikeToViewRatio")
-                        .HasColumnType("float");
+                    b.Property<decimal>("LikeToViewRatio")
+                        .HasPrecision(8, 4)
+                        .HasColumnType("decimal(8,4)");
 
                     b.Property<int>("TotalClipsViewed")
                         .HasColumnType("int");
@@ -575,7 +581,7 @@ namespace MovieApp.Logic.Migrations
                     b.Property<int>("TotalLikes")
                         .HasColumnType("int");
 
-                    b.Property<long>("TotalWatchTimeSec")
+                    b.Property<long>("TotalWatchTimeSeconds")
                         .HasColumnType("bigint");
 
                     b.Property<int>("UserId")
@@ -589,7 +595,7 @@ namespace MovieApp.Logic.Migrations
                     b.ToTable("UserProfiles");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.UserReelInteraction", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.UserReelInteraction", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -609,11 +615,12 @@ namespace MovieApp.Logic.Migrations
                     b.Property<DateTime>("ViewedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<double>("WatchDurationSec")
-                        .HasColumnType("float");
+                    b.Property<decimal>("WatchDurationSeconds")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<double>("WatchPercentage")
-                        .HasColumnType("float");
+                    b.Property<decimal>("WatchPercentage")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -624,20 +631,20 @@ namespace MovieApp.Logic.Migrations
                     b.ToTable("UserReelInteractions");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.ActiveSale", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.ActiveSale", b =>
                 {
-                    b.HasOne("MovieApp.Logic.Models.Movie", "Movie")
+                    b.HasOne("MovieApp.DataLayer.Models.Movie", "Movie")
                         .WithOne("ActiveSale")
-                        .HasForeignKey("MovieApp.Logic.Models.ActiveSale", "MovieId")
+                        .HasForeignKey("MovieApp.DataLayer.Models.ActiveSale", "MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Movie");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.Equipment", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.Equipment", b =>
                 {
-                    b.HasOne("MovieApp.Logic.Models.User", "Seller")
+                    b.HasOne("MovieApp.DataLayer.Models.User", "Seller")
                         .WithMany("EquipmentForSale")
                         .HasForeignKey("SellerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -646,9 +653,9 @@ namespace MovieApp.Logic.Migrations
                     b.Navigation("Seller");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.MovieEvent", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.MovieEvent", b =>
                 {
-                    b.HasOne("MovieApp.Logic.Models.Movie", "Movie")
+                    b.HasOne("MovieApp.DataLayer.Models.Movie", "Movie")
                         .WithMany()
                         .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -657,15 +664,15 @@ namespace MovieApp.Logic.Migrations
                     b.Navigation("Movie");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.MovieReview", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.MovieReview", b =>
                 {
-                    b.HasOne("MovieApp.Logic.Models.Movie", "Movie")
+                    b.HasOne("MovieApp.DataLayer.Models.Movie", "Movie")
                         .WithMany()
                         .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MovieApp.Logic.Models.User", "User")
+                    b.HasOne("MovieApp.DataLayer.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -676,15 +683,15 @@ namespace MovieApp.Logic.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.OwnedMovie", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.OwnedMovie", b =>
                 {
-                    b.HasOne("MovieApp.Logic.Models.Movie", "Movie")
+                    b.HasOne("MovieApp.DataLayer.Models.Movie", "Movie")
                         .WithMany()
                         .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MovieApp.Logic.Models.User", "User")
+                    b.HasOne("MovieApp.DataLayer.Models.User", "User")
                         .WithMany("OwnedMovies")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -695,15 +702,15 @@ namespace MovieApp.Logic.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.OwnedTicket", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.OwnedTicket", b =>
                 {
-                    b.HasOne("MovieApp.Logic.Models.MovieEvent", "Event")
+                    b.HasOne("MovieApp.DataLayer.Models.MovieEvent", "Event")
                         .WithMany()
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MovieApp.Logic.Models.User", "User")
+                    b.HasOne("MovieApp.DataLayer.Models.User", "User")
                         .WithMany("OwnedTickets")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -714,15 +721,15 @@ namespace MovieApp.Logic.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.Reel", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.Reel", b =>
                 {
-                    b.HasOne("MovieApp.Logic.Models.User", "CreatorUser")
+                    b.HasOne("MovieApp.DataLayer.Models.User", "CreatorUser")
                         .WithMany("CreatedReels")
                         .HasForeignKey("CreatorUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MovieApp.Logic.Models.Movie", "Movie")
+                    b.HasOne("MovieApp.DataLayer.Models.Movie", "Movie")
                         .WithMany()
                         .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -733,9 +740,9 @@ namespace MovieApp.Logic.Migrations
                     b.Navigation("Movie");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.ScrapeJobLog", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.ScrapeJobLog", b =>
                 {
-                    b.HasOne("MovieApp.Logic.Models.ScrapeJob", "ScrapeJob")
+                    b.HasOne("MovieApp.DataLayer.Models.ScrapeJob", "ScrapeJob")
                         .WithMany("Logs")
                         .HasForeignKey("ScrapeJobId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -744,27 +751,27 @@ namespace MovieApp.Logic.Migrations
                     b.Navigation("ScrapeJob");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.Transaction", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.Transaction", b =>
                 {
-                    b.HasOne("MovieApp.Logic.Models.User", "Buyer")
+                    b.HasOne("MovieApp.DataLayer.Models.User", "Buyer")
                         .WithMany("Purchases")
                         .HasForeignKey("BuyerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MovieApp.Logic.Models.Equipment", "Equipment")
+                    b.HasOne("MovieApp.DataLayer.Models.Equipment", "Equipment")
                         .WithMany()
                         .HasForeignKey("EquipmentId");
 
-                    b.HasOne("MovieApp.Logic.Models.MovieEvent", "Event")
+                    b.HasOne("MovieApp.DataLayer.Models.MovieEvent", "Event")
                         .WithMany()
                         .HasForeignKey("EventId");
 
-                    b.HasOne("MovieApp.Logic.Models.Movie", "Movie")
+                    b.HasOne("MovieApp.DataLayer.Models.Movie", "Movie")
                         .WithMany()
                         .HasForeignKey("MovieId");
 
-                    b.HasOne("MovieApp.Logic.Models.User", "Seller")
+                    b.HasOne("MovieApp.DataLayer.Models.User", "Seller")
                         .WithMany("Sales")
                         .HasForeignKey("SellerId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -780,19 +787,19 @@ namespace MovieApp.Logic.Migrations
                     b.Navigation("Seller");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.UserMoviePreference", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.UserMoviePreference", b =>
                 {
-                    b.HasOne("MovieApp.Logic.Models.Movie", "Movie")
+                    b.HasOne("MovieApp.DataLayer.Models.Movie", "Movie")
                         .WithMany()
                         .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MovieApp.Logic.Models.Reel", null)
+                    b.HasOne("MovieApp.DataLayer.Models.Reel", null)
                         .WithMany("MoviePreferences")
                         .HasForeignKey("ReelId");
 
-                    b.HasOne("MovieApp.Logic.Models.User", "User")
+                    b.HasOne("MovieApp.DataLayer.Models.User", "User")
                         .WithMany("MoviePreferences")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -803,26 +810,26 @@ namespace MovieApp.Logic.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.UserProfile", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.UserProfile", b =>
                 {
-                    b.HasOne("MovieApp.Logic.Models.User", "User")
+                    b.HasOne("MovieApp.DataLayer.Models.User", "User")
                         .WithOne("Profile")
-                        .HasForeignKey("MovieApp.Logic.Models.UserProfile", "UserId")
+                        .HasForeignKey("MovieApp.DataLayer.Models.UserProfile", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.UserReelInteraction", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.UserReelInteraction", b =>
                 {
-                    b.HasOne("MovieApp.Logic.Models.Reel", "Reel")
+                    b.HasOne("MovieApp.DataLayer.Models.Reel", "Reel")
                         .WithMany()
                         .HasForeignKey("ReelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MovieApp.Logic.Models.User", "User")
+                    b.HasOne("MovieApp.DataLayer.Models.User", "User")
                         .WithMany("ReelInteractions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -833,22 +840,22 @@ namespace MovieApp.Logic.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.Movie", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.Movie", b =>
                 {
                     b.Navigation("ActiveSale");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.Reel", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.Reel", b =>
                 {
                     b.Navigation("MoviePreferences");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.ScrapeJob", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.ScrapeJob", b =>
                 {
                     b.Navigation("Logs");
                 });
 
-            modelBuilder.Entity("MovieApp.Logic.Models.User", b =>
+            modelBuilder.Entity("MovieApp.DataLayer.Models.User", b =>
                 {
                     b.Navigation("CreatedReels");
 

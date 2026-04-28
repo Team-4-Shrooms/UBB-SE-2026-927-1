@@ -1,6 +1,6 @@
-using MovieApp.Logic.Data;
-using MovieApp.Logic.Models;
-using MovieApp.Logic.Repositories;
+using MovieApp.DataLayer;
+using MovieApp.DataLayer.Models;
+using MovieApp.DataLayer.Repositories;
 
 namespace MovieApp.Tests.Repositories
 {

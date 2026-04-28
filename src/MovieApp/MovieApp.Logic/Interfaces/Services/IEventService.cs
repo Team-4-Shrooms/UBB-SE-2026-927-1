@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Models;
 
 namespace MovieApp.Logic.Interfaces.Services
 {
@@ -13,3 +13,4 @@ namespace MovieApp.Logic.Interfaces.Services
         Task PurchaseTicketAsync(int userId, int eventId);
     }
 }
+

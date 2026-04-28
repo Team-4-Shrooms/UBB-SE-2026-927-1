@@ -1,6 +1,6 @@
 //using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace MovieApp.Logic.Models
+namespace MovieApp.DataLayer.Models
 {
     public partial class Reel //: ObservableObject
     {

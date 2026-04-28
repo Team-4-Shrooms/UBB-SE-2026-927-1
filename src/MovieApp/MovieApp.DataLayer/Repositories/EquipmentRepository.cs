@@ -1,17 +1,14 @@
 using Microsoft.EntityFrameworkCore;
-using MovieApp.Logic.Interfaces.Repositories;
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Interfaces.Repositories;
+using MovieApp.DataLayer.Models;
 
-namespace MovieApp.Logic.Repositories
+namespace MovieApp.DataLayer.Repositories
 {
     public sealed class EquipmentRepository : IEquipmentRepository
     {
-        private const string EquipmentPurchaseTransactionType = "EquipmentPurchase";
-        private const string CompletedTransactionStatus = "Completed";
+        private readonly MovieApp.DataLayer.Interfaces.IMovieAppDbContext _context;
 
-        private readonly MovieApp.Logic.Data.IMovieAppDbContext _context;
-
-        public EquipmentRepository(MovieApp.Logic.Data.IMovieAppDbContext context)
+        public EquipmentRepository(MovieApp.DataLayer.Interfaces.IMovieAppDbContext context)
         {
             _context = context;
         }
@@ -24,55 +21,27 @@ namespace MovieApp.Logic.Repositories
                 .ToList();
         }
 
-        public void ListItem(Equipment item)
+        public async Task<Equipment?> GetByIdAsync(int id)
         {
-            if (item is null)
-            {
-                throw new ArgumentNullException(nameof(item));
-            }
-
-            item.Status = EquipmentStatus.Available;
-            _context.Equipment.Add(item);
-            _context.SaveChanges();
+            return await _context.Equipment
+                .Include(e => e.Seller)
+                .FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public void PurchaseEquipment(int equipmentId, int buyerId, decimal price, string address)
+        public async Task AddAsync(Equipment item)
         {
-            if (buyerId <= 0)
-            {
-                throw new InvalidOperationException("You must be logged in to purchase.");
-            }
+            await _context.Equipment.AddAsync(item);
+        }
 
-            Equipment? equipment = _context.Equipment
-                .Include(candidate => candidate.Seller)
-                .FirstOrDefault(candidate => candidate.Id == equipmentId);
-            if (equipment is null)
-            {
-                throw new InvalidOperationException("Equipment not found.");
-            }
-            User? buyer = _context.Users.FirstOrDefault(candidate => candidate.Id == buyerId);
-            if (buyer is null)
-            {
-                throw new InvalidOperationException("Buyer not found.");
-            }
+        public async Task AddTransactionAsync(Transaction transaction)
+        {
+            await _context.Transactions.AddAsync(transaction);
+        }
 
-            buyer.Balance -= price;
-            equipment.Status = EquipmentStatus.Sold;
-
-            Transaction transaction = new Transaction
-            {
-                Buyer = buyer,
-                Seller = equipment.Seller,
-                Equipment = equipment,
-                Amount = -price,
-                Type = EquipmentPurchaseTransactionType,
-                Status = CompletedTransactionStatus,
-                Timestamp = DateTime.UtcNow,
-                ShippingAddress = address
-            };
-            _context.Transactions.Add(transaction);
-
-            _context.SaveChanges();
+        public async Task<int> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync();
         }
     }
 }
+

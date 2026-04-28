@@ -7,13 +7,7 @@
         <Platforms>AnyCPU;x64</Platforms>
     </PropertyGroup>
 
-    <ItemGroup>
-        <Compile Remove="AppDbContext\**" />
-        <Compile Remove="Interfaces\**" />
-        <Compile Remove="Migrations\**" />
-        <Compile Remove="Models\**" />
-        <Compile Remove="Repositories\**" />
-    </ItemGroup>
+
 
     <ItemGroup>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.26" />
@@ -30,7 +24,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\MovieApp.DataLayer\MovieApp.DataLayer.csproj" />
-        <ProjectReference Include="..\MovieApp.WebApi\MovieApp.WebApi.csproj" />
     </ItemGroup>
 
 </Project>

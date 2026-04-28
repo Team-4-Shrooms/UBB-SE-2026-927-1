@@ -1,12 +1,13 @@
 using Microsoft.EntityFrameworkCore;
-using MovieApp.Logic.Models;
-using MovieApp.Logic.Data;
+using MovieApp.DataLayer.Models;
+using MovieApp.DataLayer;
+using MovieApp.DataLayer.Interfaces;
 
 namespace MovieApp.WebApi.Data
 {
     public class AppDbContext : DbContext, IMovieAppDbContext
     {
-        public AppDbContext(DbContextOptions options) : base(options) 
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) 
         { 
         }
 
@@ -143,13 +144,6 @@ namespace MovieApp.WebApi.Data
             modelBuilder.Entity<UserReelInteraction>()
                 .Property(interaction => interaction.WatchDurationSeconds)
                 .HasPrecision(18, 2);
-        }
-    }
-
-    public class WebAPIDbContext : AppDbContext
-    {
-        public WebAPIDbContext(DbContextOptions options) : base(options)
-        {
         }
     }
 }

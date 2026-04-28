@@ -1,4 +1,4 @@
-namespace MovieApp.Logic.Models
+namespace MovieApp.DataLayer.Models
 {
     /// <summary>
     /// A display model representing a user's top-scored movie preference,

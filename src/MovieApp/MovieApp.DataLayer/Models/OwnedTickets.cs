@@ -1,4 +1,4 @@
-﻿namespace MovieApp.Logic.Models
+﻿namespace MovieApp.DataLayer.Models
 {
     public class OwnedTicket
     {

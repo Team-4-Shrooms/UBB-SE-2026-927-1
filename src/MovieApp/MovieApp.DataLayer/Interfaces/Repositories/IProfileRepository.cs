@@ -1,31 +1,16 @@
-﻿using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Models;
 
-namespace MovieApp.Logic.Interfaces.Repositories
+namespace MovieApp.DataLayer.Interfaces.Repositories
 {
     /// <summary>
     /// Repository for managing user engagement profiles in the reels feed context.
     /// </summary>
     public interface IProfileRepository
     {
-        /// <summary>
-        /// Retrieves the engagement profile for a user.
-        /// </summary>
-        /// <param name="userId">The ID of the user.</param>
-        /// <returns>The user's engagement profile, or null if no profile exists.</returns>
         Task<UserProfile?> GetProfileAsync(int userId);
-
-        /// <summary>
-        /// Builds an engagement profile by aggregating user interaction data.
-        /// </summary>
-        /// <param name="userId">The ID of the user for whom to build the profile.</param>
-        /// <returns>The constructed user profile based on interactions, or null if no interactions exist.</returns>
-        Task<UserProfile> BuildProfileFromInteractionsAsync(int userId);
-
-        /// <summary>
-        /// Inserts or updates the engagement profile for a user.
-        /// </summary>
-        /// <param name="profile">The profile model to save.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        Task UpsertProfileAsync(UserProfile profile);
+        Task<List<UserReelInteraction>> GetInteractionsAsync(int userId);
+        Task AddProfileAsync(UserProfile profile);
+        Task<int> SaveChangesAsync();
     }
 }
+

@@ -1,15 +1,15 @@
 using Microsoft.EntityFrameworkCore;
-using MovieApp.Logic.Interfaces.Repositories;
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Interfaces.Repositories;
+using MovieApp.DataLayer.Models;
 
-namespace MovieApp.Logic.Repositories
+namespace MovieApp.DataLayer.Repositories
 {
     public sealed class TransactionRepository : ITransactionRepository
     {
-        private readonly MovieApp.Logic.Data.IMovieAppDbContext _context;
+        private readonly MovieApp.DataLayer.Interfaces.IMovieAppDbContext _context;
         private DbSet<Transaction> Transactions => _context.Transactions;
 
-        public TransactionRepository(MovieApp.Logic.Data.IMovieAppDbContext context)
+        public TransactionRepository(MovieApp.DataLayer.Interfaces.IMovieAppDbContext context)
         {
             _context = context;
         }

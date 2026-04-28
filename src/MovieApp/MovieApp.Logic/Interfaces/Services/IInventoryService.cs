@@ -12,3 +12,4 @@ namespace MovieApp.Logic.Interfaces.Services
         Task RemoveOwnedTicketAsync(int userId, int eventId);
     }
 }
+
