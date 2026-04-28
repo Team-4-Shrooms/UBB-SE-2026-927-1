@@ -1,6 +1,7 @@
 using MovieApp.DataLayer.Models;
 
-namespace MovieApp.DataLayer.DTO.WebAPI;
+using MovieApp.WebApi.DTOs;
+namespace MovieApp.WebApi.Mappings;
 
 public static class WebApiDtoMappingExtensions
 {
