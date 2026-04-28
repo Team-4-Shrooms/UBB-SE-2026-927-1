@@ -3,6 +3,7 @@ using MovieApp.DataLayer;
 using MovieApp.DataLayer.Interfaces;
 using MovieApp.DataLayer.Repositories;
 using MovieApp.WebApi.Data;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,7 +33,23 @@ builder.Services.AddScoped<TransactionRepository>();
 builder.Services.AddScoped<ScrapeJobRepository>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    string xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "MovieApp WebApi",
+        Version = "v1",
+        Description = "HTTP API for the MovieApp application."
+    });
+
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
+});
 
 var app = builder.Build();
 
@@ -49,7 +66,11 @@ using (IServiceScope scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "MovieApp WebApi v1");
+        options.DocumentTitle = "MovieApp WebApi";
+    });
 }
 
 app.UseHttpsRedirection();
