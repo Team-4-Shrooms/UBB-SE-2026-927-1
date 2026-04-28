@@ -7,93 +7,52 @@ namespace MovieApp.Logic.Repositories
 {
     public sealed class EventRepository : IEventRepository
     {
-        private const string EventTicketTransactionType = "EventTicket";
-        private const string CompletedTransactionStatus = "Completed";
-
         private readonly AppDbContext _context;
-
         public EventRepository(AppDbContext context)
         {
             _context = context;
         }
-
-        public List<MovieEvent> GetEventsForMovie(int movieId)
+        public async Task<List<MovieEvent>> GetEventsByMovieIdAsync(int movieId)
         {
-            return _context.MovieEvents
+            return await _context.MovieEvents
                 .AsNoTracking()
-                .Where(movieEvent => movieEvent.Movie.Id == movieId)
-                .OrderBy(movieEvent => movieEvent.Date)
-                .ThenBy(movieEvent => movieEvent.Id)
-                .ToList();
+                .Where(e => e.Movie.Id == movieId)
+                .OrderBy(e => e.Date)
+                .ToListAsync();
         }
 
-        public List<MovieEvent> GetAllEvents()
+        public async Task<List<MovieEvent>> GetAllEventsAsync()
         {
-            return _context.MovieEvents
+            return await _context.MovieEvents
                 .AsNoTracking()
-                .OrderBy(movieEvent => movieEvent.Date)
-                .ThenBy(movieEvent => movieEvent.Id)
-                .ToList();
+                .OrderBy(e => e.Date)
+                .ToListAsync();
         }
 
-        public MovieEvent? GetEventById(int eventId)
+        public async Task<MovieEvent?> GetEventByIdAsync(int eventId)
         {
-            return _context.MovieEvents
-                .AsNoTracking()
-                .FirstOrDefault(movieEvent => movieEvent.Id == eventId);
+            return await _context.MovieEvents.FindAsync(eventId);
         }
 
-        public void PurchaseTicket(int userId, int eventId)
+        public async Task<bool> UserHasTicketAsync(int userId, int eventId)
         {
-            if (userId <= 0)
-            {
-                throw new InvalidOperationException("You must be logged in to purchase.");
-            }
+            return await _context.OwnedTickets
+                .AnyAsync(ot => ot.User.Id == userId && ot.Event.Id == eventId);
+        }
 
-            User? user = _context.Users.FirstOrDefault(candidate => candidate.Id == userId);
-            if (user is null)
-            {
-                throw new InvalidOperationException("User not found.");
-            }
-            MovieEvent? movieEvent = _context.MovieEvents.FirstOrDefault(candidate => candidate.Id == eventId);
-            if (movieEvent is null)
-            {
-                throw new InvalidOperationException("Event not found.");
-            }
-            bool alreadyOwned = _context.OwnedTickets
-                .Any(ownedTicket => ownedTicket.User.Id == userId && ownedTicket.Event.Id == eventId);
-            if (alreadyOwned)
-            {
-                throw new InvalidOperationException("You already own a ticket for this event.");
-            }
-            decimal price = movieEvent.TicketPrice;
-            if (user.Balance < price)
-            {
-                throw new InvalidOperationException("Insufficient balance.");
-            }
+        public async Task AddOwnedTicketAsync(OwnedTicket ticket)
+        {
+            await _context.OwnedTickets.AddAsync(ticket);
+        }
 
-            user.Balance -= price;
+        public async Task AddTransactionAsync(Transaction transaction)
+        {
+            await _context.Transactions.AddAsync(transaction);
+        }
 
-            OwnedTicket ticket = new OwnedTicket
-            {
-                User = user,
-                Event = movieEvent,
-                PurchaseDate = DateTime.UtcNow
-            };
-            _context.OwnedTickets.Add(ticket);
-
-            Transaction transaction = new Transaction
-            {
-                Buyer = user,
-                Event = movieEvent,
-                Amount = -price,
-                Type = EventTicketTransactionType,
-                Status = CompletedTransactionStatus,
-                Timestamp = DateTime.UtcNow
-            };
-            _context.Transactions.Add(transaction);
-
-            _context.SaveChanges();
+        public async Task<int> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync();
         }
     }
 }

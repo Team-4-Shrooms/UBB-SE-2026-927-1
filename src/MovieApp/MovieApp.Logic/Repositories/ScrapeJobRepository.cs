@@ -4,7 +4,6 @@ using MovieApp.Logic.Interfaces.Repositories;
 using MovieApp.Logic.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System;
 
 namespace MovieApp.Logic.Repositories
 {
@@ -18,10 +17,6 @@ namespace MovieApp.Logic.Repositories
 
         private readonly AppDbContext _context;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ScrapeJobRepository"/> class.
-        /// </summary>
-        /// <param name="context">The EF Core database context.</param>
         public ScrapeJobRepository(AppDbContext context)
         {
             _context = context;
@@ -38,12 +33,8 @@ namespace MovieApp.Logic.Repositories
         /// <inheritdoc />
         public async Task UpdateJobAsync(ScrapeJob job)
         {
-            ScrapeJob? existing = await _context.ScrapeJobs.FindAsync(job.Id);
-
-            if (existing is null)
-            {
-                return;
-            }
+            ScrapeJob existing = await _context.ScrapeJobs.FindAsync(job.Id)
+                ?? throw new KeyNotFoundException($"ScrapeJob {job.Id} not found.");
 
             existing.Status = job.Status;
             existing.MoviesFound = job.MoviesFound;
@@ -137,7 +128,6 @@ namespace MovieApp.Logic.Repositories
         /// <inheritdoc />
         public async Task<int> InsertScrapedReelAsync(Reel reel)
         {
-            reel.CreatedAt = DateTime.UtcNow;
             _context.Reels.Add(reel);
             await _context.SaveChangesAsync();
             return reel.Id;

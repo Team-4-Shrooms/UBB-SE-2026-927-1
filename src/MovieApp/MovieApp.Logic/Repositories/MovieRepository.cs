@@ -7,105 +7,40 @@ namespace MovieApp.Logic.Repositories
 {
     public sealed class MovieRepository : IMovieRepository
     {
-        private const string MoviePurchaseTransactionType = "MoviePurchase";
-        private const string CompletedTransactionStatus = "Completed";
-        private const int MaxSearchResults = 10;
-
         private readonly AppDbContext _context;
-
         public MovieRepository(AppDbContext context)
         {
             _context = context;
         }
 
-        public List<Movie> GetAllMovies()
+        public async Task<Movie?> GetMovieByIdAsync(int movieId)
         {
-            return _context.Movies
-                .AsNoTracking()
-                .OrderBy(movie => movie.Title)
-                .ToList();
+            return await _context.Movies.FindAsync(movieId);
         }
 
-        public Movie? GetMovieById(int movieId)
+        public async Task<bool> UserOwnsMovieAsync(int userId, int movieId)
         {
-            return _context.Movies
-                .AsNoTracking()
-                .FirstOrDefault(movie => movie.Id == movieId);
+            return await _context.OwnedMovies.AnyAsync(om => om.User.Id == userId && om.Movie.Id == movieId);
         }
 
-        public bool UserOwnsMovie(int userId, int movieId)
+        public async Task AddOwnedMovieAsync(OwnedMovie ownership)
         {
-            if (userId <= 0)
-            {
-                return false;
-            }
-
-            return _context.OwnedMovies
-                .Any(ownedMovie => ownedMovie.User.Id == userId && ownedMovie.Movie.Id == movieId);
+            await _context.OwnedMovies.AddAsync(ownership);
         }
 
-        public void PurchaseMovie(int userId, int movieId, decimal finalPrice)
+        public async Task AddTransactionAsync(Transaction transaction)
         {
-            if (userId <= 0)
-            {
-                throw new InvalidOperationException("You must be logged in to purchase.");
-            }
-
-            User? user = _context.Users.FirstOrDefault(candidate => candidate.Id == userId);
-            if (user is null)
-            {
-                throw new InvalidOperationException("User not found.");
-            }
-            Movie? movie = _context.Movies.FirstOrDefault(candidate => candidate.Id == movieId);
-            if (movie is null)
-            {
-                throw new InvalidOperationException("Movie not found.");
-            }
-            bool alreadyOwned = _context.OwnedMovies
-                .Any(ownedMovie => ownedMovie.User.Id == userId && ownedMovie.Movie.Id == movieId);
-            if (alreadyOwned)
-            {
-                throw new InvalidOperationException("You already own this movie.");
-            }
-            if (user.Balance < finalPrice)
-            {
-                throw new InvalidOperationException("Insufficient balance.");
-            }
-
-            user.Balance -= finalPrice;
-
-            OwnedMovie ownership = new OwnedMovie
-            {
-                User = user,
-                Movie = movie,
-                PurchaseDate = DateTime.UtcNow
-            };
-            _context.OwnedMovies.Add(ownership);
-
-            Transaction transaction = new Transaction
-            {
-                Buyer = user,
-                Movie = movie,
-                Amount = -finalPrice,
-                Type = MoviePurchaseTransactionType,
-                Status = CompletedTransactionStatus,
-                Timestamp = DateTime.UtcNow
-            };
-            _context.Transactions.Add(transaction);
-
-            _context.SaveChanges();
+            await _context.Transactions.AddAsync(transaction);
         }
 
-        public async Task<List<Movie>> SearchTop10MoviesAsync(string partialMovieName)
+        public async Task<int> SaveChangesAsync()
         {
-            string pattern = partialMovieName ?? string.Empty;
+            return await _context.SaveChangesAsync();
+        }
 
-            return await _context.Movies
-                .AsNoTracking()
-                .Where(movie => movie.Title.Contains(pattern))
-                .OrderBy(movie => movie.Title)
-                .Take(MaxSearchResults)
-                .ToListAsync();
+        public async Task<List<Movie>> SearchMoviesAsync(string pattern, int limit)
+        {
+            return await _context.Movies.Where(m => m.Title.Contains(pattern)).Take(limit).ToListAsync();
         }
     }
 }

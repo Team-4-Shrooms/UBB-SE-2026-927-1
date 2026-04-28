@@ -1,4 +1,4 @@
-﻿using MovieApp.Logic.Models;
+using MovieApp.Logic.Models;
 
 namespace MovieApp.Logic.Interfaces.Repositories
 {
@@ -7,12 +7,6 @@ namespace MovieApp.Logic.Interfaces.Repositories
     /// </summary>
     public interface IActiveSalesRepository
     {
-        /// <summary>
-        /// Retrieves a dictionary mapping movie IDs to their best available discount percentages.
-        /// </summary>
-        /// <returns>Dictionary where the key is the movie ID and the value is the best discount percentage available for that movie.</returns>
-        Dictionary<int, decimal> GetBestDiscountPercentByMovieId();
-
         /// <summary>
         /// Retrieves a list of currently active sales.
         /// </summary>

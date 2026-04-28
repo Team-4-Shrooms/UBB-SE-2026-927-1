@@ -14,25 +14,6 @@ namespace MovieApp.Logic.Repositories
             _context = context;
         }
 
-        public Dictionary<int, decimal> GetBestDiscountPercentByMovieId()
-        {
-            List<ActiveSale> sales = GetCurrentSales();
-
-            Dictionary<int, decimal> bestByMovieId = new Dictionary<int, decimal>();
-            foreach (ActiveSale sale in sales)
-            {
-                int movieId = sale.Movie.Id;
-                decimal percentage = sale.DiscountPercentage;
-
-                if (!bestByMovieId.TryGetValue(movieId, out decimal existing) || percentage > existing)
-                {
-                    bestByMovieId[movieId] = percentage;
-                }
-            }
-
-            return bestByMovieId;
-        }
-
         public List<ActiveSale> GetCurrentSales()
         {
             DateTime now = DateTime.UtcNow;
