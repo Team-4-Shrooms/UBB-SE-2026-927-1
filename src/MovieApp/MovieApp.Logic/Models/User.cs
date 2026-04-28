@@ -1,4 +1,4 @@
-﻿namespace MovieApp.Logic.Models
+namespace MovieApp.Logic.Models
 {
     public class User
     {
@@ -9,7 +9,6 @@
         public decimal Balance { get; set; }
 
         // --- Navigation Properties (Crucial for EF Core) ---
-        public UserProfile? Profile { get; set; }
         public ICollection<OwnedMovie> OwnedMovies { get; set; } = new List<OwnedMovie>();
         public ICollection<OwnedTicket> OwnedTickets { get; set; } = new List<OwnedTicket>();
         public ICollection<Equipment> EquipmentForSale { get; set; } = new List<Equipment>();

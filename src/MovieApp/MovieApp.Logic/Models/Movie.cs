@@ -18,8 +18,6 @@ namespace MovieApp.Logic.Models
         public decimal? ActiveSaleDiscountPercent { get; set; }
         public string Synopsis { get; set; } = string.Empty;
 
-        public ActiveSale? ActiveSale { get; set; }
-
         [NotMapped]
         public string OriginalPriceText => Price.ToString("0.00");
         [NotMapped]

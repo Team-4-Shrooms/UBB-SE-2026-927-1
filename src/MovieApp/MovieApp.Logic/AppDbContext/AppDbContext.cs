@@ -36,14 +36,14 @@ namespace MovieApp.Logic.Data
             base.OnModelCreating(modelBuilder);
 
             // 1-to-1 Relationships
-            modelBuilder.Entity<User>()
-                .HasOne(user => user.Profile)
-                .WithOne(userProfile => userProfile.User)
+            modelBuilder.Entity<UserProfile>()
+                .HasOne(profile => profile.User)
+                .WithOne()
                 .HasForeignKey<UserProfile>("UserId");
 
-            modelBuilder.Entity<Movie>()
-                .HasOne(movie => movie.ActiveSale)
-                .WithOne(activeSale => activeSale.Movie)
+            modelBuilder.Entity<ActiveSale>()
+                .HasOne(activeSale => activeSale.Movie)
+                .WithOne()
                 .HasForeignKey<ActiveSale>("MovieId");
 
             // Prevent Multiple Cascade Delete Paths
