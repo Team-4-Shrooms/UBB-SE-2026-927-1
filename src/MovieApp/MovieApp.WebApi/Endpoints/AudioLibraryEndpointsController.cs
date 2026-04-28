@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MovieApp.DataLayer.DTO.WebAPI;
 using MovieApp.DataLayer.Repositories;
 
 namespace MovieApp.WebApi.Endpoints;
@@ -17,12 +18,14 @@ public sealed class AudioLibraryEndpointsController : ControllerBase
     [HttpGet("tracks")]
     public async Task<IActionResult> GetAllTracksAsync()
     {
-        return Ok(await _repository.GetAllTracksAsync());
+        var tracks = await _repository.GetAllTracksAsync();
+        return Ok(tracks.Select(track => track.ToDto()));
     }
 
     [HttpGet("tracks/{musicTrackId:int}")]
     public async Task<IActionResult> GetTrackByIdAsync(int musicTrackId)
     {
-        return Ok(await _repository.GetTrackByIdAsync(musicTrackId));
+        MusicTrackDto? track = (await _repository.GetTrackByIdAsync(musicTrackId))?.ToDto();
+        return Ok(track);
     }
 }

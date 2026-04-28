@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MovieApp.DataLayer.DTO.WebAPI;
 using MovieApp.DataLayer.Repositories;
 
 namespace MovieApp.WebApi.Endpoints;
@@ -21,11 +22,9 @@ public sealed class UserEndpointsController : ControllerBase
     }
 
     [HttpPut("{userId:int}/balance")]
-    public IActionResult UpdateBalance(int userId, [FromBody] UpdateBalanceRequest request)
+    public IActionResult UpdateBalance(int userId, [FromBody] UpdateBalanceRequestBody request)
     {
         _repository.UpdateBalance(userId, request.NewBalance);
         return Ok();
     }
-
-    public sealed record UpdateBalanceRequest(decimal NewBalance);
 }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MovieApp.DataLayer.DTO.WebAPI;
 using MovieApp.DataLayer.Repositories;
 
 namespace MovieApp.WebApi.Endpoints;
@@ -23,7 +24,8 @@ public sealed class RecommendationEndpointsController : ControllerBase
     [HttpGet("reels")]
     public async Task<IActionResult> GetAllReelsAsync()
     {
-        return Ok(await _repository.GetAllReelsAsync());
+        var reels = await _repository.GetAllReelsAsync();
+        return Ok(reels.Select(reel => reel.ToDto()));
     }
 
     [HttpGet("users/{userId:int}/preference-scores")]
@@ -41,6 +43,7 @@ public sealed class RecommendationEndpointsController : ControllerBase
     [HttpGet("likes/within/{days:int}")]
     public async Task<IActionResult> GetLikesWithinDaysAsync(int days)
     {
-        return Ok(await _repository.GetLikesWithinDaysAsync(days));
+        var interactions = await _repository.GetLikesWithinDaysAsync(days);
+        return Ok(interactions.Select(interaction => interaction.ToDto()));
     }
 }

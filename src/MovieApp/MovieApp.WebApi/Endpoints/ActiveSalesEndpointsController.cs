@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MovieApp.DataLayer.DTO.WebAPI;
 using MovieApp.DataLayer.Repositories;
 
 namespace MovieApp.WebApi.Endpoints;
@@ -17,7 +18,9 @@ public sealed class ActiveSalesEndpointsController : ControllerBase
     [HttpGet("current")]
     public IActionResult GetCurrentSales()
     {
-        return Ok(_repository.GetCurrentSales());
+        var currentSales = _repository.GetCurrentSales().Select(sale => sale.ToDto());
+
+        return Ok(currentSales);
     }
 
     [HttpGet("best-discounts")]

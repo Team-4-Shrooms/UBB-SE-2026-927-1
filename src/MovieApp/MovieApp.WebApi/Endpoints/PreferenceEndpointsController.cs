@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MovieApp.DataLayer.DTO.WebAPI;
 using MovieApp.DataLayer.Repositories;
 
 namespace MovieApp.WebApi.Endpoints;
@@ -21,19 +22,16 @@ public sealed class PreferenceEndpointsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> InsertPreferenceAsync([FromBody] InsertPreferenceRequest request)
+    public async Task<IActionResult> InsertPreferenceAsync([FromBody] InsertPreferenceRequestBody request)
     {
         await _repository.InsertPreferenceAsync(request.UserId, request.MovieId, request.Score);
         return Ok();
     }
 
     [HttpPut("users/{userId:int}/movies/{movieId:int}/boost")]
-    public async Task<IActionResult> UpdatePreferenceAsync(int userId, int movieId, [FromBody] UpdatePreferenceRequest request)
+    public async Task<IActionResult> UpdatePreferenceAsync(int userId, int movieId, [FromBody] UpdatePreferenceRequestBody request)
     {
         await _repository.UpdatePreferenceAsync(userId, movieId, request.Boost);
         return Ok();
     }
-
-    public sealed record InsertPreferenceRequest(int UserId, int MovieId, decimal Score);
-    public sealed record UpdatePreferenceRequest(decimal Boost);
 }

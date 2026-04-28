@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using MovieApp.DataLayer.DTO.WebAPI;
+using MovieApp.DataLayer.Interfaces;
 using MovieApp.DataLayer.Models;
 using MovieApp.DataLayer.Repositories;
 
@@ -9,16 +11,31 @@ namespace MovieApp.WebApi.Endpoints;
 public sealed class InteractionEndpointsController : ControllerBase
 {
     private readonly InteractionRepository _repository;
+    private readonly IMovieAppDbContext _context;
 
-    public InteractionEndpointsController(InteractionRepository repository)
+    public InteractionEndpointsController(InteractionRepository repository, IMovieAppDbContext context)
     {
         _repository = repository;
+        _context = context;
     }
 
     [HttpPost]
-    public async Task<IActionResult> InsertInteractionAsync([FromBody] UserReelInteraction interaction)
+    public async Task<IActionResult> InsertInteractionAsync([FromBody] InsertInteractionRequestBody interaction)
     {
-        await _repository.InsertInteractionAsync(interaction);
+        User user = await _context.Users.FindAsync(interaction.UserId)
+            ?? throw new InvalidOperationException($"User {interaction.UserId} not found.");
+        Reel reel = await _context.Reels.FindAsync(interaction.ReelId)
+            ?? throw new InvalidOperationException($"Reel {interaction.ReelId} not found.");
+
+        await _repository.InsertInteractionAsync(new UserReelInteraction
+        {
+            IsLiked = interaction.IsLiked,
+            WatchDurationSeconds = interaction.WatchDurationSeconds,
+            WatchPercentage = interaction.WatchPercentage,
+            ViewedAt = interaction.ViewedAt,
+            User = user,
+            Reel = reel,
+        });
         return Ok();
     }
 
@@ -37,7 +54,7 @@ public sealed class InteractionEndpointsController : ControllerBase
     }
 
     [HttpPut("users/{userId:int}/reels/{reelId:int}/view")]
-    public async Task<IActionResult> UpdateViewDataAsync(int userId, int reelId, [FromBody] UpdateViewDataRequest request)
+    public async Task<IActionResult> UpdateViewDataAsync(int userId, int reelId, [FromBody] UpdateViewDataRequestBody request)
     {
         await _repository.UpdateViewDataAsync(userId, reelId, request.WatchDurationSeconds, request.WatchPercentage);
         return Ok();
@@ -60,6 +77,4 @@ public sealed class InteractionEndpointsController : ControllerBase
     {
         return Ok(await _repository.GetReelMovieIdAsync(reelId));
     }
-
-    public sealed record UpdateViewDataRequest(decimal WatchDurationSeconds, decimal WatchPercentage);
 }

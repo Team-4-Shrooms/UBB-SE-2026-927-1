@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MovieApp.DataLayer.DTO.WebAPI;
 using MovieApp.DataLayer.Repositories;
 
 namespace MovieApp.WebApi.Endpoints;
@@ -17,17 +18,19 @@ public sealed class ReelEndpointsController : ControllerBase
     [HttpGet("users/{userId:int}")]
     public async Task<IActionResult> GetUserReelsAsync(int userId)
     {
-        return Ok(await _repository.GetUserReelsAsync(userId));
+        var reels = await _repository.GetUserReelsAsync(userId);
+        return Ok(reels.Select(reel => reel.ToDto()));
     }
 
     [HttpGet("{reelId:int}")]
     public async Task<IActionResult> GetReelByIdAsync(int reelId)
     {
-        return Ok(await _repository.GetReelByIdAsync(reelId));
+        ReelDto? reel = (await _repository.GetReelByIdAsync(reelId))?.ToDto();
+        return Ok(reel);
     }
 
     [HttpPut("{reelId:int}")]
-    public async Task<IActionResult> UpdateReelEditsAsync(int reelId, [FromBody] UpdateReelEditsRequest request)
+    public async Task<IActionResult> UpdateReelEditsAsync(int reelId, [FromBody] UpdateReelEditsRequestBody request)
     {
         int affectedRows = await _repository.UpdateReelEditsAsync(reelId, request.CropDataJson, request.BackgroundMusicId, request.VideoUrl);
         return Ok(affectedRows);
@@ -39,6 +42,4 @@ public sealed class ReelEndpointsController : ControllerBase
         await _repository.DeleteReelAsync(reelId);
         return Ok();
     }
-
-    public sealed record UpdateReelEditsRequest(string CropDataJson, int? BackgroundMusicId, string VideoUrl);
 }
