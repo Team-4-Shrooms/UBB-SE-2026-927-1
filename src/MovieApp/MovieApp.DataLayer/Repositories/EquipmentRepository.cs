@@ -17,6 +17,7 @@ namespace MovieApp.DataLayer.Repositories
         {
             return _context.Equipment
                 .AsNoTracking()
+                .Include(equipment => equipment.Seller)
                 .Where(equipment => equipment.Status == EquipmentStatus.Available)
                 .ToList();
         }

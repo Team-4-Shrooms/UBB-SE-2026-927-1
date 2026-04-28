@@ -15,8 +15,10 @@ namespace MovieApp.DataLayer.Repositories
         {
             return await _context.MovieEvents
                 .AsNoTracking()
-                .Where(e => e.Movie.Id == movieId)
-                .OrderBy(e => e.Date)
+                .Include(movieEvent => movieEvent.Movie)
+                .Where(movieEvent => movieEvent.Movie.Id == movieId)
+                .OrderBy(movieEvent => movieEvent.Date)
+                .ThenBy(movieEvent => movieEvent.Id)
                 .ToListAsync();
         }
 
@@ -24,13 +26,18 @@ namespace MovieApp.DataLayer.Repositories
         {
             return await _context.MovieEvents
                 .AsNoTracking()
-                .OrderBy(e => e.Date)
+                .Include(movieEvent => movieEvent.Movie)
+                .OrderBy(movieEvent => movieEvent.Date)
+                .ThenBy(movieEvent => movieEvent.Id)
                 .ToListAsync();
         }
 
         public async Task<MovieEvent?> GetEventByIdAsync(int eventId)
         {
-            return await _context.MovieEvents.FindAsync(eventId);
+            return await _context.MovieEvents
+                .AsNoTracking()
+                .Include(movieEvent => movieEvent.Movie)
+                .FirstOrDefaultAsync(movieEvent => movieEvent.Id == eventId);
         }
 
         public async Task<bool> UserHasTicketAsync(int userId, int eventId)

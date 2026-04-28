@@ -14,7 +14,11 @@ namespace MovieApp.DataLayer.Repositories
 
         public async Task<List<Movie>> GetOwnedMoviesAsync(int userId)
         {
-            return await _context.OwnedMovies.Where(om => om.User.Id == userId).Select(om => om.Movie).ToListAsync();
+            return await _context.OwnedMovies
+                .Include(ownedMovie => ownedMovie.Movie)
+                .Where(om => om.User.Id == userId)
+                .Select(om => om.Movie)
+                .ToListAsync();
         }
 
         public async Task<List<OwnedMovie>> GetMovieOwnershipsAsync(int userId, int movieId)
@@ -29,7 +33,11 @@ namespace MovieApp.DataLayer.Repositories
 
         public async Task<List<OwnedTicket>> GetTicketOwnershipsAsync(int userId, int eventId)
         {
-            return await _context.OwnedTickets.Where(ot => ot.User.Id == userId && ot.Event.Id == eventId).ToListAsync();
+            return await _context.OwnedTickets
+                .Include(ownedTicket => ownedTicket.Event)
+                    .ThenInclude(movieEvent => movieEvent.Movie)
+                .Where(ot => ot.User.Id == userId && ot.Event.Id == eventId)
+                .ToListAsync();
         }
 
         public void RemoveTicketOwnerships(IEnumerable<OwnedTicket> ownerships)

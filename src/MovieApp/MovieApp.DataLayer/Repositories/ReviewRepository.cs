@@ -13,9 +13,17 @@ namespace MovieApp.DataLayer.Repositories
             _context = context;
         }
 
-        public async Task<List<MovieReview>> GetReviewsForMovieAsync(int movieId) =>
-        await _context.MovieReviews.Include(r => r.User).Where(r => r.Movie.Id == movieId)
-            .OrderByDescending(r => r.CreatedAt).ToListAsync();
+        public async Task<List<MovieReview>> GetReviewsForMovieAsync(int movieId)
+        {
+            return await _context.MovieReviews
+                .AsNoTracking()
+                .Include(review => review.Movie)
+                .Include(review => review.User)
+                .Where(review => review.Movie.Id == movieId)
+                .OrderByDescending(review => review.CreatedAt)
+                .ThenByDescending(review => review.Id)
+                .ToListAsync();
+        }
 
         public async Task<List<decimal>> GetRawRatingsForMovieAsync(int movieId) =>
             await _context.MovieReviews.Where(r => r.Movie.Id == movieId).Select(r => r.StarRating).ToListAsync();
