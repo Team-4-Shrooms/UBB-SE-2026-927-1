@@ -7,7 +7,7 @@ namespace MovieApp.Tests.Repositories
     public sealed class ReviewRepositoryTests
     {
         [Fact]
-        public void GetReviewsForMovie_ReturnsCorrectCount()
+        public async Task GetReviewsForMovieAsync_TwoReviewsExist_ReturnsTwoReviews()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             Movie movie = BuildMovie();
@@ -20,13 +20,13 @@ namespace MovieApp.Tests.Repositories
             context.SaveChanges();
 
             ReviewRepository repository = new ReviewRepository(context);
-            List<MovieReview> result = repository.GetReviewsForMovie(movie.Id);
+            List<MovieReview> reviews = await repository.GetReviewsForMovieAsync(movie.Id);
 
-            Assert.Equal(2, result.Count);
+            Assert.Equal(2, reviews.Count);
         }
 
         [Fact]
-        public void GetReviewsForMovie_OrdersByCreatedAtDescending()
+        public async Task GetReviewsForMovieAsync_TwoReviewsExist_FirstReviewIsNewerThanSecond()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             Movie movie = BuildMovie();
@@ -39,61 +39,27 @@ namespace MovieApp.Tests.Repositories
             context.SaveChanges();
 
             ReviewRepository repository = new ReviewRepository(context);
-            List<MovieReview> result = repository.GetReviewsForMovie(movie.Id);
+            List<MovieReview> reviews = await repository.GetReviewsForMovieAsync(movie.Id);
 
-            Assert.True(result[0].CreatedAt >= result[1].CreatedAt);
+            Assert.True(reviews[0].CreatedAt >= reviews[1].CreatedAt);
         }
 
         [Fact]
-        public void AddReview_StoresStarRating()
+        public async Task GetReviewsForMovieAsync_NoReviewsExist_ReturnsEmptyList()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             Movie movie = BuildMovie();
-            User user = BuildUser();
             context.Movies.Add(movie);
-            context.Users.Add(user);
             context.SaveChanges();
 
             ReviewRepository repository = new ReviewRepository(context);
-            repository.AddReview(movie.Id, user.Id, 7, "   ");
+            List<MovieReview> reviews = await repository.GetReviewsForMovieAsync(movie.Id);
 
-            Assert.Equal(7m, context.MovieReviews.Single().StarRating);
+            Assert.Empty(reviews);
         }
 
         [Fact]
-        public void AddReview_WhitespaceComment_StoresNull()
-        {
-            using AppDbContext context = TestDbContextFactory.Create();
-            Movie movie = BuildMovie();
-            User user = BuildUser();
-            context.Movies.Add(movie);
-            context.Users.Add(user);
-            context.SaveChanges();
-
-            ReviewRepository repository = new ReviewRepository(context);
-            repository.AddReview(movie.Id, user.Id, 7, "   ");
-
-            Assert.Null(context.MovieReviews.Single().Comment);
-        }
-
-        [Fact]
-        public void AddReview_PreservesNonEmptyComment()
-        {
-            using AppDbContext context = TestDbContextFactory.Create();
-            Movie movie = BuildMovie();
-            User user = BuildUser();
-            context.Movies.Add(movie);
-            context.Users.Add(user);
-            context.SaveChanges();
-
-            ReviewRepository repository = new ReviewRepository(context);
-            repository.AddReview(movie.Id, user.Id, 9, "Great");
-
-            Assert.Equal("Great", context.MovieReviews.Single().Comment);
-        }
-
-        [Fact]
-        public void GetReviewCount_ReturnsCorrectCount()
+        public async Task GetRawRatingsForMovieAsync_TwoReviewsExist_ReturnsTwoRatings()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             Movie movie = BuildMovie();
@@ -102,145 +68,105 @@ namespace MovieApp.Tests.Repositories
             context.Users.Add(user);
             context.MovieReviews.AddRange(
                 BuildReview(movie, user, 8, DateTime.UtcNow),
-                BuildReview(movie, user, 9, DateTime.UtcNow));
-            context.SaveChanges();
-
-            ReviewRepository repository = new ReviewRepository(context);
-
-            Assert.Equal(2, repository.GetReviewCount(movie.Id));
-        }
-
-        [Fact]
-        public void GetReviewCounts_EmptyIds_ReturnsEmptyDictionary()
-        {
-            using AppDbContext context = TestDbContextFactory.Create();
-            ReviewRepository repository = new ReviewRepository(context);
-
-            Dictionary<int, int> result = repository.GetReviewCounts(Enumerable.Empty<int>());
-
-            Assert.Empty(result);
-        }
-
-        [Fact]
-        public void GetReviewCounts_DeduplicatesIds_ReturnsSingleEntry()
-        {
-            using AppDbContext context = TestDbContextFactory.Create();
-            Movie movie = BuildMovie();
-            User user = BuildUser();
-            context.Movies.Add(movie);
-            context.Users.Add(user);
-            context.MovieReviews.Add(BuildReview(movie, user, 8, DateTime.UtcNow));
-            context.SaveChanges();
-
-            ReviewRepository repository = new ReviewRepository(context);
-            Dictionary<int, int> result = repository.GetReviewCounts(new List<int> { movie.Id, movie.Id });
-
-            Assert.Single(result);
-        }
-
-        [Fact]
-        public void GetReviewCounts_DeduplicatesIds_ReturnsCorrectCountForMovie()
-        {
-            using AppDbContext context = TestDbContextFactory.Create();
-            Movie movie = BuildMovie();
-            User user = BuildUser();
-            context.Movies.Add(movie);
-            context.Users.Add(user);
-            context.MovieReviews.Add(BuildReview(movie, user, 8, DateTime.UtcNow));
-            context.SaveChanges();
-
-            ReviewRepository repository = new ReviewRepository(context);
-            Dictionary<int, int> result = repository.GetReviewCounts(new List<int> { movie.Id, movie.Id });
-
-            Assert.Equal(1, result[movie.Id]);
-        }
-
-        [Fact]
-        public void GetStarRatingBuckets_ReturnsElevenBuckets()
-        {
-            using AppDbContext context = TestDbContextFactory.Create();
-            Movie movie = BuildMovie();
-            User user = BuildUser();
-            context.Movies.Add(movie);
-            context.Users.Add(user);
-            context.SaveChanges();
-
-            ReviewRepository repository = new ReviewRepository(context);
-            int[] buckets = repository.GetStarRatingBuckets(movie.Id);
-
-            Assert.Equal(11, buckets.Length);
-        }
-
-        [Fact]
-        public void GetStarRatingBuckets_ZeroBucketHasNoCounts()
-        {
-            using AppDbContext context = TestDbContextFactory.Create();
-            Movie movie = BuildMovie();
-            User user = BuildUser();
-            context.Movies.Add(movie);
-            context.Users.Add(user);
-            context.MovieReviews.AddRange(
-                BuildReview(movie, user, 1, DateTime.UtcNow),
                 BuildReview(movie, user, 5, DateTime.UtcNow));
             context.SaveChanges();
 
             ReviewRepository repository = new ReviewRepository(context);
-            int[] buckets = repository.GetStarRatingBuckets(movie.Id);
+            List<decimal> ratings = await repository.GetRawRatingsForMovieAsync(movie.Id);
 
-            Assert.Equal(0, buckets[0]);
+            Assert.Equal(2, ratings.Count);
         }
 
         [Fact]
-        public void GetStarRatingBuckets_RatingOneIsCountedInBucketOne()
+        public async Task GetRawRatingsForMovieAsync_NoReviewsExist_ReturnsEmptyList()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            Movie movie = BuildMovie();
+            context.Movies.Add(movie);
+            context.SaveChanges();
+
+            ReviewRepository repository = new ReviewRepository(context);
+            List<decimal> ratings = await repository.GetRawRatingsForMovieAsync(movie.Id);
+
+            Assert.Empty(ratings);
+        }
+
+        [Fact]
+        public async Task GetReviewCountsAsync_EmptyMovieIdList_ReturnsEmptyDictionary()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            ReviewRepository repository = new ReviewRepository(context);
+
+            Dictionary<int, int> reviewCounts = await repository.GetReviewCountsAsync(Enumerable.Empty<int>());
+
+            Assert.Empty(reviewCounts);
+        }
+
+        [Fact]
+        public async Task GetReviewCountsAsync_MovieWithOneReview_ReturnsCountOfOne()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             Movie movie = BuildMovie();
             User user = BuildUser();
             context.Movies.Add(movie);
             context.Users.Add(user);
-            context.MovieReviews.AddRange(
-                BuildReview(movie, user, 1, DateTime.UtcNow),
-                BuildReview(movie, user, 1, DateTime.UtcNow));
+            context.MovieReviews.Add(BuildReview(movie, user, 8, DateTime.UtcNow));
             context.SaveChanges();
 
             ReviewRepository repository = new ReviewRepository(context);
-            int[] buckets = repository.GetStarRatingBuckets(movie.Id);
+            Dictionary<int, int> reviewCounts = await repository.GetReviewCountsAsync(new List<int> { movie.Id });
 
-            Assert.Equal(2, buckets[1]);
+            Assert.Equal(1, reviewCounts[movie.Id]);
         }
 
         [Fact]
-        public void GetStarRatingBuckets_RatingFiveIsCountedInBucketFive()
+        public async Task AddReviewAsync_ValidReview_CreatesOneRecord()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             Movie movie = BuildMovie();
             User user = BuildUser();
             context.Movies.Add(movie);
             context.Users.Add(user);
-            context.MovieReviews.Add(BuildReview(movie, user, 5, DateTime.UtcNow));
             context.SaveChanges();
 
             ReviewRepository repository = new ReviewRepository(context);
-            int[] buckets = repository.GetStarRatingBuckets(movie.Id);
+            MovieReview review = new MovieReview
+            {
+                Movie = movie,
+                User = user,
+                StarRating = 7,
+                Comment = "Great movie",
+                CreatedAt = DateTime.UtcNow
+            };
+            await repository.AddReviewAsync(review);
+            await repository.SaveChangesAsync();
 
-            Assert.Equal(1, buckets[5]);
+            Assert.Single(context.MovieReviews);
         }
 
         [Fact]
-        public void GetStarRatingBuckets_RatingTenIsCountedInBucketTen()
+        public async Task AddReviewAsync_RatingOfNine_StoresCorrectStarRating()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             Movie movie = BuildMovie();
             User user = BuildUser();
             context.Movies.Add(movie);
             context.Users.Add(user);
-            context.MovieReviews.Add(BuildReview(movie, user, 10, DateTime.UtcNow));
             context.SaveChanges();
 
             ReviewRepository repository = new ReviewRepository(context);
-            int[] buckets = repository.GetStarRatingBuckets(movie.Id);
+            MovieReview review = new MovieReview
+            {
+                Movie = movie,
+                User = user,
+                StarRating = 9,
+                Comment = null,
+                CreatedAt = DateTime.UtcNow
+            };
+            await repository.AddReviewAsync(review);
+            await repository.SaveChangesAsync();
 
-            Assert.Equal(1, buckets[10]);
+            Assert.Equal(9m, context.MovieReviews.Single().StarRating);
         }
 
         private static Movie BuildMovie()

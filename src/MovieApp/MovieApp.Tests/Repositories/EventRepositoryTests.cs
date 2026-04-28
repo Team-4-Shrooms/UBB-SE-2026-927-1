@@ -7,16 +7,18 @@ namespace MovieApp.Tests.Repositories
     public sealed class EventRepositoryTests
     {
         [Fact]
-        public void GetAllEvents_NoEvents_ReturnsEmptyList()
+        public async Task GetAllEventsAsync_NoEventsExist_ReturnsEmptyList()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             EventRepository repository = new EventRepository(context);
 
-            Assert.Empty(repository.GetAllEvents());
+            List<MovieEvent> allEvents = await repository.GetAllEventsAsync();
+
+            Assert.Empty(allEvents);
         }
 
         [Fact]
-        public void GetAllEvents_ReturnsCorrectCount()
+        public async Task GetAllEventsAsync_TwoEventsExist_ReturnsTwoEvents()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             Movie movie = BuildMovie();
@@ -27,13 +29,13 @@ namespace MovieApp.Tests.Repositories
             context.SaveChanges();
 
             EventRepository repository = new EventRepository(context);
-            List<MovieEvent> result = repository.GetAllEvents();
+            List<MovieEvent> allEvents = await repository.GetAllEventsAsync();
 
-            Assert.Equal(2, result.Count);
+            Assert.Equal(2, allEvents.Count);
         }
 
         [Fact]
-        public void GetAllEvents_OrdersByDateAscending()
+        public async Task GetAllEventsAsync_TwoEventsExist_ReturnsEventsOrderedByDateAscending()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             Movie movie = BuildMovie();
@@ -44,51 +46,51 @@ namespace MovieApp.Tests.Repositories
             context.SaveChanges();
 
             EventRepository repository = new EventRepository(context);
-            List<string> titles = repository.GetAllEvents()
+            List<string> eventTitles = (await repository.GetAllEventsAsync())
                 .Select(movieEvent => movieEvent.Title)
                 .ToList();
 
-            Assert.Equal(new[] { "Early", "Late" }, titles);
+            Assert.Equal(new[] { "Early", "Late" }, eventTitles);
         }
 
         [Fact]
-        public void GetEventsForMovie_ReturnsOnlyEventsForRequestedMovie()
+        public async Task GetEventsByMovieIdAsync_TwoMoviesWithEvents_ReturnsOnlyEventsForRequestedMovie()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             Movie movieA = BuildMovie();
             Movie movieB = BuildMovie();
             context.Movies.AddRange(movieA, movieB);
             context.MovieEvents.AddRange(
-                BuildEvent(movieA, "A1", DateTime.UtcNow.AddDays(1)),
-                BuildEvent(movieB, "B1", DateTime.UtcNow.AddDays(2)));
+                BuildEvent(movieA, "EventA", DateTime.UtcNow.AddDays(1)),
+                BuildEvent(movieB, "EventB", DateTime.UtcNow.AddDays(2)));
             context.SaveChanges();
 
             EventRepository repository = new EventRepository(context);
-            List<MovieEvent> result = repository.GetEventsForMovie(movieA.Id);
+            List<MovieEvent> eventsForMovieA = await repository.GetEventsByMovieIdAsync(movieA.Id);
 
-            Assert.Single(result);
+            Assert.Single(eventsForMovieA);
         }
 
         [Fact]
-        public void GetEventsForMovie_ResultMatchesRequestedMovieTitle()
+        public async Task GetEventsByMovieIdAsync_TwoMoviesWithEvents_ReturnedEventHasCorrectTitle()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             Movie movieA = BuildMovie();
             Movie movieB = BuildMovie();
             context.Movies.AddRange(movieA, movieB);
             context.MovieEvents.AddRange(
-                BuildEvent(movieA, "A1", DateTime.UtcNow.AddDays(1)),
-                BuildEvent(movieB, "B1", DateTime.UtcNow.AddDays(2)));
+                BuildEvent(movieA, "EventA", DateTime.UtcNow.AddDays(1)),
+                BuildEvent(movieB, "EventB", DateTime.UtcNow.AddDays(2)));
             context.SaveChanges();
 
             EventRepository repository = new EventRepository(context);
-            List<MovieEvent> result = repository.GetEventsForMovie(movieA.Id);
+            List<MovieEvent> eventsForMovieA = await repository.GetEventsByMovieIdAsync(movieA.Id);
 
-            Assert.Equal("A1", result[0].Title);
+            Assert.Equal("EventA", eventsForMovieA[0].Title);
         }
 
         [Fact]
-        public void GetEventById_ExistingId_ReturnsEventWithMatchingTitle()
+        public async Task GetEventByIdAsync_EventExists_ReturnsEventWithMatchingTitle()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             Movie movie = BuildMovie();
@@ -98,97 +100,24 @@ namespace MovieApp.Tests.Repositories
             context.SaveChanges();
 
             EventRepository repository = new EventRepository(context);
-            MovieEvent? result = repository.GetEventById(movieEvent.Id);
+            MovieEvent? foundEvent = await repository.GetEventByIdAsync(movieEvent.Id);
 
-            Assert.Equal("Show", result!.Title);
+            Assert.Equal("Show", foundEvent!.Title);
         }
 
         [Fact]
-        public void GetEventById_UnknownId_ReturnsNull()
+        public async Task GetEventByIdAsync_EventDoesNotExist_ReturnsNull()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             EventRepository repository = new EventRepository(context);
 
-            Assert.Null(repository.GetEventById(99));
+            MovieEvent? foundEvent = await repository.GetEventByIdAsync(99);
+
+            Assert.Null(foundEvent);
         }
 
         [Fact]
-        public void PurchaseTicket_ZeroUserId_Throws()
-        {
-            using AppDbContext context = TestDbContextFactory.Create();
-            EventRepository repository = new EventRepository(context);
-
-            Assert.Throws<InvalidOperationException>(() => repository.PurchaseTicket(0, 1));
-        }
-
-        [Fact]
-        public void PurchaseTicket_NegativeUserId_Throws()
-        {
-            using AppDbContext context = TestDbContextFactory.Create();
-            EventRepository repository = new EventRepository(context);
-
-            Assert.Throws<InvalidOperationException>(() => repository.PurchaseTicket(-1, 1));
-        }
-
-        [Fact]
-        public void PurchaseTicket_HappyPath_DeductsBalance()
-        {
-            using AppDbContext context = TestDbContextFactory.Create();
-            User user = BuildUser(100m);
-            Movie movie = BuildMovie();
-            MovieEvent movieEvent = BuildEvent(movie, "Show", DateTime.UtcNow.AddDays(1));
-            movieEvent.TicketPrice = 25m;
-            context.Users.Add(user);
-            context.Movies.Add(movie);
-            context.MovieEvents.Add(movieEvent);
-            context.SaveChanges();
-
-            EventRepository repository = new EventRepository(context);
-            repository.PurchaseTicket(user.Id, movieEvent.Id);
-
-            Assert.Equal(75m, context.Users.Single().Balance);
-        }
-
-        [Fact]
-        public void PurchaseTicket_HappyPath_CreatesOwnership()
-        {
-            using AppDbContext context = TestDbContextFactory.Create();
-            User user = BuildUser(100m);
-            Movie movie = BuildMovie();
-            MovieEvent movieEvent = BuildEvent(movie, "Show", DateTime.UtcNow.AddDays(1));
-            movieEvent.TicketPrice = 25m;
-            context.Users.Add(user);
-            context.Movies.Add(movie);
-            context.MovieEvents.Add(movieEvent);
-            context.SaveChanges();
-
-            EventRepository repository = new EventRepository(context);
-            repository.PurchaseTicket(user.Id, movieEvent.Id);
-
-            Assert.Single(context.OwnedTickets);
-        }
-
-        [Fact]
-        public void PurchaseTicket_HappyPath_LogsTransaction()
-        {
-            using AppDbContext context = TestDbContextFactory.Create();
-            User user = BuildUser(100m);
-            Movie movie = BuildMovie();
-            MovieEvent movieEvent = BuildEvent(movie, "Show", DateTime.UtcNow.AddDays(1));
-            movieEvent.TicketPrice = 25m;
-            context.Users.Add(user);
-            context.Movies.Add(movie);
-            context.MovieEvents.Add(movieEvent);
-            context.SaveChanges();
-
-            EventRepository repository = new EventRepository(context);
-            repository.PurchaseTicket(user.Id, movieEvent.Id);
-
-            Assert.Single(context.Transactions);
-        }
-
-        [Fact]
-        public void PurchaseTicket_AlreadyOwned_Throws()
+        public async Task UserHasTicketAsync_UserOwnsTicket_ReturnsTrue()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             User user = BuildUser(100m);
@@ -202,17 +131,18 @@ namespace MovieApp.Tests.Repositories
 
             EventRepository repository = new EventRepository(context);
 
-            Assert.Throws<InvalidOperationException>(() => repository.PurchaseTicket(user.Id, movieEvent.Id));
+            bool hasTicket = await repository.UserHasTicketAsync(user.Id, movieEvent.Id);
+
+            Assert.True(hasTicket);
         }
 
         [Fact]
-        public void PurchaseTicket_InsufficientBalance_Throws()
+        public async Task UserHasTicketAsync_UserDoesNotOwnTicket_ReturnsFalse()
         {
             using AppDbContext context = TestDbContextFactory.Create();
-            User user = BuildUser(5m);
+            User user = BuildUser(100m);
             Movie movie = BuildMovie();
             MovieEvent movieEvent = BuildEvent(movie, "Show", DateTime.UtcNow.AddDays(1));
-            movieEvent.TicketPrice = 25m;
             context.Users.Add(user);
             context.Movies.Add(movie);
             context.MovieEvents.Add(movieEvent);
@@ -220,7 +150,28 @@ namespace MovieApp.Tests.Repositories
 
             EventRepository repository = new EventRepository(context);
 
-            Assert.Throws<InvalidOperationException>(() => repository.PurchaseTicket(user.Id, movieEvent.Id));
+            bool hasTicket = await repository.UserHasTicketAsync(user.Id, movieEvent.Id);
+
+            Assert.False(hasTicket);
+        }
+
+        [Fact]
+        public async Task AddOwnedTicketAsync_ValidTicket_CreatesOneRecord()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            User user = BuildUser(100m);
+            Movie movie = BuildMovie();
+            MovieEvent movieEvent = BuildEvent(movie, "Show", DateTime.UtcNow.AddDays(1));
+            context.Users.Add(user);
+            context.Movies.Add(movie);
+            context.MovieEvents.Add(movieEvent);
+            context.SaveChanges();
+
+            EventRepository repository = new EventRepository(context);
+            await repository.AddOwnedTicketAsync(new OwnedTicket { User = user, Event = movieEvent });
+            await repository.SaveChangesAsync();
+
+            Assert.Single(context.OwnedTickets);
         }
 
         private static Movie BuildMovie()

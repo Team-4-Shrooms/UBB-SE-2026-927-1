@@ -56,7 +56,10 @@ var app = builder.Build();
 using (IServiceScope scope = app.Services.CreateScope())
 {
     AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await context.Database.MigrateAsync();
+    if (context.Database.IsSqlServer())
+    {
+        await context.Database.MigrateAsync();
+    }
 
     DataSeeder seeder = new DataSeeder(context);
     await seeder.SeedAsync();
@@ -73,10 +76,18 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsEnvironment("Testing"))
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
+
+/// <summary>
+/// Enables WebApplicationFactory discovery for integration tests.
+/// </summary>
+public partial class Program { }
