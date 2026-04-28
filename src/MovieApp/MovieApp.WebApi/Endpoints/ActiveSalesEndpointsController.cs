@@ -19,13 +19,6 @@ public sealed class ActiveSalesEndpointsController : ControllerBase
     public IActionResult GetCurrentSales()
     {
         var currentSales = _repository.GetCurrentSales().Select(sale => sale.ToDto());
-
         return Ok(currentSales);
-    }
-
-    [HttpGet("best-discounts")]
-    public IActionResult GetBestDiscountPercentByMovieId()
-    {
-        return Ok(_repository.GetBestDiscountPercentByMovieId());
     }
 }

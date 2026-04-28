@@ -15,15 +15,6 @@ public sealed class PersonalityMatchEndpointsController : ControllerBase
         _repository = repository;
     }
 
-    [HttpGet("users/{excludedUserId:int}/all-preferences")]
-    public async Task<IActionResult> GetAllPreferencesExceptUserAsync(int excludedUserId)
-    {
-        var preferences = await _repository.GetAllPreferencesExceptUserAsync(excludedUserId);
-        return Ok(preferences.ToDictionary(
-            entry => entry.Key,
-            entry => entry.Value.Select(preference => preference.ToDto()).ToList()));
-    }
-
     [HttpGet("users/{userId:int}/current-preferences")]
     public async Task<IActionResult> GetCurrentUserPreferencesAsync(int userId)
     {
@@ -42,18 +33,5 @@ public sealed class PersonalityMatchEndpointsController : ControllerBase
     public async Task<IActionResult> GetRandomUserIdsAsync(int excludedUserId, [FromQuery] int userIdsCount)
     {
         return Ok(await _repository.GetRandomUserIdsAsync(excludedUserId, userIdsCount));
-    }
-
-    [HttpGet("users/{userId:int}/username")]
-    public async Task<IActionResult> GetUsernameAsync(int userId)
-    {
-        return Ok(await _repository.GetUsernameAsync(userId));
-    }
-
-    [HttpGet("users/{userId:int}/top-preferences")]
-    public async Task<IActionResult> GetTopPreferencesWithTitlesAsync(int userId, [FromQuery] int topMoviePreferencesCount)
-    {
-        var preferences = await _repository.GetTopPreferencesWithTitlesAsync(userId, topMoviePreferencesCount);
-        return Ok(preferences.Select(preference => preference.ToDto()));
     }
 }

@@ -70,6 +70,9 @@ namespace MovieApp.DataLayer.Repositories
             DateTime cutoff = DateTime.UtcNow.AddDays(-days);
 
             return await _context.UserReelInteractions
+                .Include(interaction => interaction.User)
+                .Include(interaction => interaction.Reel)
+                    .ThenInclude(reel => reel.Movie)
                 .Where(interaction => interaction.IsLiked && interaction.ViewedAt >= cutoff)
                 .ToListAsync();
         }

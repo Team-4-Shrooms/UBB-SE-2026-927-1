@@ -23,7 +23,11 @@ namespace MovieApp.DataLayer.Repositories
 
         public async Task<List<OwnedMovie>> GetMovieOwnershipsAsync(int userId, int movieId)
         {
-            return await _context.OwnedMovies.Where(om => om.User.Id == userId && om.Movie.Id == movieId).ToListAsync();
+            return await _context.OwnedMovies
+                .Include(om => om.User)
+                .Include(om => om.Movie)
+                .Where(om => om.User.Id == userId && om.Movie.Id == movieId)
+                .ToListAsync();
         }
 
         public void RemoveMovieOwnerships(IEnumerable<OwnedMovie> ownerships)

@@ -16,35 +16,23 @@ public sealed class EventEndpointsController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAllEvents()
+    public async Task<IActionResult> GetAllEvents()
     {
-        return Ok(_repository.GetAllEvents().Select(movieEvent => movieEvent.ToDto()));
+        var events = await _repository.GetAllEventsAsync();
+        return Ok(events.Select(movieEvent => movieEvent.ToDto()));
     }
 
     [HttpGet("{eventId:int}")]
-    public IActionResult GetEventById(int eventId)
+    public async Task<IActionResult> GetEventById(int eventId)
     {
-        MovieEventDto? movieEvent = _repository.GetEventById(eventId)?.ToDto();
-        return Ok(movieEvent);
+        var movieEvent = await _repository.GetEventByIdAsync(eventId);
+        return Ok(movieEvent?.ToDto());
     }
 
     [HttpGet("movie/{movieId:int}")]
-    public IActionResult GetEventsForMovie(int movieId)
+    public async Task<IActionResult> GetEventsForMovie(int movieId)
     {
-        return Ok(_repository.GetEventsForMovie(movieId).Select(movieEvent => movieEvent.ToDto()));
-    }
-
-    [HttpPost("{eventId:int}/purchase")]
-    public IActionResult PurchaseTicket(int eventId, [FromBody] PurchaseTicketRequestBody request)
-    {
-        try
-        {
-            _repository.PurchaseTicket(request.UserId, eventId);
-            return Ok();
-        }
-        catch (InvalidOperationException exception)
-        {
-            return BadRequest(exception.Message);
-        }
+        var events = await _repository.GetEventsByMovieIdAsync(movieId);
+        return Ok(events.Select(movieEvent => movieEvent.ToDto()));
     }
 }

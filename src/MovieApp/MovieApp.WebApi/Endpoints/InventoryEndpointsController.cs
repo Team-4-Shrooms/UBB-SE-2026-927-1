@@ -16,34 +16,9 @@ public sealed class InventoryEndpointsController : ControllerBase
     }
 
     [HttpGet("users/{userId:int}/movies")]
-    public IActionResult GetOwnedMovies(int userId)
+    public async Task<IActionResult> GetOwnedMovies(int userId)
     {
-        return Ok(_repository.GetOwnedMovies(userId).Select(movie => movie.ToOwnedMovieDto(userId)));
-    }
-
-    [HttpDelete("users/{userId:int}/movies/{movieId:int}")]
-    public IActionResult RemoveOwnedMovie(int userId, int movieId)
-    {
-        _repository.RemoveOwnedMovie(userId, movieId);
-        return Ok();
-    }
-
-    [HttpGet("users/{userId:int}/tickets")]
-    public IActionResult GetOwnedTickets(int userId)
-    {
-        return Ok(_repository.GetOwnedTickets(userId).Select(movieEvent => movieEvent.ToOwnedTicketDto(userId)));
-    }
-
-    [HttpDelete("users/{userId:int}/tickets/{eventId:int}")]
-    public IActionResult RemoveOwnedTicket(int userId, int eventId)
-    {
-        _repository.RemoveOwnedTicket(userId, eventId);
-        return Ok();
-    }
-
-    [HttpGet("users/{userId:int}/equipment")]
-    public IActionResult GetOwnedEquipment(int userId)
-    {
-        return Ok(_repository.GetOwnedEquipment(userId).Select(equipment => equipment.ToDto()));
+        var movies = await _repository.GetOwnedMoviesAsync(userId);
+        return Ok(movies.Select(movie => movie.ToOwnedMovieDto(userId)));
     }
 }

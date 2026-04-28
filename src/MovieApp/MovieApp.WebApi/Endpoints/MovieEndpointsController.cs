@@ -15,43 +15,25 @@ public sealed class MovieEndpointsController : ControllerBase
         _repository = repository;
     }
 
-    [HttpGet]
-    public IActionResult GetAllMovies()
-    {
-        return Ok(_repository.GetAllMovies().Select(movie => movie.ToDto()));
-    }
+
 
     [HttpGet("{movieId:int}")]
-    public IActionResult GetMovieById(int movieId)
+    public async Task<IActionResult> GetMovieById(int movieId)
     {
-        MovieDto? movie = _repository.GetMovieById(movieId)?.ToDto();
-        return Ok(movie);
+        var movie = await _repository.GetMovieByIdAsync(movieId);
+        return Ok(movie?.ToDto());
     }
 
     [HttpGet("search")]
     public async Task<IActionResult> SearchTop10MoviesAsync([FromQuery] string? partialMovieName)
     {
-        var movies = await _repository.SearchTop10MoviesAsync(partialMovieName ?? string.Empty);
+        var movies = await _repository.SearchMoviesAsync(partialMovieName ?? string.Empty, 10);
         return Ok(movies.Select(movie => movie.ToDto()));
     }
 
     [HttpGet("{movieId:int}/owned/{userId:int}")]
-    public IActionResult UserOwnsMovie(int movieId, int userId)
+    public async Task<IActionResult> UserOwnsMovie(int movieId, int userId)
     {
-        return Ok(_repository.UserOwnsMovie(userId, movieId));
-    }
-
-    [HttpPost("{movieId:int}/purchase")]
-    public IActionResult PurchaseMovie(int movieId, [FromBody] PurchaseMovieRequestBody request)
-    {
-        try
-        {
-            _repository.PurchaseMovie(request.UserId, movieId, request.FinalPrice);
-            return Ok();
-        }
-        catch (InvalidOperationException exception)
-        {
-            return BadRequest(exception.Message);
-        }
+        return Ok(await _repository.UserOwnsMovieAsync(userId, movieId));
     }
 }
