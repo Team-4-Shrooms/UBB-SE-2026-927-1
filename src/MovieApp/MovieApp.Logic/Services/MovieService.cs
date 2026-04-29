@@ -11,38 +11,42 @@ namespace MovieApp.DataLayer.Services
 {
     public class MovieService : IMovieService
     {
-        private readonly IMovieRepository _movieRepo;
-        private readonly IUserRepository _userRepo;
+        private readonly IMovieRepository _movieRepository;
+        private readonly IUserRepository _userRepository;
 
-        public MovieService(IMovieRepository movieRepo, IUserRepository userRepo)
+        public MovieService(IMovieRepository movieRepository, IUserRepository userRepository)
         {
-            _movieRepo = movieRepo;
-            _userRepo = userRepo;
+            _movieRepository = movieRepository;
+            _userRepository = userRepository;
         }
         public async Task PurchaseMovieAsync(int userId, int movieId, decimal price)
         {
-            var user = await _userRepo.GetUserByIdAsync(userId)
+            var user = await _userRepository.GetUserByIdAsync(userId)
                        ?? throw new KeyNotFoundException("User not found.");
 
-            var movie = await _movieRepo.GetMovieByIdAsync(movieId)
+            var movie = await _movieRepository.GetMovieByIdAsync(movieId)
                         ?? throw new KeyNotFoundException("Movie not found.");
 
-            if (await _movieRepo.UserOwnsMovieAsync(userId, movieId))
+            if (await _movieRepository.UserOwnsMovieAsync(userId, movieId))
+            {
                 throw new InvalidOperationException("Movie already owned.");
+            }
 
             if (user.Balance < price)
+            {
                 throw new InvalidOperationException("Insufficient balance.");
+            }
 
             user.Balance -= price;
 
-            await _movieRepo.AddOwnedMovieAsync(new OwnedMovie
+            await _movieRepository.AddOwnedMovieAsync(new OwnedMovie
             {
                 User = user,
                 Movie = movie,
                 PurchaseDate = DateTime.UtcNow
             });
 
-            await _movieRepo.AddTransactionAsync(new Transaction
+            await _movieRepository.AddTransactionAsync(new Transaction
             {
                 Buyer = user,
                 Movie = movie,
@@ -52,12 +56,12 @@ namespace MovieApp.DataLayer.Services
                 Timestamp = DateTime.UtcNow
             });
 
-            await _movieRepo.SaveChangesAsync();
+            await _movieRepository.SaveChangesAsync();
         }
 
         public async Task<List<Movie>> SearchMoviesAsync(string? query)
         {
-            return await _movieRepo.SearchMoviesAsync(query ?? string.Empty, 10);
+            return await _movieRepository.SearchMoviesAsync(query ?? string.Empty, 10);
         }
 
     }

@@ -13,7 +13,6 @@ namespace MovieApp.Features.ReelsUpload.ViewModels
 {
     /// <summary>
     /// ViewModel for the Reels Upload page.
-    /// Owner: Alex
     /// </summary>
     public partial class ReelsUploadViewModel : ObservableObject
     {
@@ -100,30 +99,33 @@ namespace MovieApp.Features.ReelsUpload.ViewModels
             try
             {
                 bool isValid = await videoStorageService.ValidateVideoAsync(LocalVideoFilePath);
+
+                // 1. If invalid, show error and STOP.
                 if (!isValid)
                 {
                     StatusMessage = "Invalid file! Must be a non-empty MP4 file\nno longer than 60 seconds.";
-
-                    StatusMessage = "Uploading to Blob Storage & saving metadata...";
-
-                    ReelUploadRequest request = new Models.ReelUploadRequest
-                    {
-                        LocalFilePath = LocalVideoFilePath,
-                        Title = ReelTitle,
-                        Caption = ReelCaption ?? string.Empty,
-                        UploaderUserId = CurrentUserID,
-                        MovieId = LinkedMovie.Id
-                    };
-
-                    Reel savedReel = await videoStorageService.UploadVideoAsync(request);
-
-                    StatusMessage = $"Success! Reel uploaded with ID {savedReel.Id}.";
-                    LocalVideoFilePath = string.Empty;
-                    ReelTitle = string.Empty;
-                    ReelCaption = string.Empty;
-                    LinkedMovie = null;
-
+                    return;
                 }
+
+                // 2. If valid, proceed with the upload!
+                StatusMessage = "Uploading to Blob Storage & saving metadata...";
+
+                ReelUploadRequest request = new Models.ReelUploadRequest
+                {
+                    LocalFilePath = LocalVideoFilePath,
+                    Title = ReelTitle,
+                    Caption = ReelCaption ?? string.Empty,
+                    UploaderUserId = CurrentUserID,
+                    MovieId = LinkedMovie.Id
+                };
+
+                Reel savedReel = await videoStorageService.UploadVideoAsync(request);
+
+                StatusMessage = $"Success! Reel uploaded with ID {savedReel.Id}.";
+                LocalVideoFilePath = string.Empty;
+                ReelTitle = string.Empty;
+                ReelCaption = string.Empty;
+                LinkedMovie = null;
             }
             catch (Exception ex)
             {

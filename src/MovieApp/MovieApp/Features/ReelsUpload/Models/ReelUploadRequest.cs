@@ -2,7 +2,6 @@ namespace MovieApp.Features.ReelsUpload.Models
 {
     /// <summary>
     /// The request to upload a reel.
-    /// Owner: Alex
     /// </summary>
     public class ReelUploadRequest
     {

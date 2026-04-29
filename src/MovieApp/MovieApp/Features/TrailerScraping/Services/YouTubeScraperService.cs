@@ -9,7 +9,6 @@ namespace MovieApp.Features.TrailerScraping.Services
 
     /// <summary>
     /// Searches YouTube using the Data API v3 to find trailer videos.
-    /// Owner: Andrei.
     /// </summary>
     public class YouTubeScraperService : IYouTubeScraperService
     {

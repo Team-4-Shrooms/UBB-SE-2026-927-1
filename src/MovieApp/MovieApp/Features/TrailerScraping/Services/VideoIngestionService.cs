@@ -11,7 +11,6 @@ namespace MovieApp.Features.TrailerScraping.Services
     /// 2. Search YouTube for trailers of a selected movie
     /// 3. For each result: download MP4, create Reel (skip duplicates)
     /// 4. Update job status to completed/failed
-    /// Owner: Andrei.
     /// </summary>
     public class VideoIngestionService : IVideoIngestionService
     {

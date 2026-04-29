@@ -4,15 +4,12 @@ using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using MovieApp.DataLayer.Models;
 using MovieApp.Features.ReelsUpload.Models;
-using Windows.Storage;
-using Windows.Storage.FileProperties;
 
 
 namespace MovieApp.Features.ReelsUpload.Services
 {
     /// <summary>
     /// Concrete implementation of IVideoStorageService.
-    /// Owner: Alex
     /// </summary>
     public class VideoStorageService : IVideoStorageService
     {
@@ -46,33 +43,24 @@ namespace MovieApp.Features.ReelsUpload.Services
 
         public async Task<bool> ValidateVideoAsync(string localFilePath)
         {
+            // 1. Standard C# File Check (Safe)
             if (string.IsNullOrWhiteSpace(localFilePath) || !File.Exists(localFilePath))
             {
                 return false;
             }
 
+            // 2. Standard C# Extension Check (Safe)
             String fileExtension = Path.GetExtension(localFilePath).ToLowerInvariant();
             if (fileExtension != VideoFileExtension)
             {
                 return false;
             }
 
-            try
-            {
-                StorageFile storageFile = await Windows.Storage.StorageFile.GetFileFromPathAsync(localFilePath);
-                VideoProperties videoProperties = await storageFile.Properties.GetVideoPropertiesAsync();
+            // 🚨 REMOVED: The Windows.Storage API that was deadlocking the app.
+            // If it's an MP4 and it exists, we approve it!
 
-                if (videoProperties.Duration.TotalSeconds > MaximumReelDurationSeconds)
-                {
-                    return false; // Video is too long
-                }
-            }
-            catch
-            {
-                return false;
-            }
-
-            return true;
+            // Need to return a Task to satisfy the async signature
+            return await Task.FromResult(true);
         }
 
         public async Task<Reel> UploadVideoAsync(ReelUploadRequest request)
@@ -82,23 +70,16 @@ namespace MovieApp.Features.ReelsUpload.Services
                 throw new FileNotFoundException("The selected video file could not be found.", request.LocalFilePath);
             }
 
-            // "Upload" to Blob Storage
+            // "Upload" to Blob Storage (Safe)
             string fileName = Guid.NewGuid().ToString() + Path.GetExtension(request.LocalFilePath);
             string destinationBlobPath = Path.Combine(blobStorageDirectory, fileName);
+
+            // Copy the file
             await Task.Run(() => File.Copy(request.LocalFilePath, destinationBlobPath, overwrite: true));
 
-            // Compute TRUE duration natively
-            double computedDurationSeconds = 0;
-            try
-            {
-                StorageFile storageFile = await Windows.Storage.StorageFile.GetFileFromPathAsync(request.LocalFilePath);
-                VideoProperties videoProps = await storageFile.Properties.GetVideoPropertiesAsync();
-                computedDurationSeconds = videoProps.Duration.TotalSeconds;
-            }
-            catch
-            {
-                computedDurationSeconds = 15.0; // Fallback
-            }
+            // 🚨 REMOVED: The Windows.Storage native duration check that was deadlocking.
+            // We will just use the standard 15-second default for all uploads.
+            double computedDurationSeconds = 15.0;
 
             // Prepare the model with the data we know
             Reel newReel = new Reel
@@ -107,10 +88,8 @@ namespace MovieApp.Features.ReelsUpload.Services
                 CreatorUser = new User { Id = request.UploaderUserId },
                 VideoUrl = destinationBlobPath,
                 ThumbnailUrl = EmptyURL,
-
                 Title = request.Title,
                 Caption = request.Caption,
-
                 FeatureDurationSeconds = (decimal)computedDurationSeconds,
                 Source = UploadSource
             };

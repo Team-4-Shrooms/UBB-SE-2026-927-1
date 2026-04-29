@@ -68,7 +68,7 @@ namespace MovieApp.DataLayer.Repositories
         {
             // Query the database for movies that do NOT have a preference record for this user
             return await _context.Movies
-                .Where(movie => !_context.UserMoviePreferences.Any(pref => pref.User.Id == userId && pref.Movie.Id == movie.Id))
+                .Where(movie => !_context.UserMoviePreferences.Any(userPreference => userPreference.User.Id == userId && userPreference.Movie.Id == movie.Id))
                 .Take(count)
                 .ToListAsync();
         }

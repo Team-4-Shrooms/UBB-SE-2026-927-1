@@ -107,7 +107,7 @@ namespace MovieApp.Features.ReelsFeed.Views
         /// <summary>
         /// Releases resources when the control unloads.
         /// </summary>
-        private void ReelItemView_Unloaded(object sender, RoutedEventArgs e)
+        private void ReelItemView_Unloaded(object sender, RoutedEventArgs eventArguments)
         {
             this.StopProgressTimer();
             this.UnsubscribeFromReel();
@@ -117,11 +117,11 @@ namespace MovieApp.Features.ReelsFeed.Views
         /// <summary>
         /// Updates the view when the bound reel changes.
         /// </summary>
-        /// <param name="d">The dependency object that owns the property.</param>
-        /// <param name="e">The property change data.</param>
-        private static void OnReelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        /// <param name="dependency">The dependency object that owns the property.</param>
+        /// <param name="eventArguments">The property change data.</param>
+        private static void OnReelChanged(DependencyObject dependency, DependencyPropertyChangedEventArgs eventArguments)
         {
-            if (d is ReelItemView view && e.NewValue is Reel reel)
+            if (dependency is ReelItemView view && eventArguments.NewValue is Reel reel)
             {
                 // Unhook from the previous model before subscribing to the new one
                 view.UnsubscribeFromReel();
@@ -164,15 +164,15 @@ namespace MovieApp.Features.ReelsFeed.Views
         /// Reacts to reel model changes that affect the like visuals.
         /// </summary>
         /// <param name="sender">The reel model that raised the event.</param>
-        /// <param name="args">The property change arguments.</param>
-        private void OnReelPropertyChanged(object? sender, PropertyChangedEventArgs args)
+        /// <param name="arguments">The property change arguments.</param>
+        private void OnReelPropertyChanged(object? sender, PropertyChangedEventArgs arguments)
         {
             if (ReelItemView.IsAppClosing || this.disposed)
             {
                 return;
             }
 
-            if (args.PropertyName is nameof(Reel.IsLiked) or nameof(Reel.LikeCount))
+            if (arguments.PropertyName is nameof(Reel.IsLiked) or nameof(Reel.LikeCount))
             {
                 if (sender is Reel reel)
                 {
@@ -193,7 +193,7 @@ namespace MovieApp.Features.ReelsFeed.Views
 
                             try
                             {
-                                //this.UpdateLikeVisuals(reel.IsLiked, reel.LikeCount);
+                                this.UpdateLikeVisuals(reel.IsLiked, reel.LikeCount);
                             }
                             catch
                             {
@@ -257,7 +257,7 @@ namespace MovieApp.Features.ReelsFeed.Views
         /// </summary>
         /// <param name="sender">The event source.</param>
         /// <param name="e">The routed event data.</param>
-        private async void LikeButton_Click(object sender, RoutedEventArgs e)
+        private async void LikeButton_Click(object sender, RoutedEventArgs eventArguments)
         {
             await this.ToggleLikeWithAnimationAsync();
         }
@@ -266,7 +266,7 @@ namespace MovieApp.Features.ReelsFeed.Views
         /// Double-tap gesture toggles like and plays heart burst animation at center.
         /// Per Task 12: double-tap gesture recognizer triggers ToggleLike + heart burst.
         /// </summary>
-        private async void ReelItemView_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
+        private async void ReelItemView_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs eventArguments)
         {
             if (this.Reel == null)
             {
@@ -297,6 +297,8 @@ namespace MovieApp.Features.ReelsFeed.Views
             bool wasLiked = this.Reel.IsLiked;
             this.Reel.IsLiked = !wasLiked;
             this.Reel.LikeCount += wasLiked ? -1 : 1;
+
+            this.UpdateLikeVisuals(this.Reel.IsLiked, this.Reel.LikeCount);
 
             // Scale-bounce animation on heart icon (Task 12)
             this.PlayHeartBounceAnimation();
@@ -469,8 +471,8 @@ namespace MovieApp.Features.ReelsFeed.Views
         /// Updates the playback progress bar from the current media session.
         /// </summary>
         /// <param name="sender">The timer that raised the tick.</param>
-        /// <param name="e">The event data.</param>
-        private void ProgressTimer_Tick(object? sender, object e)
+        /// <param name="eventArguments">The event data.</param>
+        private void ProgressTimer_Tick(object? sender, object eventArguments)
         {
             if (ReelItemView.IsAppClosing || this.disposed)
             {
@@ -578,7 +580,7 @@ namespace MovieApp.Features.ReelsFeed.Views
             return null;
         }
 
-        private void MediaPlayer_MediaEnded(Windows.Media.Playback.MediaPlayer sender, object args)
+        private void MediaPlayer_MediaEnded(Windows.Media.Playback.MediaPlayer sender, object arguments)
         {
             // This callback fires on a Media Foundation background thread.
             // Do NOT access any DependencyProperty here.

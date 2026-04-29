@@ -11,7 +11,6 @@ namespace MovieApp.Features.TrailerScraping.ViewModels
     /// <summary>
     /// ViewModel for the Trailer Scraping admin dashboard.
     /// Handles movie autocomplete, scrape execution, and log display.
-    /// Owner: Andrei.
     /// </summary>
     public partial class TrailerScrapingViewModel : ObservableObject
     {

@@ -6,7 +6,6 @@ namespace MovieApp.Features.ReelsUpload.Services
 {
     /// <summary>
     /// Handles uploading and validating video files for Reels.
-    /// Owner: Alex
     /// </summary>
     public interface IVideoStorageService
     {

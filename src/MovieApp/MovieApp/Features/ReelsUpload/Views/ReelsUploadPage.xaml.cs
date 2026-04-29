@@ -8,7 +8,6 @@ namespace MovieApp.Features.ReelsUpload.Views
 {
     /// <summary>
     /// Code-behind for the Reels Upload page.
-    /// Owner: Alex
     /// </summary>
     public sealed partial class ReelsUploadPage : Page
     {
