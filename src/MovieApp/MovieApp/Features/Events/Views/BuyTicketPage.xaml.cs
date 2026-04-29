@@ -122,7 +122,6 @@ namespace MovieApp.Features.Events.Views
 
             try
             {
-                // Bypass service for tracking fix
                 var userId = SessionManager.CurrentUserID;
                 var user = await _context.Users.FindAsync(userId) 
                     ?? throw new Exception("User not found.");

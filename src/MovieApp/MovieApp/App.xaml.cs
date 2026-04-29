@@ -11,14 +11,8 @@ using MovieApp.Logic.Services;
 using MovieApp.Features.Marketplace.ViewModels;
 using MovieApp.Features.Wallet.ViewModels;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
 namespace MovieApp
 {
-    /// <summary>
-    /// Provides application-specific behavior to supplement the default Application class.
-    /// </summary>
     public partial class App : Application
     {
         private Window? _window;
@@ -39,6 +33,7 @@ namespace MovieApp
             var connectionString = "Server=localhost\\SQLEXPRESS;Database=MovieApp;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;";
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 
+<<<<<<< HEAD
             services.AddHttpClient<ApiClient>(client =>
             {
                 client.BaseAddress = new Uri("https://localhost:7196/");

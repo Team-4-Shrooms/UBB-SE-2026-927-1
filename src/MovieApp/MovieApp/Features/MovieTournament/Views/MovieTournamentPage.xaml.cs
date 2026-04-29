@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MovieApp.Features.MovieTournament.Services;
@@ -10,8 +10,7 @@ namespace MovieApp.Features.MovieTournament.Views
     /// Host page for the movie tournament feature.
     /// On load, navigates the inner frame to the appropriate sub-page
     /// based on the current tournament state.
-    /// </summary>
-    public sealed partial class MovieTournamentPage : Page
+    /// </summary>`n    public sealed partial class MovieTournamentPage : Page
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MovieTournamentPage"/> class

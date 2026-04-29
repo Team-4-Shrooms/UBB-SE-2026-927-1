@@ -38,13 +38,11 @@ namespace MovieApp.Features.Inventory.Views
 
             MoviesGrid.ItemsSource = await _repo.GetOwnedMoviesAsync(userId);
             
-            // Workaround for missing repository methods: use context directly
             TicketsGrid.ItemsSource = await _context.OwnedTickets
                 .Include(ot => ot.Event)
                 .Where(ot => ot.User.Id == userId)
                 .ToListAsync();
                 
-            // Equipment I bought (where I am the Buyer in a transaction)
             var boughtEquipmentIds = await _context.Transactions
                 .Where(t => t.Buyer.Id == userId && t.Type == "EquipmentPurchase")
                 .Select(t => t.Equipment.Id)
@@ -54,7 +52,6 @@ namespace MovieApp.Features.Inventory.Views
                 .Where(e => boughtEquipmentIds.Contains(e.Id))
                 .ToListAsync();
 
-            // Detach entities to avoid tracking conflicts when calling services (RemoveMovie/Ticket)
             _context.ChangeTracker.Clear();
         }
 
@@ -202,7 +199,6 @@ namespace MovieApp.Features.Inventory.Views
                 {
                     var userId = SessionManager.CurrentUserID;
                     
-                    // Find the purchase transaction
                     var transaction = await _context.Transactions
                         .FirstOrDefaultAsync(t => t.Buyer.Id == userId && t.Equipment.Id == eq.Id && t.Type == "EquipmentPurchase");
                     
@@ -211,7 +207,6 @@ namespace MovieApp.Features.Inventory.Views
                         _context.Transactions.Remove(transaction);
                     }
 
-                    // Mark equipment as available again
                     var dbEq = await _context.Equipment.FindAsync(eq.Id);
                     if (dbEq != null)
                     {
