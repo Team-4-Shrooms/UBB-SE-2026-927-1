@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Models;
 
-namespace MovieApp.Logic.Interfaces.Services
+namespace MovieApp.DataLayer.Interfaces.Services
 {
     public interface IPersonalityMatchService
     {
         Task<Dictionary<int, List<UserMoviePreference>>> GetAllPreferencesGroupedAsync(int excludedUserId);
         Task<string> GetUsernameAsync(int userId);
-        Task<List<MoviePreferenceDisplay>> GetTopPreferencesWithTitlesAsync(int userId, int count);
+        Task<List<MoviePreferenceDisplay>> GetTopMoviePreferencesAsync(int userId, int topMoviePreferencesCount);
     }
 }
 

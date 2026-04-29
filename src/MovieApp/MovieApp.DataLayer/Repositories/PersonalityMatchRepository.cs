@@ -29,36 +29,57 @@ namespace MovieApp.DataLayer.Repositories
         public async Task<List<UserMoviePreference>> GetAllPreferencesExceptUserAsync(int excludedUserId)
         {
             return await _context.UserMoviePreferences
-                .Include(p => p.User)
-                .Include(p => p.Movie)
-                .Where(p => p.User.Id != excludedUserId)
+                .Include(preferences => preferences.User)
+                .Include(preferences => preferences.Movie)
+                .Where(preferences => preferences.User.Id != excludedUserId)
                 .ToListAsync();
         }
 
         public async Task<List<UserMoviePreference>> GetCurrentUserPreferencesAsync(int userId)
         {
             return await _context.UserMoviePreferences
-                .Include(p => p.Movie)
-                .Where(p => p.User.Id == userId)
+                .Include(preferences => preferences.Movie)
+                .Where(preferences => preferences.User.Id == userId)
                 .ToListAsync();
         }
 
         public async Task<UserProfile?> GetUserProfileAsync(int userId)
         {
             return await _context.UserProfiles
-                .Include(p => p.User)
-                .FirstOrDefaultAsync(p => p.User.Id == userId);
+                .Include(preferences => preferences.User)
+                .FirstOrDefaultAsync(preferences => preferences.User.Id == userId);
         }
 
         public async Task<List<int>> GetRandomUserIdsAsync(int excludedUserId, int userIdsCount)
         {
             return await _context.UserMoviePreferences
-                .Where(p => p.User.Id != excludedUserId)
-                .Select(p => p.User.Id)
+                .Where(preferences => preferences.User.Id != excludedUserId)
+                .Select(preferences => preferences.User.Id)
                 .Distinct()
                 .OrderBy(id => EF.Functions.Random())
                 .Take(userIdsCount)
                 .ToListAsync();
+        }
+
+        public async Task<List<MoviePreferenceDisplay>> GetTopPreferencesWithTitlesAsync(int userId, int count)
+        {
+            return await _context.UserMoviePreferences
+                .Where(preferences => preferences.User.Id == userId)
+                .OrderByDescending(preferences => preferences.Score)
+                .Take(count)
+                .Select(preferences => new MoviePreferenceDisplay
+                {
+                    MovieId = preferences.Movie.Id,
+                    Title = preferences.Movie.Title,
+                    Score = preferences.Score
+                })
+                .ToListAsync();
+        }
+
+        public async Task<string> GetUsernameAsync(int userId)
+        {
+            User? user = await _context.Users.FindAsync(userId);
+            return user?.Username ?? $"{FallbackUsernamePrefix} {userId}";
         }
 
     }

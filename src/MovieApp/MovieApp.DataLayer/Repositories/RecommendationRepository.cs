@@ -43,6 +43,7 @@ namespace MovieApp.DataLayer.Repositories
         public async Task<Dictionary<int, decimal>> GetUserPreferenceScoresAsync(int userId)
         {
             return await _context.UserMoviePreferences
+                .Include(preference => preference.Movie) 
                 .Where(preference => preference.User.Id == userId)
                 .ToDictionaryAsync(
                     preference => preference.Movie.Id,

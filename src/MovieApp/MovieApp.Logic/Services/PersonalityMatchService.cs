@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Interfaces.Repositories;
-using MovieApp.Logic.Interfaces.Services;
+using MovieApp.DataLayer.Interfaces.Services;
 using MovieApp.DataLayer.Models;
 
-namespace MovieApp.Logic.Services
+namespace MovieApp.DataLayer.Services
 {
     public class PersonalityMatchService : IPersonalityMatchService
     {
@@ -36,7 +36,7 @@ namespace MovieApp.Logic.Services
             return user?.Username ?? $"{FallbackUsernamePrefix} {userId}";
         }
 
-        public async Task<List<MoviePreferenceDisplay>> GetTopPreferencesWithTitlesAsync(int userId, int count)
+        public async Task<List<MoviePreferenceDisplay>> GetTopMoviePreferencesAsync(int userId, int count)
         {
             var preferences = await _matchRepo.GetCurrentUserPreferencesAsync(userId);
 

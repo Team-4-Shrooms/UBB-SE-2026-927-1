@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -23,6 +23,7 @@
       <ProjectReference Include="..\MovieApp.DataLayer\MovieApp.DataLayer.csproj" />
       <ProjectReference Include="..\MovieApp.Logic\MovieApp.Logic.csproj" />
       <ProjectReference Include="..\MovieApp.WebDTOs\MovieApp.WebDTOs.csproj" />
+      <ProjectReference Include="..\MovieApp.DataLayer\MovieApp.DataLayer.csproj" />
   </ItemGroup>
 
 </Project>

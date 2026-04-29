@@ -3,15 +3,207 @@
     x:Class="MovieApp.Features.PersonalityMatch.Views.PersonalityMatchPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:MovieApp.Features.PersonalityMatch.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:MovieApp.Features.PersonalityMatch.Models"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    Loaded="Page_Loaded">
 
-    <Grid>
-        <StackPanel Spacing="10">
-            <TextBlock Text="Personality Match" Style="{StaticResource PageHeaderStyle}"/>
-        </StackPanel>
-    </Grid>
+    <Page.Resources>
+        <!-- Used by the Add Account ContentDialog to display available accounts -->
+        <DataTemplate x:Key="AccountPickerItemTemplate" x:DataType="models:UserAccountModel">
+            <StackPanel Padding="4,8" Spacing="2">
+                <TextBlock Text="{x:Bind Username}"
+                           Style="{StaticResource BodyStrongTextBlockStyle}" />
+                <TextBlock Text="{x:Bind FacebookAccount}"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}" />
+            </StackPanel>
+        </DataTemplate>
+    </Page.Resources>
+
+    <SplitView IsPaneOpen="{x:Bind ViewModel.IsAccountPanelOpen, Mode=TwoWay}"
+               PanePlacement="Right"
+               DisplayMode="Overlay"
+               OpenPaneLength="280">
+
+        <!-- Account switcher panel (slides in from the right) -->
+        <SplitView.Pane>
+            <ScrollViewer Background="{ThemeResource NavigationViewDefaultPaneBackground}">
+                <StackPanel Padding="16" Spacing="8">
+
+                    <!-- Current account (clickable → opens own detail view) -->
+                    <TextBlock Text="My Account"
+                               Style="{StaticResource SubtitleTextBlockStyle}"
+                               Margin="0,0,0,4" />
+                    <Button HorizontalAlignment="Stretch"
+                            Background="#33FF4040"
+                            Command="{x:Bind ViewModel.ViewCurrentAccountDetailCommand}">
+                        <StackPanel Padding="4" Spacing="2">
+                            <TextBlock Text="{x:Bind ViewModel.CurrentUsername, Mode=OneWay}"
+                                       Style="{StaticResource BodyStrongTextBlockStyle}" />
+                            <TextBlock Text="{x:Bind ViewModel.CurrentFacebookAccount, Mode=OneWay}"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}" />
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Change account section -->
+                    <TextBlock Text="Change account"
+                               Style="{StaticResource BodyStrongTextBlockStyle}"
+                               Margin="0,12,0,4" />
+                    <ListView x:Name="OtherAccountsListView"
+                              ItemsSource="{x:Bind ViewModel.OtherAccounts, Mode=OneWay}"
+                              SelectionMode="None"
+                              IsItemClickEnabled="True"
+                              ItemClick="OtherAccountsList_ItemClick">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="models:UserAccountModel">
+                                <StackPanel Padding="4,8" Spacing="2">
+                                    <TextBlock Text="{x:Bind Username}"
+                                               Style="{StaticResource BodyStrongTextBlockStyle}" />
+                                    <TextBlock Text="{x:Bind FacebookAccount}"
+                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <!-- Add account -->
+                    <Button Content="Add account"
+                            HorizontalAlignment="Stretch"
+                            Margin="0,12,0,0"
+                            Click="AddAccount_Click" />
+
+                </StackPanel>
+            </ScrollViewer>
+        </SplitView.Pane>
+
+        <!-- Main page content -->
+        <Grid Padding="32">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Header: title + Account button aligned to the right -->
+            <Grid Grid.Row="0" Margin="0,0,0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="{x:Bind ViewModel.PageTitle, Mode=OneWay}"
+                           Style="{StaticResource TitleTextBlockStyle}" />
+
+                <Button Grid.Column="1"
+                        Content="{x:Bind ViewModel.CurrentUsername, Mode=OneWay}"
+                        VerticalAlignment="Center"
+                        Command="{x:Bind ViewModel.ToggleAccountPanelCommand}" />
+            </Grid>
+
+            <TextBlock Grid.Row="1"
+                       Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
+                       Style="{StaticResource SubtitleTextBlockStyle}"
+                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                       Margin="0,0,0,16" />
+
+            <!-- Loading indicator -->
+            <ProgressRing Grid.Row="2"
+                          IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
+                          Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
+                          Width="48" Height="48"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center" />
+
+            <!-- Match list -->
+            <ListView Grid.Row="2"
+                      x:Name="MatchListView"
+                      ItemsSource="{x:Bind ViewModel.MatchResults, Mode=OneWay}"
+                      Visibility="{x:Bind ViewModel.HasMatches, Mode=OneWay}"
+                      SelectionMode="None"
+                      IsItemClickEnabled="True"
+                      ItemClick="MatchListView_ItemClick">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="8,12" ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="80" />
+                                <ColumnDefinition Width="120" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding MatchedUsername}"
+                                           Style="{StaticResource BodyStrongTextBlockStyle}" />
+                                <TextBlock Text="{Binding FacebookAccount}"
+                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}" />
+                            </StackPanel>
+
+                            <ProgressBar Grid.Column="1"
+                                         Value="{Binding MatchScore}"
+                                         Maximum="100"
+                                         VerticalAlignment="Center" />
+
+                            <TextBlock Grid.Column="2"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Right">
+                                <Run Text="{Binding MatchScore}" />
+                                <Run Text="%" />
+                            </TextBlock>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <!-- No match fallback -->
+            <StackPanel Grid.Row="2"
+                        Visibility="{x:Bind ViewModel.ShowNoMatch, Mode=OneWay}"
+                        Spacing="8">
+
+                <TextBlock Text="No match"
+                           Style="{StaticResource SubtitleTextBlockStyle}"
+                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                           Margin="0,0,0,8" />
+
+                <TextBlock Text="Maybe you like:"
+                           Style="{StaticResource BodyStrongTextBlockStyle}"
+                           Margin="0,0,0,4" />
+
+                <ListView ItemsSource="{x:Bind ViewModel.FallbackUsers, Mode=OneWay}"
+                          SelectionMode="None"
+                          IsItemClickEnabled="True"
+                          ItemClick="FallbackListView_ItemClick">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="8,12" ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding MatchedUsername}"
+                                               Style="{StaticResource BodyStrongTextBlockStyle}" />
+                                    <TextBlock Text="{Binding FacebookAccount}"
+                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}" />
+                                </StackPanel>
+
+                                <FontIcon Grid.Column="1"
+                                          Glyph="&#xE76C;"
+                                          VerticalAlignment="Center" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </StackPanel>
+        </Grid>
+
+    </SplitView>
 </Page>
