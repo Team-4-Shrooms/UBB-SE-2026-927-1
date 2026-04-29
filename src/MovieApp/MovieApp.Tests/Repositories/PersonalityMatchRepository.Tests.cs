@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using MovieApp.Logic.Data;
-using MovieApp.Logic.Models;
-using MovieApp.Logic.Repositories;
+using MovieApp.DataLayer;
+using MovieApp.DataLayer.Models;
+using MovieApp.DataLayer.Repositories;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
@@ -56,9 +56,9 @@ namespace MovieApp.Tests.Repositories
         }
 
         [Fact]
-        public async Task GetAllPreferencesExceptUserAsync_excludesSpecifiedUser()
+        public async Task GetAllPreferencesExceptUserAsync_TwoUsersWithPreferences_ExcludesSpecifiedUser()
         {
-            await using AppDbContext context = CreateContext("Personality_" + nameof(GetAllPreferencesExceptUserAsync_excludesSpecifiedUser));
+            await using AppDbContext context = CreateContext("Personality_" + nameof(GetAllPreferencesExceptUserAsync_TwoUsersWithPreferences_ExcludesSpecifiedUser));
             (User user1, User user2, Movie movie) = await SeedTwoUsersAndMovie(context);
 
             context.UserMoviePreferences.AddRange(
@@ -80,15 +80,17 @@ namespace MovieApp.Tests.Repositories
 
             PersonalityMatchRepository repository = new PersonalityMatchRepository(context);
 
-            Dictionary<int, List<UserMoviePreference>> result = await repository.GetAllPreferencesExceptUserAsync(user1.Id);
+            List<UserMoviePreference> otherPreferences = await repository.GetAllPreferencesExceptUserAsync(user1.Id);
 
-            Assert.False(result.ContainsKey(user1.Id));
+            bool excludesSpecifiedUser = otherPreferences.All(preference => preference.User.Id != user1.Id);
+
+            Assert.True(excludesSpecifiedUser);
         }
 
         [Fact]
-        public async Task GetAllPreferencesExceptUserAsync_includesOtherUsers()
+        public async Task GetAllPreferencesExceptUserAsync_TwoUsersWithPreferences_IncludesOtherUserPreferences()
         {
-            await using AppDbContext context = CreateContext("Personality_" + nameof(GetAllPreferencesExceptUserAsync_includesOtherUsers));
+            await using AppDbContext context = CreateContext("Personality_" + nameof(GetAllPreferencesExceptUserAsync_TwoUsersWithPreferences_IncludesOtherUserPreferences));
             (User user1, User user2, Movie movie) = await SeedTwoUsersAndMovie(context);
 
             context.UserMoviePreferences.AddRange(
@@ -110,15 +112,17 @@ namespace MovieApp.Tests.Repositories
 
             PersonalityMatchRepository repository = new PersonalityMatchRepository(context);
 
-            Dictionary<int, List<UserMoviePreference>> result = await repository.GetAllPreferencesExceptUserAsync(user1.Id);
+            List<UserMoviePreference> otherPreferences = await repository.GetAllPreferencesExceptUserAsync(user1.Id);
 
-            Assert.True(result.ContainsKey(user2.Id));
+            bool containsOtherUser = otherPreferences.Any(preference => preference.User.Id == user2.Id);
+
+            Assert.True(containsOtherUser);
         }
 
         [Fact]
-        public async Task GetAllPreferencesExceptUserAsync_noOtherUsers_returnsEmpty()
+        public async Task GetAllPreferencesExceptUserAsync_OnlyExcludedUserHasPreferences_ReturnsEmptyList()
         {
-            await using AppDbContext context = CreateContext("Personality_" + nameof(GetAllPreferencesExceptUserAsync_noOtherUsers_returnsEmpty));
+            await using AppDbContext context = CreateContext("Personality_" + nameof(GetAllPreferencesExceptUserAsync_OnlyExcludedUserHasPreferences_ReturnsEmptyList));
             (User user1, User user2, Movie movie) = await SeedTwoUsersAndMovie(context);
 
             context.UserMoviePreferences.Add(
@@ -133,15 +137,15 @@ namespace MovieApp.Tests.Repositories
 
             PersonalityMatchRepository repository = new PersonalityMatchRepository(context);
 
-            Dictionary<int, List<UserMoviePreference>> result = await repository.GetAllPreferencesExceptUserAsync(user1.Id);
+            List<UserMoviePreference> otherPreferences = await repository.GetAllPreferencesExceptUserAsync(user1.Id);
 
-            Assert.Empty(result);
+            Assert.Empty(otherPreferences);
         }
 
         [Fact]
-        public async Task GetAllPreferencesExceptUserAsync_otherUserHasCorrectPreferenceCount()
+        public async Task GetAllPreferencesExceptUserAsync_OtherUserHasOnePreference_ReturnsSinglePreference()
         {
-            await using AppDbContext context = CreateContext("Personality_" + nameof(GetAllPreferencesExceptUserAsync_otherUserHasCorrectPreferenceCount));
+            await using AppDbContext context = CreateContext("Personality_" + nameof(GetAllPreferencesExceptUserAsync_OtherUserHasOnePreference_ReturnsSinglePreference));
             (User user1, User user2, Movie movie) = await SeedTwoUsersAndMovie(context);
 
             context.UserMoviePreferences.AddRange(
@@ -163,15 +167,15 @@ namespace MovieApp.Tests.Repositories
 
             PersonalityMatchRepository repository = new PersonalityMatchRepository(context);
 
-            Dictionary<int, List<UserMoviePreference>> result = await repository.GetAllPreferencesExceptUserAsync(user1.Id);
+            List<UserMoviePreference> otherPreferences = await repository.GetAllPreferencesExceptUserAsync(user1.Id);
 
-            Assert.Single(result[user2.Id]);
+            Assert.Single(otherPreferences);
         }
 
         [Fact]
-        public async Task GetCurrentUserPreferencesAsync_returnsCorrectCount()
+        public async Task GetCurrentUserPreferencesAsync_UserHasOnePreference_ReturnsSinglePreference()
         {
-            await using AppDbContext context = CreateContext("Personality_" + nameof(GetCurrentUserPreferencesAsync_returnsCorrectCount));
+            await using AppDbContext context = CreateContext("Personality_" + nameof(GetCurrentUserPreferencesAsync_UserHasOnePreference_ReturnsSinglePreference));
             (User user1, User user2, Movie movie) = await SeedTwoUsersAndMovie(context);
 
             context.UserMoviePreferences.AddRange(
@@ -193,15 +197,15 @@ namespace MovieApp.Tests.Repositories
 
             PersonalityMatchRepository repository = new PersonalityMatchRepository(context);
 
-            List<UserMoviePreference> result = await repository.GetCurrentUserPreferencesAsync(user1.Id);
+            List<UserMoviePreference> userPreferences = await repository.GetCurrentUserPreferencesAsync(user1.Id);
 
-            Assert.Single(result);
+            Assert.Single(userPreferences);
         }
 
         [Fact]
-        public async Task GetCurrentUserPreferencesAsync_returnsOnlyUserPreferences()
+        public async Task GetCurrentUserPreferencesAsync_TwoUsersWithPreferences_ReturnsOnlyRequestedUserPreferences()
         {
-            await using AppDbContext context = CreateContext("Personality_" + nameof(GetCurrentUserPreferencesAsync_returnsOnlyUserPreferences));
+            await using AppDbContext context = CreateContext("Personality_" + nameof(GetCurrentUserPreferencesAsync_TwoUsersWithPreferences_ReturnsOnlyRequestedUserPreferences));
             (User user1, User user2, Movie movie) = await SeedTwoUsersAndMovie(context);
 
             context.UserMoviePreferences.AddRange(
@@ -223,28 +227,28 @@ namespace MovieApp.Tests.Repositories
 
             PersonalityMatchRepository repository = new PersonalityMatchRepository(context);
 
-            List<UserMoviePreference> result = await repository.GetCurrentUserPreferencesAsync(user1.Id);
+            List<UserMoviePreference> userPreferences = await repository.GetCurrentUserPreferencesAsync(user1.Id);
 
-            Assert.Equal(user1.Id, result[0].User.Id);
+            Assert.Equal(user1.Id, userPreferences[0].User.Id);
         }
 
         [Fact]
-        public async Task GetCurrentUserPreferencesAsync_noPreferences_returnsEmpty()
+        public async Task GetCurrentUserPreferencesAsync_UserHasNoPreferences_ReturnsEmptyList()
         {
-            await using AppDbContext context = CreateContext("Personality_" + nameof(GetCurrentUserPreferencesAsync_noPreferences_returnsEmpty));
+            await using AppDbContext context = CreateContext("Personality_" + nameof(GetCurrentUserPreferencesAsync_UserHasNoPreferences_ReturnsEmptyList));
             (User user1, User user2, Movie movie) = await SeedTwoUsersAndMovie(context);
 
             PersonalityMatchRepository repository = new PersonalityMatchRepository(context);
 
-            List<UserMoviePreference> result = await repository.GetCurrentUserPreferencesAsync(user1.Id);
+            List<UserMoviePreference> userPreferences = await repository.GetCurrentUserPreferencesAsync(user1.Id);
 
-            Assert.Empty(result);
+            Assert.Empty(userPreferences);
         }
 
         [Fact]
-        public async Task GetUserProfileAsync_profileExists_returnsNotNull()
+        public async Task GetUserProfileAsync_ProfileExists_ReturnsNotNull()
         {
-            await using AppDbContext context = CreateContext("Personality_" + nameof(GetUserProfileAsync_profileExists_returnsNotNull));
+            await using AppDbContext context = CreateContext("Personality_" + nameof(GetUserProfileAsync_ProfileExists_ReturnsNotNull));
             (User user1, User user2, Movie movie) = await SeedTwoUsersAndMovie(context);
 
             context.UserProfiles.Add(new UserProfile
@@ -261,15 +265,15 @@ namespace MovieApp.Tests.Repositories
 
             PersonalityMatchRepository repository = new PersonalityMatchRepository(context);
 
-            UserProfile? result = await repository.GetUserProfileAsync(user1.Id);
+            UserProfile? foundProfile = await repository.GetUserProfileAsync(user1.Id);
 
-            Assert.NotNull(result);
+            Assert.NotNull(foundProfile);
         }
 
         [Fact]
-        public async Task GetUserProfileAsync_profileExists_returnsCorrectTotalLikes()
+        public async Task GetUserProfileAsync_ProfileExists_ReturnsCorrectTotalLikes()
         {
-            await using AppDbContext context = CreateContext("Personality_" + nameof(GetUserProfileAsync_profileExists_returnsCorrectTotalLikes));
+            await using AppDbContext context = CreateContext("Personality_" + nameof(GetUserProfileAsync_ProfileExists_ReturnsCorrectTotalLikes));
             (User user1, User user2, Movie movie) = await SeedTwoUsersAndMovie(context);
 
             context.UserProfiles.Add(new UserProfile
@@ -286,51 +290,28 @@ namespace MovieApp.Tests.Repositories
 
             PersonalityMatchRepository repository = new PersonalityMatchRepository(context);
 
-            UserProfile? result = await repository.GetUserProfileAsync(user1.Id);
+            UserProfile? foundProfile = await repository.GetUserProfileAsync(user1.Id);
 
-            Assert.Equal(5, result!.TotalLikes);
+            Assert.Equal(5, foundProfile!.TotalLikes);
         }
 
         [Fact]
-        public async Task GetUserProfileAsync_noProfile_returnsNull()
+        public async Task GetUserProfileAsync_ProfileDoesNotExist_ReturnsNull()
         {
-            await using AppDbContext context = CreateContext("Personality_" + nameof(GetUserProfileAsync_noProfile_returnsNull));
+            await using AppDbContext context = CreateContext("Personality_" + nameof(GetUserProfileAsync_ProfileDoesNotExist_ReturnsNull));
             (User user1, User user2, Movie movie) = await SeedTwoUsersAndMovie(context);
 
             PersonalityMatchRepository repository = new PersonalityMatchRepository(context);
 
-            UserProfile? result = await repository.GetUserProfileAsync(user1.Id);
+            UserProfile? foundProfile = await repository.GetUserProfileAsync(user1.Id);
 
-            Assert.Null(result);
+            Assert.Null(foundProfile);
         }
 
         [Fact]
-        public async Task GetRandomUserIdsAsync_multipleUsers_returnsRequestedCount()
+        public async Task GetRandomUserIdsAsync_OtherUserHasPreferences_ReturnsSingleUserId()
         {
-            await using AppDbContext context = CreateContext("Personality_" + nameof(GetRandomUserIdsAsync_multipleUsers_returnsRequestedCount));
-            (User user1, User user2, Movie movie) = await SeedTwoUsersAndMovie(context);
-
-            context.UserMoviePreferences.Add(
-                new UserMoviePreference
-                {
-                    User = user2,
-                    Movie = movie,
-                    Score = 3m,
-                    LastModified = DateTime.UtcNow,
-                });
-            await context.SaveChangesAsync();
-
-            PersonalityMatchRepository repository = new PersonalityMatchRepository(context);
-
-            List<int> result = await repository.GetRandomUserIdsAsync(user1.Id, 1);
-
-            Assert.Single(result);
-        }
-
-        [Fact]
-        public async Task GetRandomUserIdsAsync_excludesCurrentUser()
-        {
-            await using AppDbContext context = CreateContext("Personality_" + nameof(GetRandomUserIdsAsync_excludesCurrentUser));
+            await using AppDbContext context = CreateContext("Personality_" + nameof(GetRandomUserIdsAsync_OtherUserHasPreferences_ReturnsSingleUserId));
             (User user1, User user2, Movie movie) = await SeedTwoUsersAndMovie(context);
 
             context.UserMoviePreferences.Add(
@@ -345,67 +326,22 @@ namespace MovieApp.Tests.Repositories
 
             PersonalityMatchRepository repository = new PersonalityMatchRepository(context);
 
-            List<int> result = await repository.GetRandomUserIdsAsync(user1.Id, 1);
+            List<int> randomUserIds = await repository.GetRandomUserIdsAsync(user1.Id, 1);
 
-            Assert.DoesNotContain(user1.Id, result);
+            Assert.Single(randomUserIds);
         }
 
         [Fact]
-        public async Task GetUsernameAsync_userExists_returnsCorrectUsername()
+        public async Task GetRandomUserIdsAsync_OtherUserHasPreferences_ExcludesCurrentUser()
         {
-            await using AppDbContext context = CreateContext("Personality_" + nameof(GetUsernameAsync_userExists_returnsCorrectUsername));
+            await using AppDbContext context = CreateContext("Personality_" + nameof(GetRandomUserIdsAsync_OtherUserHasPreferences_ExcludesCurrentUser));
             (User user1, User user2, Movie movie) = await SeedTwoUsersAndMovie(context);
 
-            PersonalityMatchRepository repository = new PersonalityMatchRepository(context);
-
-            string result = await repository.GetUsernameAsync(user1.Id);
-
-            Assert.Equal("user1", result);
-        }
-
-        [Fact]
-        public async Task GetUsernameAsync_userDoesNotExist_returnsFallback()
-        {
-            await using AppDbContext context = CreateContext("Personality_" + nameof(GetUsernameAsync_userDoesNotExist_returnsFallback));
-
-            PersonalityMatchRepository repository = new PersonalityMatchRepository(context);
-
-            string result = await repository.GetUsernameAsync(999);
-
-            Assert.Equal("User 999", result);
-        }
-
-        [Fact]
-        public async Task GetTopPreferencesWithTitlesAsync_returnsCorrectCount()
-        {
-            await using AppDbContext context = CreateContext("Personality_" + nameof(GetTopPreferencesWithTitlesAsync_returnsCorrectCount));
-            (User user1, User user2, Movie movie) = await SeedTwoUsersAndMovie(context);
-
-            Movie movie2 = new Movie
-            {
-                Title = "Movie 2",
-                Description = "desc",
-                Rating = 7m,
-                Price = 5m,
-                PrimaryGenre = "Drama",
-                ReleaseYear = 2021,
-                Synopsis = "synopsis",
-            };
-            context.Movies.Add(movie2);
-            await context.SaveChangesAsync();
-
-            context.UserMoviePreferences.AddRange(
+            context.UserMoviePreferences.Add(
                 new UserMoviePreference
                 {
-                    User = user1,
+                    User = user2,
                     Movie = movie,
-                    Score = 9m,
-                    LastModified = DateTime.UtcNow,
-                },
-                new UserMoviePreference
-                {
-                    User = user1,
-                    Movie = movie2,
                     Score = 3m,
                     LastModified = DateTime.UtcNow,
                 });
@@ -413,224 +349,9 @@ namespace MovieApp.Tests.Repositories
 
             PersonalityMatchRepository repository = new PersonalityMatchRepository(context);
 
-            List<MoviePreferenceDisplay> result = await repository.GetTopPreferencesWithTitlesAsync(user1.Id, 2);
+            List<int> randomUserIds = await repository.GetRandomUserIdsAsync(user1.Id, 1);
 
-            Assert.Equal(2, result.Count);
-        }
-
-        [Fact]
-        public async Task GetTopPreferencesWithTitlesAsync_firstResultIsBestMovie()
-        {
-            await using AppDbContext context = CreateContext("Personality_" + nameof(GetTopPreferencesWithTitlesAsync_firstResultIsBestMovie));
-            (User user1, User user2, Movie movie) = await SeedTwoUsersAndMovie(context);
-
-            Movie movie2 = new Movie
-            {
-                Title = "Movie 2",
-                Description = "desc",
-                Rating = 7m,
-                Price = 5m,
-                PrimaryGenre = "Drama",
-                ReleaseYear = 2021,
-                Synopsis = "synopsis",
-            };
-            context.Movies.Add(movie2);
-            await context.SaveChangesAsync();
-
-            context.UserMoviePreferences.AddRange(
-                new UserMoviePreference
-                {
-                    User = user1,
-                    Movie = movie,
-                    Score = 9m,
-                    LastModified = DateTime.UtcNow,
-                },
-                new UserMoviePreference
-                {
-                    User = user1,
-                    Movie = movie2,
-                    Score = 3m,
-                    LastModified = DateTime.UtcNow,
-                });
-            await context.SaveChangesAsync();
-
-            PersonalityMatchRepository repository = new PersonalityMatchRepository(context);
-
-            List<MoviePreferenceDisplay> result = await repository.GetTopPreferencesWithTitlesAsync(user1.Id, 2);
-
-            Assert.True(result[0].IsBestMovie);
-        }
-
-        [Fact]
-        public async Task GetTopPreferencesWithTitlesAsync_firstResultHasHighestScore()
-        {
-            await using AppDbContext context = CreateContext("Personality_" + nameof(GetTopPreferencesWithTitlesAsync_firstResultHasHighestScore));
-            (User user1, User user2, Movie movie) = await SeedTwoUsersAndMovie(context);
-
-            Movie movie2 = new Movie
-            {
-                Title = "Movie 2",
-                Description = "desc",
-                Rating = 7m,
-                Price = 5m,
-                PrimaryGenre = "Drama",
-                ReleaseYear = 2021,
-                Synopsis = "synopsis",
-            };
-            context.Movies.Add(movie2);
-            await context.SaveChangesAsync();
-
-            context.UserMoviePreferences.AddRange(
-                new UserMoviePreference
-                {
-                    User = user1,
-                    Movie = movie,
-                    Score = 9m,
-                    LastModified = DateTime.UtcNow,
-                },
-                new UserMoviePreference
-                {
-                    User = user1,
-                    Movie = movie2,
-                    Score = 3m,
-                    LastModified = DateTime.UtcNow,
-                });
-            await context.SaveChangesAsync();
-
-            PersonalityMatchRepository repository = new PersonalityMatchRepository(context);
-
-            List<MoviePreferenceDisplay> result = await repository.GetTopPreferencesWithTitlesAsync(user1.Id, 2);
-
-            Assert.Equal(9m, result[0].Score);
-        }
-
-        [Fact]
-        public async Task GetTopPreferencesWithTitlesAsync_secondResultIsNotBestMovie()
-        {
-            await using AppDbContext context = CreateContext("Personality_" + nameof(GetTopPreferencesWithTitlesAsync_secondResultIsNotBestMovie));
-            (User user1, User user2, Movie movie) = await SeedTwoUsersAndMovie(context);
-
-            Movie movie2 = new Movie
-            {
-                Title = "Movie 2",
-                Description = "desc",
-                Rating = 7m,
-                Price = 5m,
-                PrimaryGenre = "Drama",
-                ReleaseYear = 2021,
-                Synopsis = "synopsis",
-            };
-            context.Movies.Add(movie2);
-            await context.SaveChangesAsync();
-
-            context.UserMoviePreferences.AddRange(
-                new UserMoviePreference
-                {
-                    User = user1,
-                    Movie = movie,
-                    Score = 9m,
-                    LastModified = DateTime.UtcNow,
-                },
-                new UserMoviePreference
-                {
-                    User = user1,
-                    Movie = movie2,
-                    Score = 3m,
-                    LastModified = DateTime.UtcNow,
-                });
-            await context.SaveChangesAsync();
-
-            PersonalityMatchRepository repository = new PersonalityMatchRepository(context);
-
-            List<MoviePreferenceDisplay> result = await repository.GetTopPreferencesWithTitlesAsync(user1.Id, 2);
-
-            Assert.False(result[1].IsBestMovie);
-        }
-
-        [Fact]
-        public async Task GetTopPreferencesWithTitlesAsync_limitedCount_returnsOnlyRequestedCount()
-        {
-            await using AppDbContext context = CreateContext("Personality_" + nameof(GetTopPreferencesWithTitlesAsync_limitedCount_returnsOnlyRequestedCount));
-            (User user1, User user2, Movie movie) = await SeedTwoUsersAndMovie(context);
-
-            Movie movie2 = new Movie
-            {
-                Title = "Movie 2",
-                Description = "desc",
-                Rating = 7m,
-                Price = 5m,
-                PrimaryGenre = "Drama",
-                ReleaseYear = 2021,
-                Synopsis = "synopsis",
-            };
-            context.Movies.Add(movie2);
-            await context.SaveChangesAsync();
-
-            context.UserMoviePreferences.AddRange(
-                new UserMoviePreference
-                {
-                    User = user1,
-                    Movie = movie,
-                    Score = 9m,
-                    LastModified = DateTime.UtcNow,
-                },
-                new UserMoviePreference
-                {
-                    User = user1,
-                    Movie = movie2,
-                    Score = 3m,
-                    LastModified = DateTime.UtcNow,
-                });
-            await context.SaveChangesAsync();
-
-            PersonalityMatchRepository repository = new PersonalityMatchRepository(context);
-
-            List<MoviePreferenceDisplay> result = await repository.GetTopPreferencesWithTitlesAsync(user1.Id, 1);
-
-            Assert.Single(result);
-        }
-
-        [Fact]
-        public async Task GetTopPreferencesWithTitlesAsync_limitedCount_returnsHighestScoringMovie()
-        {
-            await using AppDbContext context = CreateContext("Personality_" + nameof(GetTopPreferencesWithTitlesAsync_limitedCount_returnsHighestScoringMovie));
-            (User user1, User user2, Movie movie) = await SeedTwoUsersAndMovie(context);
-
-            Movie movie2 = new Movie
-            {
-                Title = "Movie 2",
-                Description = "desc",
-                Rating = 7m,
-                Price = 5m,
-                PrimaryGenre = "Drama",
-                ReleaseYear = 2021,
-                Synopsis = "synopsis",
-            };
-            context.Movies.Add(movie2);
-            await context.SaveChangesAsync();
-
-            context.UserMoviePreferences.AddRange(
-                new UserMoviePreference
-                {
-                    User = user1,
-                    Movie = movie,
-                    Score = 9m,
-                    LastModified = DateTime.UtcNow,
-                },
-                new UserMoviePreference
-                {
-                    User = user1,
-                    Movie = movie2,
-                    Score = 3m,
-                    LastModified = DateTime.UtcNow,
-                });
-            await context.SaveChangesAsync();
-
-            PersonalityMatchRepository repository = new PersonalityMatchRepository(context);
-
-            List<MoviePreferenceDisplay> result = await repository.GetTopPreferencesWithTitlesAsync(user1.Id, 1);
-
-            Assert.Equal(9m, result[0].Score);
+            Assert.DoesNotContain(user1.Id, randomUserIds);
         }
     }
 }

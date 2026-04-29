@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MovieApp.Logic.Interfaces.Repositories;
+using MovieApp.DataLayer.Interfaces.Repositories;
 using MovieApp.Logic.Interfaces.Services;
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Models;
 
 namespace MovieApp.Logic.Services
 {
@@ -34,3 +34,4 @@ namespace MovieApp.Logic.Services
         }
     }
 }
+

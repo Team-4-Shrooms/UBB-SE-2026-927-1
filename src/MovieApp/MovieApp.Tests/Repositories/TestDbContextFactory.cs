@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using MovieApp.Logic.Data;
+using MovieApp.DataLayer;
 
 namespace MovieApp.Tests.Repositories
 {
