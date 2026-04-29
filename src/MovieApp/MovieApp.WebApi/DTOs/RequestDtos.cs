@@ -38,8 +38,8 @@ public sealed class InsertReelRequestBody
     public string? Genre { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? LastEditedAt { get; set; }
-    public int? MovieId { get; set; }
-    public int? CreatorUserId { get; set; }
+    public int MovieId { get; set; }
+    public int CreatorUserId { get; set; }
 }
 
 public sealed class ScrapeJobRequestBody

@@ -392,8 +392,8 @@ public static class WebApiDtoMappingExtensions
             Genre = dto.Genre,
             CreatedAt = dto.CreatedAt,
             LastEditedAt = dto.LastEditedAt,
-            Movie = dto.MovieId.HasValue ? new Movie { Id = dto.MovieId.Value } : null!,
-            CreatorUser = dto.CreatorUserId.HasValue ? new User { Id = dto.CreatorUserId.Value } : null!,
+            Movie = new Movie { Id = dto.MovieId },
+            CreatorUser = new User { Id = dto.CreatorUserId },
         };
     }
 

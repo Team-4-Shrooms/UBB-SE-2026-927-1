@@ -190,7 +190,7 @@ Base route: `api/video-storage`
 
 | Method | Route | Request | Response |
 | --- | --- | --- | --- |
-| POST | `/reels` | `InsertReelRequestBody` | `200 OK` with `ReelDto`. |
+| POST | `/reels` | `InsertReelRequestBody` | `200 OK` with `ReelDto`. `400 Bad Request` if IDs are invalid. `404 Not Found` if entities are not found. |
 
 ## Request Body Schemas
 

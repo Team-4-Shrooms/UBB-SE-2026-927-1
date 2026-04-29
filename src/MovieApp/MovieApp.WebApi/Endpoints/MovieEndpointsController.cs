@@ -22,7 +22,12 @@ public sealed class MovieEndpointsController : ControllerBase
     public async Task<IActionResult> GetMovieById(int movieId)
     {
         var movie = await _repository.GetMovieByIdAsync(movieId);
-        return Ok(movie?.ToDto());
+
+        if (movie == null) {
+            return NotFound($"Movie {movieId} does not exist");
+        }
+
+        return Ok(movie.ToDto());
     }
 
     [HttpGet("search")]

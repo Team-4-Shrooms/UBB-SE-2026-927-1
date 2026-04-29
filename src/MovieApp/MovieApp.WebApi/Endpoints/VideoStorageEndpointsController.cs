@@ -23,18 +23,26 @@ public sealed class VideoStorageEndpointsController : ControllerBase
     [HttpPost("reels")]
     public async Task<IActionResult> InsertReelAsync([FromBody] InsertReelRequestBody reel)
     {
-        User? creatorUser = null;
-        if (reel.CreatorUserId.HasValue)
+        if (reel.CreatorUserId <= 0)
         {
-            creatorUser = await _context.Users.FindAsync(reel.CreatorUserId.Value)
-                ?? throw new InvalidOperationException($"User {reel.CreatorUserId.Value} not found.");
+            return BadRequest("CreatorUserId is required and must be greater than 0.");
         }
 
-        Movie? movie = null;
-        if (reel.MovieId.HasValue)
+        var creatorUser = await _context.Users.FindAsync(reel.CreatorUserId);
+        if (creatorUser == null)
         {
-            movie = await _context.Movies.FindAsync(reel.MovieId.Value)
-                ?? throw new InvalidOperationException($"Movie {reel.MovieId.Value} not found.");
+            return NotFound($"User {reel.CreatorUserId} not found.");
+        }
+
+        if (reel.MovieId <= 0)
+        {
+            return BadRequest("MovieId is required and must be greater than 0.");
+        }
+
+        var movie = await _context.Movies.FindAsync(reel.MovieId);
+        if (movie == null)
+        {
+            return NotFound($"Movie {reel.MovieId} not found.");
         }
 
         Reel inserted = await _repository.InsertReelAsync(new Reel
@@ -50,8 +58,8 @@ public sealed class VideoStorageEndpointsController : ControllerBase
             Genre = reel.Genre,
             CreatedAt = reel.CreatedAt,
             LastEditedAt = reel.LastEditedAt,
-            Movie = movie!,
-            CreatorUser = creatorUser!,
+            Movie = movie,
+            CreatorUser = creatorUser,
         });
 
         ReelDto insertedReel = inserted.ToDto();
