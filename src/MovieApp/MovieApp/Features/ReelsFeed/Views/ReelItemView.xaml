@@ -1,0 +1,105 @@
+<UserControl
+    x:Class="MovieApp.Features.ReelsFeed.Views.ReelItemView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="using:MovieApp.Core.Models"
+    DoubleTapped="ReelItemView_DoubleTapped">
+
+    <Grid Background="Black">
+        <!-- The Media Player -->
+        <MediaPlayerElement x:Name="ReelPlayer"
+                            AreTransportControlsEnabled="False"
+                            Stretch="UniformToFill" />
+
+        <!-- Right-side action bar (TikTok/Instagram style) -->
+        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center"
+                    Margin="0,0,16,0" Spacing="4">
+            <Button x:Name="LikeButton"
+                    Click="LikeButton_Click"
+                    Width="48" Height="48"
+                    CornerRadius="24"
+                    Padding="0"
+                    Background="Transparent"
+                    BorderBrush="Transparent">
+                <FontIcon x:Name="HeartIcon"
+                          FontFamily="Segoe MDL2 Assets"
+                          Glyph="&#xEB51;"
+                          FontSize="26"
+                          Foreground="White"
+                          RenderTransformOrigin="0.5,0.5">
+                    <FontIcon.RenderTransform>
+                        <ScaleTransform x:Name="HeartScale" ScaleX="1" ScaleY="1" />
+                    </FontIcon.RenderTransform>
+                </FontIcon>
+            </Button>
+            <TextBlock x:Name="LikeCountText"
+                       Text="0"
+                       Foreground="White"
+                       FontSize="13" FontWeight="SemiBold"
+                       HorizontalAlignment="Center" />
+        </StackPanel>
+
+        <!-- Heart burst overlay (shown briefly on double-tap) -->
+        <FontIcon x:Name="HeartBurst"
+                  FontFamily="Segoe MDL2 Assets"
+                  Glyph="&#xEB52;"
+                  FontSize="80"
+                  Foreground="White"
+                  Opacity="0"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  IsHitTestVisible="False"
+                  RenderTransformOrigin="0.5,0.5">
+            <FontIcon.RenderTransform>
+                <ScaleTransform x:Name="BurstScale" ScaleX="0.5" ScaleY="0.5" />
+            </FontIcon.RenderTransform>
+        </FontIcon>
+
+        <!-- Bottom Overlay -->
+        <Grid VerticalAlignment="Bottom">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Gradient + metadata -->
+            <Grid Grid.Row="0" Height="200">
+                <Grid.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="Transparent" Offset="0" />
+                        <GradientStop Color="#EE000000" Offset="1" />
+                    </LinearGradientBrush>
+                </Grid.Background>
+                <StackPanel VerticalAlignment="Bottom" Margin="16,0,16,12">
+                    <TextBlock Text="{x:Bind Reel.Title, Mode=OneWay}"
+                               Foreground="White" FontSize="22" FontWeight="Bold" />
+                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+                        <!-- Genre pill badge -->
+                        <Border x:Name="GenreBadge"
+                                Background="#99FF6347"
+                                CornerRadius="10"
+                                Padding="10,4"
+                                Visibility="Collapsed">
+                            <TextBlock x:Name="GenreText"
+                                       Foreground="White" FontSize="12" FontWeight="SemiBold" />
+                        </Border>
+                        <!-- Caption -->
+                        <Border Background="#33FFFFFF" CornerRadius="4" Padding="8,4">
+                            <TextBlock Text="{x:Bind Reel.Caption, Mode=OneWay}"
+                                       Foreground="White" FontSize="14" />
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <!-- Playback progress bar -->
+            <ProgressBar x:Name="PlaybackProgress"
+                         Grid.Row="1"
+                         Height="3"
+                         Minimum="0" Maximum="100" Value="0"
+                         Foreground="White"
+                         Background="#33FFFFFF"
+                         CornerRadius="0" />
+        </Grid>
+    </Grid>
+</UserControl>

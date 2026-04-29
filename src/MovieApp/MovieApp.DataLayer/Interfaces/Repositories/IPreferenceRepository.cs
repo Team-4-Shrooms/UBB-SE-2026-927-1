@@ -1,3 +1,5 @@
+using MovieApp.DataLayer.Models;
+
 namespace MovieApp.DataLayer.Interfaces.Repositories
 {
     /// <summary>
@@ -20,5 +22,10 @@ namespace MovieApp.DataLayer.Interfaces.Repositories
         /// Updates an existing preference by adding the provided boost to the current score.
         /// </summary>
         Task UpdatePreferenceAsync(int userId, int movieId, decimal boost);
+
+        /// <summary>
+        /// Fetches a collection of movies that the user has not yet swiped on.
+        /// </summary>
+        Task<List<Movie>> GetMovieFeedAsync(int userId, int count);
     }
 }

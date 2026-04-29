@@ -29,6 +29,23 @@ namespace MovieApp.DataLayer.Repositories
         {
             reel.CreatedAt = DateTime.UtcNow;
 
+            // Cast the interface back to DbContext so we can access the tracker
+            var dbContext = (DbContext)_context;
+
+            // Swap out the "fake" movie stub for the real tracked movie
+            if (reel.Movie != null)
+            {
+                var trackedMovie = await dbContext.Set<Movie>().FindAsync(reel.Movie.Id);
+                reel.Movie = trackedMovie;
+            }
+
+            // Swap out the "fake" user stub for the real tracked user
+            if (reel.CreatorUser != null)
+            {
+                var trackedUser = await dbContext.Set<User>().FindAsync(reel.CreatorUser.Id);
+                reel.CreatorUser = trackedUser;
+            }
+
             Reels.Add(reel);
             await _context.SaveChangesAsync();
 

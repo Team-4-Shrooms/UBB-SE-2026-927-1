@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="MovieApp.Features.MovieSwipe.Views.MovieSwipeView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <!-- ── Loading Spinner ── -->
+        <ProgressRing
+            x:Name="LoadingRing"
+            IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
+            Width="60" Height="60"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center" />
+
+        <!-- ── "All caught up!" Empty State ── -->
+        <StackPanel
+            x:Name="EmptyStatePanel"
+            Visibility="{x:Bind ViewModel.IsAllCaughtUp, Mode=OneWay}"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Spacing="16">
+            <FontIcon Glyph="&#xE8FB;" FontSize="64"
+                      HorizontalAlignment="Center"
+                      Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+            <TextBlock Text="All caught up!"
+                       Style="{StaticResource TitleTextBlockStyle}"
+                       HorizontalAlignment="Center" />
+            <TextBlock Text="You've swiped on all available movies."
+                       Style="{StaticResource SubtitleTextBlockStyle}"
+                       HorizontalAlignment="Center"
+                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+        </StackPanel>
+
+        <!-- ── Card Stack Area ── -->
+        <Grid x:Name="CardContainer"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+              Width="340" Height="500">
+
+            <!-- The swipeable movie card -->
+            <Border x:Name="MovieCard"
+                    CornerRadius="16"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    Width="340" Height="500"
+                    PointerPressed="MovieCard_PointerPressed"
+                    PointerMoved="MovieCard_PointerMoved"
+                    PointerReleased="MovieCard_PointerReleased"
+                    PointerCaptureLost="MovieCard_PointerCaptureLost"
+                    ManipulationMode="TranslateX,TranslateY">
+
+                <Border.RenderTransform>
+                    <CompositeTransform x:Name="CardTransform" />
+                </Border.RenderTransform>
+
+                <Grid>
+                    <!-- Poster Image (top 70%) -->
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="7*" />
+                        <RowDefinition Height="3*" />
+                    </Grid.RowDefinitions>
+
+                    <Image x:Name="PosterImage"
+                           Grid.Row="0"
+                           Stretch="UniformToFill"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center" />
+
+                    <!-- Fallback text when no poster -->
+                    <Border Grid.Row="0"
+                            Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
+                        <FontIcon Glyph="&#xE8B9;" FontSize="48"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                    </Border>
+
+                    <!-- Title / Genre bar (bottom 30%) -->
+                    <StackPanel Grid.Row="1"
+                                VerticalAlignment="Center"
+                                Padding="20,12">
+                        <TextBlock x:Name="TitleText"
+                                   Text="Movie Title"
+                                   Style="{StaticResource SubtitleTextBlockStyle}"
+                                   TextWrapping="WrapWholeWords"
+                                   MaxLines="2" />
+                        <TextBlock x:Name="GenreText"
+                                   Text="Genre"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                   Margin="0,4,0,0" />
+                    </StackPanel>
+
+                    <!-- ── "LIKE" Overlay (green) ── -->
+                    <Border x:Name="LikeOverlay"
+                            Grid.Row="0" Grid.RowSpan="2"
+                            CornerRadius="16"
+                            Opacity="0"
+                            Background="#4000C853">
+                        <TextBlock Text="LIKE"
+                                   FontSize="48"
+                                   FontWeight="Bold"
+                                   Foreground="#00C853"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   CharacterSpacing="200" />
+                    </Border>
+
+                    <!-- ── "NOPE" Overlay (red) ── -->
+                    <Border x:Name="NopeOverlay"
+                            Grid.Row="0" Grid.RowSpan="2"
+                            CornerRadius="16"
+                            Opacity="0"
+                            Background="#40FF1744">
+                        <TextBlock Text="NOPE"
+                                   FontSize="48"
+                                   FontWeight="Bold"
+                                   Foreground="#FF1744"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   CharacterSpacing="200" />
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ── Status bar at the bottom ── -->
+        <TextBlock Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Bottom"
+                   Margin="0,0,0,24"
+                   Style="{StaticResource CaptionTextBlockStyle}"
+                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+    </Grid>
+</Page>

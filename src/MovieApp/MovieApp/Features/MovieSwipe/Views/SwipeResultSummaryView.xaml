@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="MovieApp.Features.MovieSwipe.Views.SwipeResultSummaryView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+        <StackPanel Spacing="20">
+            <SymbolIcon Symbol="Emoji" Foreground="{StaticResource SystemAccentColor}" RenderTransformOrigin="0.5,0.5">
+                <SymbolIcon.RenderTransform>
+                    <ScaleTransform ScaleX="3" ScaleY="3"/>
+                </SymbolIcon.RenderTransform>
+            </SymbolIcon>
+            
+            <TextBlock Text="All caught up!" 
+                       FontSize="32" 
+                       FontWeight="Bold" 
+                       HorizontalAlignment="Center"/>
+            
+            <TextBlock Text="You've swiped through all available movies. Check back later for more!" 
+                       TextWrapping="Wrap" 
+                       HorizontalAlignment="Center" 
+                       TextAlignment="Center" 
+                       Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                       MaxWidth="400"/>
+        </StackPanel>
+    </Grid>
+</Page>

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MovieApp.Logic.Interfaces.Services
+namespace MovieApp.DataLayer.Interfaces.Services
 {
     public interface IActiveSalesService
     {
