@@ -1,18 +1,18 @@
-using MovieApp.Logic.Data;
-using MovieApp.Logic.Models;
-using MovieApp.Logic.Repositories;
+using MovieApp.DataLayer;
+using MovieApp.DataLayer.Models;
+using MovieApp.DataLayer.Repositories;
 
 namespace MovieApp.Tests.Repositories
 {
     public sealed class InventoryRepositoryTests
     {
         [Fact]
-        public void GetOwnedMovies_ReturnsMoviesOwnedByUser()
+        public async Task GetOwnedMoviesAsync_UserOwnsTwoMovies_ReturnsTwoMovies()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             User user = BuildUser();
-            Movie movieA = BuildMovie("A");
-            Movie movieB = BuildMovie("B");
+            Movie movieA = BuildMovie("MovieA");
+            Movie movieB = BuildMovie("MovieB");
             context.Users.Add(user);
             context.Movies.AddRange(movieA, movieB);
             context.OwnedMovies.AddRange(
@@ -21,138 +21,69 @@ namespace MovieApp.Tests.Repositories
             context.SaveChanges();
 
             InventoryRepository repository = new InventoryRepository(context);
-            List<Movie> owned = repository.GetOwnedMovies(user.Id);
+            List<Movie> ownedMovies = await repository.GetOwnedMoviesAsync(user.Id);
 
-            Assert.Equal(2, owned.Count);
+            Assert.Equal(2, ownedMovies.Count);
         }
 
         [Fact]
-        public void GetOwnedTickets_ReturnsTicketsOwnedByUser()
+        public async Task GetMovieOwnershipsAsync_OwnershipExists_ReturnsSingleOwnership()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             User user = BuildUser();
-            Movie movie = BuildMovie("M");
-            MovieEvent movieEvent = BuildEvent(movie);
-            context.Users.Add(user);
-            context.Movies.Add(movie);
-            context.MovieEvents.Add(movieEvent);
-            context.OwnedTickets.Add(new OwnedTicket { User = user, Event = movieEvent });
-            context.SaveChanges();
-
-            InventoryRepository repository = new InventoryRepository(context);
-            List<MovieEvent> tickets = repository.GetOwnedTickets(user.Id);
-
-            Assert.Single(tickets);
-        }
-
-        [Fact]
-        public void GetOwnedEquipment_ReturnsEquipmentBoughtByUser_ReturnsSingleItem()
-        {
-            using AppDbContext context = TestDbContextFactory.Create();
-            User buyer = BuildUser();
-            User seller = BuildUser();
-            seller.Username = "seller";
-            seller.Email = "seller@example.com";
-            Equipment equipment = BuildEquipment(seller);
-            context.Users.AddRange(buyer, seller);
-            context.Equipment.Add(equipment);
-            context.Transactions.Add(BuildEquipmentPurchase(buyer, seller, equipment));
-            context.SaveChanges();
-
-            InventoryRepository repository = new InventoryRepository(context);
-            List<Equipment> result = repository.GetOwnedEquipment(buyer.Id);
-
-            Assert.Single(result);
-        }
-
-        [Fact]
-        public void GetOwnedEquipment_ReturnsEquipmentBoughtByUser_ResultHasMatchingTitle()
-        {
-            using AppDbContext context = TestDbContextFactory.Create();
-            User buyer = BuildUser();
-            User seller = BuildUser();
-            seller.Username = "seller";
-            seller.Email = "seller@example.com";
-            Equipment equipment = BuildEquipment(seller);
-            context.Users.AddRange(buyer, seller);
-            context.Equipment.Add(equipment);
-            context.Transactions.Add(BuildEquipmentPurchase(buyer, seller, equipment));
-            context.SaveChanges();
-
-            InventoryRepository repository = new InventoryRepository(context);
-            List<Equipment> result = repository.GetOwnedEquipment(buyer.Id);
-
-            Assert.Equal("Camera", result[0].Title);
-        }
-
-        [Fact]
-        public void RemoveOwnedMovie_RemovesOwnership()
-        {
-            using AppDbContext context = TestDbContextFactory.Create();
-            User user = BuildUser();
-            Movie movie = BuildMovie("M");
+            Movie movie = BuildMovie("TestMovie");
             context.Users.Add(user);
             context.Movies.Add(movie);
             context.OwnedMovies.Add(new OwnedMovie { User = user, Movie = movie });
             context.SaveChanges();
 
             InventoryRepository repository = new InventoryRepository(context);
-            repository.RemoveOwnedMovie(user.Id, movie.Id);
+            List<OwnedMovie> ownerships = await repository.GetMovieOwnershipsAsync(user.Id, movie.Id);
+
+            Assert.Single(ownerships);
+        }
+
+        [Fact]
+        public async Task GetMovieOwnershipsAsync_OwnershipDoesNotExist_ReturnsEmptyList()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            User user = BuildUser();
+            Movie movie = BuildMovie("TestMovie");
+            context.Users.Add(user);
+            context.Movies.Add(movie);
+            context.SaveChanges();
+
+            InventoryRepository repository = new InventoryRepository(context);
+            List<OwnedMovie> ownerships = await repository.GetMovieOwnershipsAsync(user.Id, movie.Id);
+
+            Assert.Empty(ownerships);
+        }
+
+        [Fact]
+        public void RemoveMovieOwnerships_OneOwnershipProvided_RemovesOwnershipFromDatabase()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            User user = BuildUser();
+            Movie movie = BuildMovie("TestMovie");
+            context.Users.Add(user);
+            context.Movies.Add(movie);
+            OwnedMovie ownership = new OwnedMovie { User = user, Movie = movie };
+            context.OwnedMovies.Add(ownership);
+            context.SaveChanges();
+
+            InventoryRepository repository = new InventoryRepository(context);
+            repository.RemoveMovieOwnerships(new[] { ownership });
+            context.SaveChanges();
 
             Assert.Empty(context.OwnedMovies);
         }
 
         [Fact]
-        public void RemoveOwnedMovie_LogsSingleTransaction()
+        public async Task GetTicketOwnershipsAsync_OwnershipExists_ReturnsSingleOwnership()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             User user = BuildUser();
-            Movie movie = BuildMovie("M");
-            context.Users.Add(user);
-            context.Movies.Add(movie);
-            context.OwnedMovies.Add(new OwnedMovie { User = user, Movie = movie });
-            context.SaveChanges();
-
-            InventoryRepository repository = new InventoryRepository(context);
-            repository.RemoveOwnedMovie(user.Id, movie.Id);
-
-            Assert.Single(context.Transactions);
-        }
-
-        [Fact]
-        public void RemoveOwnedMovie_LogsTransactionWithRemoveType()
-        {
-            using AppDbContext context = TestDbContextFactory.Create();
-            User user = BuildUser();
-            Movie movie = BuildMovie("M");
-            context.Users.Add(user);
-            context.Movies.Add(movie);
-            context.OwnedMovies.Add(new OwnedMovie { User = user, Movie = movie });
-            context.SaveChanges();
-
-            InventoryRepository repository = new InventoryRepository(context);
-            repository.RemoveOwnedMovie(user.Id, movie.Id);
-
-            Assert.Equal("RemoveOwnedMovie", context.Transactions.Single().Type);
-        }
-
-        [Fact]
-        public void RemoveOwnedMovie_InvalidUserId_DoesNotThrow()
-        {
-            using AppDbContext context = TestDbContextFactory.Create();
-            InventoryRepository repository = new InventoryRepository(context);
-
-            Exception? exception = Record.Exception(() => repository.RemoveOwnedMovie(0, 1));
-
-            Assert.Null(exception);
-        }
-
-        [Fact]
-        public void RemoveOwnedTicket_RemovesOwnership()
-        {
-            using AppDbContext context = TestDbContextFactory.Create();
-            User user = BuildUser();
-            Movie movie = BuildMovie("M");
+            Movie movie = BuildMovie("TestMovie");
             MovieEvent movieEvent = BuildEvent(movie);
             context.Users.Add(user);
             context.Movies.Add(movie);
@@ -161,87 +92,70 @@ namespace MovieApp.Tests.Repositories
             context.SaveChanges();
 
             InventoryRepository repository = new InventoryRepository(context);
-            repository.RemoveOwnedTicket(user.Id, movieEvent.Id);
+            List<OwnedTicket> ownerships = await repository.GetTicketOwnershipsAsync(user.Id, movieEvent.Id);
+
+            Assert.Single(ownerships);
+        }
+
+        [Fact]
+        public async Task GetTicketOwnershipsAsync_OwnershipDoesNotExist_ReturnsEmptyList()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            User user = BuildUser();
+            Movie movie = BuildMovie("TestMovie");
+            MovieEvent movieEvent = BuildEvent(movie);
+            context.Users.Add(user);
+            context.Movies.Add(movie);
+            context.MovieEvents.Add(movieEvent);
+            context.SaveChanges();
+
+            InventoryRepository repository = new InventoryRepository(context);
+            List<OwnedTicket> ownerships = await repository.GetTicketOwnershipsAsync(user.Id, movieEvent.Id);
+
+            Assert.Empty(ownerships);
+        }
+
+        [Fact]
+        public void RemoveTicketOwnerships_OneOwnershipProvided_RemovesOwnershipFromDatabase()
+        {
+            using AppDbContext context = TestDbContextFactory.Create();
+            User user = BuildUser();
+            Movie movie = BuildMovie("TestMovie");
+            MovieEvent movieEvent = BuildEvent(movie);
+            context.Users.Add(user);
+            context.Movies.Add(movie);
+            context.MovieEvents.Add(movieEvent);
+            OwnedTicket ownership = new OwnedTicket { User = user, Event = movieEvent };
+            context.OwnedTickets.Add(ownership);
+            context.SaveChanges();
+
+            InventoryRepository repository = new InventoryRepository(context);
+            repository.RemoveTicketOwnerships(new[] { ownership });
+            context.SaveChanges();
 
             Assert.Empty(context.OwnedTickets);
         }
 
         [Fact]
-        public void RemoveOwnedTicket_LogsSingleTransaction()
+        public async Task AddTransactionAsync_ValidTransaction_CreatesOneRecord()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             User user = BuildUser();
-            Movie movie = BuildMovie("M");
-            MovieEvent movieEvent = BuildEvent(movie);
             context.Users.Add(user);
-            context.Movies.Add(movie);
-            context.MovieEvents.Add(movieEvent);
-            context.OwnedTickets.Add(new OwnedTicket { User = user, Event = movieEvent });
             context.SaveChanges();
 
             InventoryRepository repository = new InventoryRepository(context);
-            repository.RemoveOwnedTicket(user.Id, movieEvent.Id);
-
-            Assert.Single(context.Transactions);
-        }
-
-        [Fact]
-        public void RemoveOwnedTicket_LogsTransactionWithRemoveType()
-        {
-            using AppDbContext context = TestDbContextFactory.Create();
-            User user = BuildUser();
-            Movie movie = BuildMovie("M");
-            MovieEvent movieEvent = BuildEvent(movie);
-            context.Users.Add(user);
-            context.Movies.Add(movie);
-            context.MovieEvents.Add(movieEvent);
-            context.OwnedTickets.Add(new OwnedTicket { User = user, Event = movieEvent });
-            context.SaveChanges();
-
-            InventoryRepository repository = new InventoryRepository(context);
-            repository.RemoveOwnedTicket(user.Id, movieEvent.Id);
-
-            Assert.Equal("RemoveOwnedTicket", context.Transactions.Single().Type);
-        }
-
-        [Fact]
-        public void RemoveOwnedTicket_InvalidUserId_DoesNotThrow()
-        {
-            using AppDbContext context = TestDbContextFactory.Create();
-            InventoryRepository repository = new InventoryRepository(context);
-
-            Exception? exception = Record.Exception(() => repository.RemoveOwnedTicket(-1, 1));
-
-            Assert.Null(exception);
-        }
-
-        private static Equipment BuildEquipment(User seller)
-        {
-            return new Equipment
+            await repository.AddTransactionAsync(new Transaction
             {
-                Title = "Camera",
-                Category = "Cameras",
-                Description = "desc",
-                Condition = "New",
-                Price = 100m,
-                ImageUrl = "https://example.com/camera.jpg",
-                Status = EquipmentStatus.Sold,
-                Seller = seller
-            };
-        }
-
-        private static Transaction BuildEquipmentPurchase(User buyer, User seller, Equipment equipment)
-        {
-            return new Transaction
-            {
-                Buyer = buyer,
-                Seller = seller,
-                Equipment = equipment,
-                Amount = -100m,
-                Type = "EquipmentPurchase",
+                Buyer = user,
+                Amount = -10m,
+                Type = "RemoveOwnedMovie",
                 Status = "Completed",
                 Timestamp = DateTime.UtcNow
-            };
+            });
+            await repository.SaveChangesAsync();
+
+            Assert.Single(context.Transactions);
         }
 
         private static User BuildUser()

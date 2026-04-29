@@ -15,3 +15,4 @@ namespace MovieApp.Logic.Interfaces.Services
         Dictionary<int, decimal> GetBestDiscountPercentByMovieId();
     }
 }
+

@@ -93,7 +93,7 @@
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260416003" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MovieApp.Logic\MovieApp.Logic.csproj" />
+    <ProjectReference Include="..\MovieApp.DataLayer\MovieApp.DataLayer.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Features\Events\Services\" />

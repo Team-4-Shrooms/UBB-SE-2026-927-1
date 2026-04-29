@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using MovieApp.Logic.Data;
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer;
+using MovieApp.DataLayer.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

@@ -12,3 +12,4 @@ namespace MovieApp.Logic.Interfaces.Services
         Task PostReviewAsync(int movieId, int userId, int rating, string? comment);
     }
 }
+
