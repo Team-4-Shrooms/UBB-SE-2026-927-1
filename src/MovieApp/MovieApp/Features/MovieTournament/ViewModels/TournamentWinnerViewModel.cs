@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Models;
 using MovieApp.Features.MovieTournament.Services;
 
 namespace MovieApp.Features.MovieTournament.ViewModels

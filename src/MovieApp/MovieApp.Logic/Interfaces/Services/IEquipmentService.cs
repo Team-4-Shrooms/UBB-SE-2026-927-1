@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Models;
 
-namespace MovieApp.Logic.Interfaces.Services
+namespace MovieApp.DataLayer.Interfaces.Services
 {
     public interface IEquipmentService
     {

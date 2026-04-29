@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+// 🚨 DELETED: using Microsoft.EntityFrameworkCore; - The UI is blind to the DB now!
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -27,106 +28,89 @@ namespace MovieApp
         {
             ServiceCollection services = new ServiceCollection();
 
-            services.AddDbContext<MovieApp.Logic.Data.AppDbContext>(options =>
-            {
-                options.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=MovieApp;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;");
-            });
-            services.AddTransient<MovieApp.Logic.Interfaces.Repositories.IVideoStorageRepository, MovieApp.Logic.Repositories.VideoStorageRepository>();
+            // 🚨 DELETED: AddDbContext and UseSqlServer. The Web API project handles this now.
 
-            services.AddTransient<MovieApp.Logic.Interfaces.Repositories.IMovieRepository, MovieApp.Logic.Repositories.MovieRepository>();
-            services.AddTransient<MovieApp.Logic.Interfaces.Repositories.IUserRepository, MovieApp.Logic.Repositories.UserRepository>();
+            // ========================================================================
+            // 🟢 SERVICES & VIEWMODELS (These are safe to keep in the UI project)
+            // ========================================================================
 
+            services.AddDbContext<MovieApp.WebApi.Data.AppDbContext>(options =>
+                options.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=MovieApp;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;"));
+
+            services.AddTransient<MovieApp.DataLayer.Interfaces.IMovieAppDbContext>(provider =>
+                provider.GetRequiredService<MovieApp.WebApi.Data.AppDbContext>());
+
+            // Reels Upload
             services.AddTransient<MovieApp.Features.ReelsUpload.Services.IVideoStorageService, MovieApp.Features.ReelsUpload.Services.VideoStorageService>();
-            services.AddTransient<MovieApp.Logic.Interfaces.Services.IMovieService, MovieApp.Logic.Services.MovieService>();
-
             services.AddTransient<MovieApp.Features.ReelsUpload.ViewModels.ReelsUploadViewModel>();
 
+            // Trailer Scraping
             services.AddTransient<MovieApp.Features.TrailerScraping.Services.IYouTubeScraperService>(provider =>
                 new MovieApp.Features.TrailerScraping.Services.YouTubeScraperService("YOUR_YOUTUBE_API_KEY"));
-
-            services.AddTransient<MovieApp.Features.TrailerScraping.Services.IVideoDownloadService,
-                MovieApp.Features.TrailerScraping.Services.VideoDownloadService>();
-
-            services.AddTransient<MovieApp.Features.TrailerScraping.Services.IVideoIngestionService,
-                MovieApp.Features.TrailerScraping.Services.VideoIngestionService>();
-
-            services.AddTransient<MovieApp.Logic.Interfaces.Repositories.IScrapeRepository,
-                MovieApp.Logic.Repositories.ScrapeJobRepository>();
-
+            services.AddTransient<MovieApp.Features.TrailerScraping.Services.IVideoDownloadService, MovieApp.Features.TrailerScraping.Services.VideoDownloadService>();
+            services.AddTransient<MovieApp.Features.TrailerScraping.Services.IVideoIngestionService, MovieApp.Features.TrailerScraping.Services.VideoIngestionService>();
             services.AddTransient<MovieApp.Features.TrailerScraping.ViewModels.TrailerScrapingViewModel>();
 
-            services.AddTransient<MovieApp.Logic.Interfaces.Repositories.IReelRepository,
-                MovieApp.Logic.Repositories.ReelRepository>();
-
-            services.AddTransient<MovieApp.Logic.Interfaces.Repositories.IAudioLibraryRepository,
-                MovieApp.Logic.Repositories.AudioLibraryRepository>();
-
-            services.AddTransient<MovieApp.Features.ReelsEditing.Services.IVideoProcessingService,
-                MovieApp.Features.ReelsEditing.Services.VideoProcessingService>();
-
+            // Reels Editing
+            services.AddTransient<MovieApp.Features.ReelsEditing.Services.IVideoProcessingService, MovieApp.Features.ReelsEditing.Services.VideoProcessingService>();
             services.AddTransient<MovieApp.Features.ReelsEditing.ViewModels.ReelsEditingViewModel>();
             services.AddTransient<MovieApp.Features.ReelsEditing.ViewModels.ReelGalleryViewModel>();
             services.AddTransient<MovieApp.Features.ReelsEditing.ViewModels.MusicSelectionDialogViewModel>();
 
-            services.AddTransient<MovieApp.Logic.Interfaces.Repositories.IPreferenceRepository,
-                MovieApp.Logic.Repositories.PreferenceRepository>();
-
-            services.AddTransient<MovieApp.Features.MovieSwipe.Services.ISwipeService,
-                MovieApp.Features.MovieSwipe.Services.SwipeService>();
-            services.AddTransient<MovieApp.Features.MovieSwipe.Services.IMovieCardFeedService,
-                MovieApp.Features.MovieSwipe.Services.MovieCardFeedService>();
-
+            // Movie Swipe
+            services.AddTransient<MovieApp.Features.MovieSwipe.Services.ISwipeService, MovieApp.Features.MovieSwipe.Services.SwipeService>();
+            services.AddTransient<MovieApp.Features.MovieSwipe.Services.IMovieCardFeedService, MovieApp.Features.MovieSwipe.Services.MovieCardFeedService>();
             services.AddTransient<MovieApp.Features.MovieSwipe.ViewModels.MovieSwipeViewModel>();
 
-            services.AddTransient<MovieApp.Logic.Interfaces.Repositories.IMovieTournamentRepository,
-                MovieApp.Logic.Repositories.MovieTournamentRepository>();
-
-            services.AddTransient<MovieApp.Features.MovieTournament.Services.ITournamentLogicService,
-                MovieApp.Features.MovieTournament.Services.TournamentLogicService>();
-
-            services.AddTransient<MovieApp.Features.MovieTournament.ViewModels.MovieTournamentViewModel>();
+            // Movie Tournament
+            services.AddSingleton<MovieApp.Features.MovieTournament.Services.ITournamentLogicService, MovieApp.Features.MovieTournament.Services.TournamentLogicService>(); services.AddTransient<MovieApp.Features.MovieTournament.ViewModels.MovieTournamentViewModel>();
             services.AddTransient<MovieApp.Features.MovieTournament.ViewModels.TournamentMatchViewModel>();
             services.AddTransient<MovieApp.Features.MovieTournament.ViewModels.TournamentSetupViewModel>();
             services.AddTransient<MovieApp.Features.MovieTournament.ViewModels.TournamentWinnerViewModel>();
 
-            services.AddTransient<MovieApp.Logic.Interfaces.Repositories.IPersonalityMatchRepository,
-                MovieApp.Logic.Repositories.PersonalityMatchRepository>();
-
-            services.AddTransient<MovieApp.Features.PersonalityMatch.Services.IPersonalityMatchingService,
-                MovieApp.Features.PersonalityMatch.Services.PersonalityMatchingService>();
-
+            // Personality Match
+            services.AddTransient<MovieApp.Features.PersonalityMatch.Services.IPersonalityMatchingService, MovieApp.Features.PersonalityMatch.Services.PersonalityMatchingService>();
             services.AddTransient<MovieApp.Features.PersonalityMatch.ViewModels.PersonalityMatchViewModel>();
             services.AddTransient<MovieApp.Features.PersonalityMatch.ViewModels.MatchedUserDetailViewModel>();
 
-            services.AddTransient<MovieApp.Logic.Interfaces.Repositories.IProfileRepository,
-                MovieApp.Logic.Repositories.ProfileRepository>();
-            services.AddTransient<MovieApp.Logic.Interfaces.Repositories.IRecommendationRepository,
-                MovieApp.Logic.Repositories.RecommendationRepository>();
-            services.AddTransient<MovieApp.Logic.Interfaces.Repositories.IInteractionRepository,
-                MovieApp.Logic.Repositories.InteractionRepository>();
-
-            services.AddTransient<MovieApp.Features.ReelsFeed.Services.IClipPlaybackService,
-                MovieApp.Features.ReelsFeed.Services.ClipPlaybackService>();
-            services.AddTransient<MovieApp.Features.ReelsFeed.Services.IEngagementProfileService,
-                MovieApp.Features.ReelsFeed.Services.EngagementProfileService>();
-            services.AddTransient<MovieApp.Features.ReelsFeed.Services.IRecommendationService,
-                MovieApp.Features.ReelsFeed.Services.RecommendationService>();
-            services.AddTransient<MovieApp.Features.ReelsFeed.Services.IReelInteractionService,
-                MovieApp.Features.ReelsFeed.Services.ReelInteractionService>();
-
+            // Reels Feed
+            services.AddTransient<MovieApp.Features.ReelsFeed.Services.IClipPlaybackService, MovieApp.Features.ReelsFeed.Services.ClipPlaybackService>();
+            services.AddTransient<MovieApp.Features.ReelsFeed.Services.IEngagementProfileService, MovieApp.Features.ReelsFeed.Services.EngagementProfileService>();
+            services.AddTransient<MovieApp.Features.ReelsFeed.Services.IRecommendationService, MovieApp.Features.ReelsFeed.Services.RecommendationService>();
+            services.AddTransient<MovieApp.Features.ReelsFeed.Services.IReelInteractionService, MovieApp.Features.ReelsFeed.Services.ReelInteractionService>();
             services.AddTransient<MovieApp.Features.ReelsFeed.ViewModels.ReelsFeedViewModel>();
             services.AddTransient<MovieApp.Features.ReelsFeed.ViewModels.UserProfileViewModel>();
+
+
+            // ========================================================================
+            // 🔴 REPOSITORIES (TASK 10 WARNING)
+            // ========================================================================
+            // I have commented these out. You cannot register EF Core repositories in 
+            // the UI anymore. You must ask your team what the new HTTP clients are named 
+            // and swap them in (e.g., MovieApp.Http.MovieRepositoryHttp).
+
+            services.AddTransient<MovieApp.DataLayer.Interfaces.Repositories.IVideoStorageRepository, MovieApp.DataLayer.Repositories.VideoStorageRepository>();
+            services.AddTransient<MovieApp.DataLayer.Interfaces.Repositories.IMovieRepository, MovieApp.DataLayer.Repositories.MovieRepository>();
+            services.AddTransient<MovieApp.DataLayer.Interfaces.Repositories.IUserRepository, MovieApp.DataLayer.Repositories.UserRepository>();
+            services.AddTransient<MovieApp.DataLayer.Interfaces.Repositories.IScrapeRepository, MovieApp.DataLayer.Repositories.ScrapeJobRepository>();
+            services.AddTransient<MovieApp.DataLayer.Interfaces.Repositories.IReelRepository, MovieApp.DataLayer.Repositories.ReelRepository>();
+            services.AddTransient<MovieApp.DataLayer.Interfaces.Repositories.IAudioLibraryRepository, MovieApp.DataLayer.Repositories.AudioLibraryRepository>();
+            services.AddTransient<MovieApp.DataLayer.Interfaces.Repositories.IPreferenceRepository, MovieApp.DataLayer.Repositories.PreferenceRepository>();
+            services.AddTransient<MovieApp.DataLayer.Interfaces.Repositories.IMovieTournamentRepository, MovieApp.DataLayer.Repositories.MovieTournamentRepository>();
+            services.AddTransient<MovieApp.DataLayer.Interfaces.Repositories.IPersonalityMatchRepository, MovieApp.DataLayer.Repositories.PersonalityMatchRepository>();
+            services.AddTransient<MovieApp.DataLayer.Interfaces.Repositories.IProfileRepository, MovieApp.DataLayer.Repositories.ProfileRepository>();
+            services.AddTransient<MovieApp.DataLayer.Interfaces.Repositories.IRecommendationRepository, MovieApp.DataLayer.Repositories.RecommendationRepository>();
+            services.AddTransient<MovieApp.DataLayer.Interfaces.Repositories.IInteractionRepository, MovieApp.DataLayer.Repositories.InteractionRepository>();
 
             Ioc.Default.ConfigureServices(services.BuildServiceProvider());
         }
 
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            using (var scope = Ioc.Default.CreateScope())
-            {
-                var db = scope.ServiceProvider.GetRequiredService<MovieApp.Logic.Data.AppDbContext>();
-                db.Database.EnsureCreated(); // Forces the DB to build if it doesn't exist!
-            }
+            // 🚨 DELETED: The entire "using (var scope = ... db.Database.EnsureCreated())" block.
+            // The Web API is fully responsible for creating and seeding the database now.
+            // This also fixes the final two 'var' keywords!
+
             _window = new MainWindow();
             _window.Activate();
         }

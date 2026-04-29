@@ -9,7 +9,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 using MovieApp.Features.MovieSwipe.ViewModels;
 using Windows.Foundation;
 using CommunityToolkit.Mvvm.DependencyInjection;
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Models;
 
 namespace MovieApp.Features.MovieSwipe.Views
 {

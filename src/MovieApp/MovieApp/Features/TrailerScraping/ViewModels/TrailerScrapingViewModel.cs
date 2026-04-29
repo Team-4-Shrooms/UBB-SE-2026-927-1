@@ -5,7 +5,7 @@ namespace MovieApp.Features.TrailerScraping.ViewModels
     using System.Threading.Tasks;
     using CommunityToolkit.Mvvm.ComponentModel;
     using CommunityToolkit.Mvvm.Input;
-    using MovieApp.Logic.Models;
+    using MovieApp.DataLayer.Models;
     using MovieApp.Features.TrailerScraping.Services;
 
     /// <summary>
@@ -209,7 +209,7 @@ namespace MovieApp.Features.TrailerScraping.ViewModels
         {
             try
             {
-                MovieApp.Logic.Models.DashboardStatsModel stats = await this.repository.GetDashboardStatsAsync();
+                MovieApp.DataLayer.Models.DashboardStatsModel stats = await this.repository.GetDashboardStatsAsync();
                 this.TotalMovies = stats.TotalMovies;
                 this.TotalReels = stats.TotalReels;
                 this.TotalJobs = stats.TotalJobs;

@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Interfaces.Repositories;
-using MovieApp.Logic.Interfaces.Services;
+using MovieApp.DataLayer.Interfaces.Services;
 using MovieApp.DataLayer.Models;
 
-namespace MovieApp.Logic.Services
+namespace MovieApp.DataLayer.Services
 {
     public class MovieService : IMovieService
     {

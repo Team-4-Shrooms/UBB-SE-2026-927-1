@@ -6,7 +6,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Models;
 using MovieApp.Features.ReelsFeed.Services;
 using Windows.Media.Playback;
 using CommunityToolkit.Mvvm.DependencyInjection;

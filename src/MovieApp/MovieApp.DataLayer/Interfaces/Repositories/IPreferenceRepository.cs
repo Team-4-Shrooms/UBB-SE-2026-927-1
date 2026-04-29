@@ -1,3 +1,5 @@
+using MovieApp.DataLayer.Models;
+
 namespace MovieApp.DataLayer.Interfaces.Repositories
 {
     /// <summary>

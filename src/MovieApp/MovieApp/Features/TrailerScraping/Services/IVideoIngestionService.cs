@@ -2,7 +2,7 @@ namespace MovieApp.Features.TrailerScraping.Services
 {
     using System;
     using System.Threading.Tasks;
-    using MovieApp.Logic.Models;
+    using MovieApp.DataLayer.Models;
 
     /// <summary>
     /// Downloads and ingests scraped trailer videos into the local system.

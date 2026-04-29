@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Models;
 using MovieApp.Features.PersonalityMatch.Models;
 
 namespace MovieApp.Features.PersonalityMatch.Services
@@ -95,9 +95,9 @@ namespace MovieApp.Features.PersonalityMatch.Services
             return results;
         }
 
-        public async Task<List<MovieApp.Logic.Models.MoviePreferenceDisplay>> GetTopMoviePreferencesAsync(int userId, int topMoviePreferencesCount)
+        public async Task<List<MoviePreferenceDisplay>> GetTopMoviePreferencesAsync(int userId, int topMoviePreferencesCount)
         {
-            List<MovieApp.Logic.Models.MoviePreferenceDisplay> preferences = await this.personalityMatchRepository.GetTopPreferencesWithTitlesAsync(userId, topMoviePreferencesCount);
+            List<MovieApp.DataLayer.Models.MoviePreferenceDisplay> preferences = await this.personalityMatchRepository.GetTopPreferencesWithTitlesAsync(userId, topMoviePreferencesCount);
 
             for (int i = 0; i < preferences.Count; i++)
             {

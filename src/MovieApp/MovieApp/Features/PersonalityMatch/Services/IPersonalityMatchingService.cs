@@ -1,4 +1,4 @@
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Models;
 using MovieApp.Features.PersonalityMatch.Models;
 namespace MovieApp.Features.PersonalityMatch.Services
 {
@@ -45,7 +45,7 @@ namespace MovieApp.Features.PersonalityMatch.Services
         /// <returns>
         /// A list of <see cref="MoviePreferenceDisplay"/> records ordered by score descending.
         /// </returns>
-        Task<List<MovieApp.Logic.Models.MoviePreferenceDisplay>> GetTopMoviePreferencesAsync(int userId, int topMoviePreferencesCount);
+        Task<List<MoviePreferenceDisplay>> GetTopMoviePreferencesAsync(int userId, int topMoviePreferencesCount);
 
         /// <summary>
         /// Retrieves the username of the specified user.

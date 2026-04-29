@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using MovieApp;
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Models;
 using MovieApp.Features.ReelsFeed.Services;
 
 namespace MovieApp.Features.ReelsFeed.ViewModels

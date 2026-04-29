@@ -9,7 +9,7 @@ namespace MovieApp.Features.ReelsEditing.Views
     using Windows.Media.Core;
     using Windows.Media.Playback;
     using CommunityToolkit.Mvvm.DependencyInjection;
-    using MovieApp.Logic.Models;
+    using MovieApp.DataLayer.Models;
 
     /// <summary>
     /// The page responsible for the reels editing interface.
@@ -155,7 +155,7 @@ namespace MovieApp.Features.ReelsEditing.Views
 
         private async void ReelGridView_ItemClick(object sender, ItemClickEventArgs eventArguments)
         {
-            if (eventArguments.ClickedItem is Logic.Models.Reel reel)
+            if (eventArguments.ClickedItem is DataLayer.Models.Reel reel)
             {
                 this.GalleryViewModel.SelectedReel = reel;
                 await this.ViewModel.LoadReelAsync(reel);
@@ -554,7 +554,7 @@ namespace MovieApp.Features.ReelsEditing.Views
 
             listView.SelectionChanged += (listSender, listEventArguments) =>
             {
-                if (listView.SelectedItem is Logic.Models.MusicTrack track)
+                if (listView.SelectedItem is DataLayer.Models.MusicTrack track)
                 {
                     this.MusicDialogViewModel.SelectedTrack = track;
                 }

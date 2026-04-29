@@ -3,7 +3,7 @@ namespace MovieApp.Features.TrailerScraping.Views
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.UI.Xaml;
     using Microsoft.UI.Xaml.Controls;
-    using MovieApp.Logic.Models;
+    using MovieApp.DataLayer.Models;
     using MovieApp.Features.TrailerScraping.ViewModels;
     using CommunityToolkit.Mvvm.DependencyInjection;
 

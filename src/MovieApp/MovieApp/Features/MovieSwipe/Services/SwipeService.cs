@@ -1,4 +1,4 @@
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Models;
 
 namespace MovieApp.Features.MovieSwipe.Services
 {

@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Models;
 using MovieApp.Features.ReelsUpload.Models;
 using Windows.Storage;
 using Windows.Storage.FileProperties;

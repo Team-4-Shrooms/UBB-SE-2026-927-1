@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Models;
 using MovieApp.Features.ReelsUpload.Models;
 
 namespace MovieApp.Features.ReelsUpload.Services

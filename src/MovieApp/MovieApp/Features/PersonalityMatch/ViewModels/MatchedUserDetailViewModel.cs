@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Models;
 using MovieApp.Features.PersonalityMatch.Models;
 using MovieApp.Features.PersonalityMatch.Services;
 
@@ -72,7 +72,7 @@ namespace MovieApp.Features.PersonalityMatch.ViewModels
         /// Gets the collection of top-rated movie preferences for the matched user,
         /// enriched with movie titles and best movie flags.
         /// </summary>
-        public ObservableCollection<MovieApp.Logic.Models.MoviePreferenceDisplay> TopPreferences { get; } = new ();
+        public ObservableCollection<MoviePreferenceDisplay> TopPreferences { get; } = new ();
 
         /// <summary>
         /// Initializes a new instance of <see cref="MatchedUserDetailViewModel"/> with the specified matching service.
@@ -175,10 +175,10 @@ namespace MovieApp.Features.PersonalityMatch.ViewModels
         /// <param name="userId">The identifier of the user whose top preferences are to be loaded.</param>
         private async Task LoadTopMoviePreferencesAsync(int userId)
         {
-            List<MovieApp.Logic.Models.MoviePreferenceDisplay> topMoviePreferences =
+            List<MoviePreferenceDisplay> topMoviePreferences =
                 await this.personalityMatchingService.GetTopMoviePreferencesAsync(userId, TopMoviePreferencesCount);
 
-            foreach (MovieApp.Logic.Models.MoviePreferenceDisplay moviePreference in topMoviePreferences)
+            foreach (MoviePreferenceDisplay moviePreference in topMoviePreferences)
             {
                 TopPreferences.Add(moviePreference);
             }

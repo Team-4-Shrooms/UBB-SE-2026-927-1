@@ -47,13 +47,14 @@
                     <ScaleTransform ScaleX="1" ScaleY="1" />
                 </Button.RenderTransform>
                 <Grid>
-                    <Image Source="{x:Bind ViewModel.GetImageSource(ViewModel.MovieOptionA.PosterUrl), Mode=OneWay}"
+                    <Image Source="{x:Bind ViewModel.MovieOptionA.PosterUrl, Mode=OneWay}"
                            Stretch="UniformToFill" />
+
                     <StackPanel VerticalAlignment="Bottom" Background="#B2000000" Padding="16">
-                        <TextBlock Text="{x:Bind ViewModel.MovieOptionA.Title, Mode=OneWay}"
+                        <TextBlock Text="{x:Bind ViewModel.MovieOptionA.Title, Mode=OneWay, FallbackValue='Loading...'}"
                                    FontSize="24" FontWeight="Bold" Foreground="White"
                                    TextWrapping="Wrap" HorizontalAlignment="Center" TextAlignment="Center" />
-                        <TextBlock Text="{x:Bind ViewModel.MovieOptionA.ReleaseYear, Mode=OneWay}"
+                        <TextBlock Text="{x:Bind ViewModel.MovieOptionA.ReleaseYear, Mode=OneWay, FallbackValue=''}"
                                    HorizontalAlignment="Center" Foreground="LightGray" />
                     </StackPanel>
                 </Grid>
@@ -63,7 +64,6 @@
                        FontSize="32" FontWeight="Bold"
                        VerticalAlignment="Center" Margin="32,0" />
 
-            <!-- Second movie option -->
             <Button Grid.Column="2"
                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                     Padding="0" CornerRadius="12"
@@ -76,13 +76,14 @@
                     <ScaleTransform ScaleX="1" ScaleY="1" />
                 </Button.RenderTransform>
                 <Grid>
-                    <Image Source="{x:Bind ViewModel.GetImageSource(ViewModel.MovieOptionB.PosterUrl), Mode=OneWay}"
+                    <Image Source="{x:Bind ViewModel.MovieOptionB.PosterUrl, Mode=OneWay}"
                            Stretch="UniformToFill" />
+
                     <StackPanel VerticalAlignment="Bottom" Background="#B2000000" Padding="16">
-                        <TextBlock Text="{x:Bind ViewModel.MovieOptionB.Title, Mode=OneWay}"
+                        <TextBlock Text="{x:Bind ViewModel.MovieOptionB.Title, Mode=OneWay, FallbackValue='Loading...'}"
                                    FontSize="24" FontWeight="Bold" Foreground="White"
                                    TextWrapping="Wrap" HorizontalAlignment="Center" TextAlignment="Center" />
-                        <TextBlock Text="{x:Bind ViewModel.MovieOptionB.ReleaseYear, Mode=OneWay}"
+                        <TextBlock Text="{x:Bind ViewModel.MovieOptionB.ReleaseYear, Mode=OneWay, FallbackValue=''}"
                                    HorizontalAlignment="Center" Foreground="LightGray" />
                     </StackPanel>
                 </Grid>

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using MovieApp.Logic.Models;
+using MovieApp.DataLayer.Models;
 
 
 namespace MovieApp.Features.ReelsFeed.Services

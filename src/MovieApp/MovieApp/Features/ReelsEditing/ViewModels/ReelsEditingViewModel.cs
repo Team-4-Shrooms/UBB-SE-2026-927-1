@@ -6,7 +6,7 @@ namespace MovieApp.Features.ReelsEditing.ViewModels
     using System.Threading.Tasks;
     using CommunityToolkit.Mvvm.ComponentModel;
     using CommunityToolkit.Mvvm.Input;
-    using MovieApp.Logic.Models;
+    using MovieApp.DataLayer.Models;
     using MovieApp.Features.ReelsEditing.Models;
     using MovieApp.Features.ReelsEditing.Services;
 

@@ -7,7 +7,7 @@ namespace MovieApp.Features.ReelsEditing.Services
     using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
-    using MovieApp.Logic.Models;
+    using MovieApp.DataLayer.Models;
 
     /// <summary>
     /// Service responsible for processing video and audio files using FFmpeg.
