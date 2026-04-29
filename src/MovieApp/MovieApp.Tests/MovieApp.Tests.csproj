@@ -24,6 +24,7 @@
     <ProjectReference Include="..\MovieApp.Logic\MovieApp.Logic.csproj" />
     <ProjectReference Include="..\MovieApp.DataLayer\MovieApp.DataLayer.csproj" />
     <ProjectReference Include="..\MovieApp.WebApi\MovieApp.WebApi.csproj" />
+    <ProjectReference Include="..\MovieApp.WebDTOs\MovieApp.WebDTOs.csproj" />
   </ItemGroup>
 
   <ItemGroup>

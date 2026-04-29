@@ -1,6 +1,6 @@
 using MovieApp.DataLayer.Models;
+using MovieApp.WebDTOs.DTOs;
 
-using MovieApp.WebApi.DTOs;
 namespace MovieApp.WebApi.Mappings;
 
 public static class WebApiDtoMappingExtensions
@@ -419,6 +419,39 @@ public static class WebApiDtoMappingExtensions
             WatchPercentage = dto.WatchPercentage,
             ViewedAt = dto.ViewedAt,
             Reel = new Reel { Id = dto.ReelId },
+        };
+    }
+
+    public static OwnedMovieDto ToDto(this OwnedMovie ownedMovie)
+    {
+        return new OwnedMovieDto
+        {
+            Id = ownedMovie.Id,
+            PurchaseDate = ownedMovie.PurchaseDate,
+            User = ownedMovie.User?.ToReferenceDto(),
+            Movie = ownedMovie.Movie?.ToReferenceDto(),
+        };
+    }
+
+    public static OwnedTicketDto ToDto(this OwnedTicket ownedTicket)
+    {
+        return new OwnedTicketDto
+        {
+            Id = ownedTicket.Id,
+            PurchaseDate = ownedTicket.PurchaseDate,
+            User = ownedTicket.User?.ToReferenceDto(),
+            Event = ownedTicket.Event?.ToReferenceDto(),
+        };
+    }
+
+    public static UserDto ToDto(this User user)
+    {
+        return new UserDto
+        {
+            Id = user.Id,
+            Username = user.Username ?? string.Empty,
+            Email = user.Email ?? string.Empty,
+            Balance = user.Balance,
         };
     }
 }

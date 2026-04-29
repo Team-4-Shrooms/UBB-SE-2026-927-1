@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using MovieApp.WebApi.DTOs;
+using MovieApp.WebDTOs.DTOs;
 using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Interfaces;
 using MovieApp.DataLayer.Models;
@@ -27,4 +27,15 @@ public sealed class ProfileEndpointsController : ControllerBase
         return Ok(profile);
     }
 
+    [HttpPost]
+    public async Task<IActionResult> AddProfileAsync([FromBody] UpsertProfileRequestBody body)
+    {
+        var user = await _context.Users.FindAsync(body.UserId)
+            ?? throw new InvalidOperationException($"User {body.UserId} not found.");
+        var profile = body.ToModel();
+        profile.User = user;
+        await _repository.AddProfileAsync(profile);
+        await _repository.SaveChangesAsync();
+        return Ok();
+    }
 }

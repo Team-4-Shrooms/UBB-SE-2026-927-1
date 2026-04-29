@@ -1,7 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using MovieApp.Http; // Ensures ApiClient is recognized
+using MovieApp.Logic.Http; // Ensures ApiClient is recognized
 using MovieApp.DataLayer.Interfaces.Repositories;
 
 
@@ -37,7 +37,7 @@ namespace MovieApp
             // e.g., services.AddTransient<MyViewModel>();
 
             // 4. Register your Repository
-            // services.AddScoped<MovieApp.DataLayer.Interfaces.Repositories.IMovieRepository, MovieApp.Http.MovieProxyRepository>();
+            // services.AddScoped<MovieApp.DataLayer.Interfaces.Repositories.IMovieRepository, MovieApp.Logic.Http.MovieProxyRepository>();
             
             services.AddTransient<IMovieRepository, MovieProxyRepository>();
             services.AddTransient<IActiveSalesRepository, ActiveSalesProxyRepository>();

@@ -12,6 +12,9 @@
   <Project Path="MovieApp.WebApi/MovieApp.WebApi.csproj">
     <Platform Solution="*|x64" Project="x64" />
   </Project>
+  <Project Path="MovieApp.WebDTOs/MovieApp.WebDTOs.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
   <Project Path="MovieApp.DataLayer/MovieApp.DataLayer.csproj">
     <Platform Solution="*|x64" Project="x64" />
   </Project>

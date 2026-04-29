@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using MovieApp.WebApi.DTOs;
+using MovieApp.WebDTOs.DTOs;
 using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Interfaces;
 using MovieApp.DataLayer.Models;
@@ -24,5 +24,24 @@ public sealed class EquipmentEndpointsController : ControllerBase
     public IActionResult FetchAvailableEquipment()
     {
         return Ok(_repository.FetchAvailableEquipment().Select(equipment => equipment.ToDto()));
+    }
+
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetByIdAsync(int id)
+    {
+        var equipment = await _repository.GetByIdAsync(id);
+        return Ok(equipment?.ToDto());
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddAsync([FromBody] EquipmentListItemRequestBody body)
+    {
+        var equipment = body.ToModel();
+        equipment.Status = EquipmentStatus.Available;
+        equipment.Seller = await _context.Users.FindAsync(body.SellerId)
+            ?? throw new InvalidOperationException($"User {body.SellerId} not found.");
+        await _repository.AddAsync(equipment);
+        await _repository.SaveChangesAsync();
+        return Ok();
     }
 }
