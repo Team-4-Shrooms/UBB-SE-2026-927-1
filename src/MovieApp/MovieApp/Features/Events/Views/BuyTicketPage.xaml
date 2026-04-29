@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="MovieApp.Features.Events.Views.BuyTicketPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="#1E1E1E" Padding="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Margin="0,0,20,0" Background="#252525" CornerRadius="8" Padding="12">
+            <Image x:Name="PosterImage" Stretch="UniformToFill"/>
+        </Border>
+
+        <StackPanel Grid.Column="1" Spacing="12">
+            <TextBlock x:Name="TitleText" FontSize="20" FontWeight="Bold" Foreground="White" TextWrapping="Wrap"/>
+            <TextBlock x:Name="DescriptionText" Foreground="#CCCCCC" TextWrapping="Wrap"/>
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <TextBlock Text="Date:" FontWeight="SemiBold" Foreground="White"/>
+                <TextBlock x:Name="DateText" Foreground="#CCCCCC"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <TextBlock Text="Location:" FontWeight="SemiBold" Foreground="White"/>
+                <TextBlock x:Name="LocationText" Foreground="#CCCCCC"/>
+            </StackPanel>
+
+            <TextBlock Text="Price" FontWeight="SemiBold" Foreground="White" Margin="0,6,0,0"/>
+            <TextBlock x:Name="PriceText" FontSize="18" FontWeight="Bold" Foreground="#1DB954"/>
+
+            <Button x:Name="ConfirmButton" Content="Confirm purchase" Click="ConfirmButton_Click"/>
+
+            <TextBlock x:Name="InsufficientText" Foreground="Red" Visibility="Collapsed">Insufficient funds.</TextBlock>
+        </StackPanel>
+    </Grid>
+</Page>

@@ -1,9 +1,15 @@
 using Microsoft.UI.Xaml;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using System;
 using MovieApp.Logic.Http;
 using MovieApp.DataLayer.Interfaces.Repositories;
 using CommunityToolkit.Mvvm.DependencyInjection;
+using MovieApp.WebApi.Data;
+using MovieApp.Logic.Interfaces.Services;
+using MovieApp.Logic.Services;
+using MovieApp.Features.Marketplace.ViewModels;
+using MovieApp.Features.Wallet.ViewModels;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -18,6 +24,7 @@ namespace MovieApp
         private Window? _window;
 
         public static Window MainWindow => ((App)Current)._window!;
+        public static IServiceProvider Services { get; private set; } = null!;
 
         public App()
         {
@@ -28,6 +35,9 @@ namespace MovieApp
         private void ConfigureServices()
         {
             var services = new ServiceCollection();
+
+            var connectionString = "Server=localhost\\SQLEXPRESS;Database=MovieApp;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;";
+            services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 
             services.AddHttpClient<ApiClient>(client =>
             {
@@ -52,6 +62,9 @@ namespace MovieApp
             services.AddTransient<ITransactionRepository, TransactionProxyRepository>();
             services.AddTransient<IUserRepository, UserProxyRepository>();
             services.AddTransient<IVideoStorageRepository, VideoStorageProxyRepository>();
+
+            // Logic Services
+            services.AddTransient<IEquipmentService, EquipmentService>();
 
             // Reels Upload
             services.AddTransient<MovieApp.Features.ReelsUpload.Services.IVideoStorageService, MovieApp.Features.ReelsUpload.Services.VideoStorageService>();
@@ -95,7 +108,15 @@ namespace MovieApp
             services.AddTransient<MovieApp.Features.ReelsFeed.ViewModels.ReelsFeedViewModel>();
             services.AddTransient<MovieApp.Features.ReelsFeed.ViewModels.UserProfileViewModel>();
 
-            Ioc.Default.ConfigureServices(services.BuildServiceProvider());
+            // Marketplace & Wallet
+            services.AddTransient<MarketplaceViewModel>();
+            services.AddTransient<SellEquipmentViewModel>();
+            services.AddTransient<WalletViewModel>();
+            services.AddTransient<FlashSaleViewModel>(sp => new FlashSaleViewModel(DateTime.Now.AddHours(2)));
+
+            var provider = services.BuildServiceProvider();
+            Services = provider;
+            Ioc.Default.ConfigureServices(provider);
         }
 
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)

@@ -1,18 +1,42 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+using MovieApp.DataLayer.Models;
+using MovieApp.Features.Marketplace.ViewModels;
+using System;
 
 namespace MovieApp.Features.Marketplace.Views
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MarketplacePage : Page
     {
+        public MarketplaceViewModel ViewModel { get; } = App.Services.GetRequiredService<MarketplaceViewModel>();
+
         public MarketplacePage()
         {
             this.InitializeComponent();
+            ViewModel.LoadData();
+        }
+
+        private void CategoryFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (CategoryFilter?.SelectedItem is ComboBoxItem selectedItem)
+            {
+                string category = selectedItem.Content.ToString()!;
+                ViewModel.FilterByCategory(category == "All" ? null : category);
+            }
+        }
+
+        private void ViewDetails_Click(object sender, RoutedEventArgs e)
+        {
+            if ((sender as Button)?.DataContext is Equipment selectedItem)
+            {
+                Frame.Navigate(typeof(EquipmentDetailPage), selectedItem);
+            }
+        }
+
+        private void GoToSell_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(SellPage));
         }
     }
 }

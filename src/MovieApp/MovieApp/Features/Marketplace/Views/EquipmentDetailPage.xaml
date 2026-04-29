@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="MovieApp.Features.Marketplace.Views.EquipmentDetailPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="#1E1E1E">
+        <Grid Padding="40">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Button x:Name="BackButton" 
+                    Content="" 
+                    FontFamily="Segoe MDL2 Assets" 
+                    FontSize="24"
+                    Click="BackButton_Click" 
+                    Background="Transparent" 
+                    Foreground="White" 
+                    Margin="0,0,0,20" 
+                    Grid.Row="0"/>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.2*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Background="#1A1A1A" CornerRadius="12" Margin="0,0,20,0" BorderBrush="#333" BorderThickness="1">
+                    <Image x:Name="ItemImage" Stretch="Uniform" MaxWidth="600" Margin="20"/>
+                </Border>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="15" Margin="20,0,0,0">
+                    <TextBlock x:Name="TitleLabel" FontSize="42" FontWeight="Bold" Foreground="White" TextWrapping="Wrap"/>
+
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Border Background="#333333" CornerRadius="4" Padding="10,4">
+                            <TextBlock x:Name="CategoryLabel" FontSize="14" Foreground="#AAAAAA"/>
+                        </Border>
+                        <Border Background="#4444FF" CornerRadius="4" Padding="10,4">
+                            <TextBlock x:Name="ConditionLabel" FontSize="14" Foreground="White" FontWeight="Bold"/>
+                        </Border>
+                    </StackPanel>
+
+                    <TextBlock x:Name="DescriptionLabel" FontSize="18" Foreground="LightGray" FontStyle="Italic" TextWrapping="Wrap" Margin="0,10"/>
+
+                    <TextBlock x:Name="PriceLabel" FontSize="36" Foreground="#4CAF50" FontWeight="Bold" Margin="0,15,0,0"/>
+
+                    <Button x:Name="ConfirmBuyButton" 
+                            Content="Confirm Purchase" 
+                            Click="BuyButton_Click"
+                            Width="280" 
+                            Height="70" 
+                            FontSize="22" 
+                            FontWeight="Bold"
+                            Background="DarkGreen" 
+                            Foreground="White" 
+                            CornerRadius="10" 
+                            Margin="0,20,0,0"/>
+
+                    <TextBlock x:Name="ErrorText" Foreground="#FF5252" Visibility="Collapsed" FontSize="14"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+
+        <Grid x:Name="ShippingModal" Background="#CC000000" Visibility="Collapsed">
+            <Border Background="#F9F9F9" 
+                    CornerRadius="15" 
+                    Padding="30" 
+                    Width="480" 
+                    HorizontalAlignment="Center" 
+                    VerticalAlignment="Center" 
+                    BorderBrush="#CCCCCC" 
+                    BorderThickness="1">
+
+                <StackPanel Spacing="18">
+                    <TextBlock Text="Shipping Details" 
+                               FontSize="26" 
+                               FontWeight="Bold" 
+                               Foreground="#1A1A1A" 
+                               Margin="0,0,0,10"/>
+
+                    <TextBox x:Name="ModalNameInput" 
+                             PlaceholderText="Ex: Georgiana Popescu" 
+                             Header="Full Name" 
+                             Foreground="Black"
+                             Background="White"
+                             BorderBrush="#AAAAAA">
+                        <TextBox.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Foreground="#333333" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                            </DataTemplate>
+                        </TextBox.HeaderTemplate>
+                    </TextBox>
+
+                    <TextBox x:Name="ModalAddressInput" 
+                             PlaceholderText="Str. Florilor nr. 5, Cluj-Napoca" 
+                             Header="Shipping Address" 
+                             Foreground="Black"
+                             Background="White"
+                             BorderBrush="#AAAAAA"
+                             AcceptsReturn="True" 
+                             Height="80" 
+                             TextWrapping="Wrap">
+                        <TextBox.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Foreground="#333333" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                            </DataTemplate>
+                        </TextBox.HeaderTemplate>
+                    </TextBox>
+
+                    <TextBox x:Name="ModalPhoneInput" 
+                             PlaceholderText="07xxxxxxxx" 
+                             Header="Phone Number" 
+                             Foreground="Black"
+                             Background="White"
+                             BorderBrush="#AAAAAA"
+                             MaxLength="10">
+                        <TextBox.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Foreground="#333333" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                            </DataTemplate>
+                        </TextBox.HeaderTemplate>
+                    </TextBox>
+
+                    <TextBlock x:Name="ModalErrorText" 
+                               Foreground="#D32F2F" 
+                               Visibility="Collapsed" 
+                               TextWrapping="Wrap" 
+                               FontSize="13" 
+                               FontWeight="Medium"/>
+
+                    <Grid Margin="0,15,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Content="Cancel" 
+                                Click="CancelShipping_Click" 
+                                Width="110" 
+                                Background="Transparent" 
+                                Foreground="#444444"
+                                BorderBrush="#AAAAAA"
+                                BorderThickness="1"/>
+
+                        <Button Content="Finish Transaction" 
+                                Grid.Column="1"
+                                Click="ConfirmShipping_Click" 
+                                Background="DarkGreen" 
+                                Foreground="White" 
+                                Width="200" 
+                                FontWeight="Bold"
+                                Padding="12"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Page>
