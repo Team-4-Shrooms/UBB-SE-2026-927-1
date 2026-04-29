@@ -37,12 +37,12 @@ namespace MovieApp.Features.Marketplace.Views
 
                 Frame.GoBack();
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
                 var dialog = new ContentDialog
                 {
                     Title = "Error",
-                    Content = ex.Message,
+                    Content = exception.Message,
                     PrimaryButtonText = "OK",
                     XamlRoot = XamlRoot
                 };
@@ -50,6 +50,9 @@ namespace MovieApp.Features.Marketplace.Views
             }
         }
 
-        private void BackButton_Click(object sender, RoutedEventArgs e) => Frame.GoBack();
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.GoBack();
+        }
     }
 }

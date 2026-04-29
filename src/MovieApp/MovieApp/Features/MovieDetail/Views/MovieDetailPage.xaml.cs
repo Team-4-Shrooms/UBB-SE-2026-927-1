@@ -21,10 +21,10 @@ namespace MovieApp.Features.MovieDetail.Views
     {
         private Movie? _movie;
         private decimal _appliedDiscount = 0;
-        private readonly IMovieRepository _movieRepo = App.Services.GetRequiredService<IMovieRepository>();
-        private readonly IActiveSalesRepository _activeSalesRepo = App.Services.GetRequiredService<IActiveSalesRepository>();
-        private readonly IReviewRepository _reviewRepo = App.Services.GetRequiredService<IReviewRepository>();
-        private readonly IUserRepository _userRepo = App.Services.GetRequiredService<IUserRepository>();
+        private readonly IMovieRepository _movieRepository = App.Services.GetRequiredService<IMovieRepository>();
+        private readonly IActiveSalesRepository _activeSalesRepository = App.Services.GetRequiredService<IActiveSalesRepository>();
+        private readonly IReviewRepository _reviewRepository = App.Services.GetRequiredService<IReviewRepository>();
+        private readonly IUserRepository _userRepository = App.Services.GetRequiredService<IUserRepository>();
         private readonly IMovieService _movieService = App.Services.GetRequiredService<IMovieService>();
         private readonly IActiveSalesService _activeSalesService = App.Services.GetRequiredService<IActiveSalesService>();
         private readonly IReviewService _reviewService = App.Services.GetRequiredService<IReviewService>();
@@ -44,9 +44,12 @@ namespace MovieApp.Features.MovieDetail.Views
                 _movie = args.Movie;
             }
 
-            if (_movie == null) return;
+            if (_movie == null)
+            {
+                return;
+            }
 
-            var discountMap = _activeSalesService.GetBestDiscountPercentByMovieId();
+            Dictionary<int, decimal> discountMap = _activeSalesService.GetBestDiscountPercentByMovieId();
             if (discountMap.TryGetValue(_movie.Id, out decimal discount))
             {
                 _appliedDiscount = discount;
@@ -54,30 +57,36 @@ namespace MovieApp.Features.MovieDetail.Views
 
             PopulateUI();
             await RefreshBuyButtonStateAsync();
-            
-            var tooltip = await BuildStarDistributionTooltipAsync(_movie.Id);
+
+            FrameworkElement? tooltip = await BuildStarDistributionTooltipAsync(_movie.Id);
             ToolTipService.SetToolTip(ReviewsButton, tooltip);
         }
 
         private void PopulateUI()
         {
-            if (_movie == null) return;
+            if (_movie == null)
+            {
+                return;
+            }
 
             TitleBlock.Text = _movie.Title;
             DescriptionBlock.Text = string.IsNullOrEmpty(_movie.Description) ? "—" : _movie.Description;
             RatingBlock.Text = $"Rating: {_movie.Rating:0.0} / 10";
-            
+
             UpdatePriceDisplay();
             TrySetPoster(_movie.PosterUrl);
         }
 
         private void UpdatePriceDisplay()
         {
-            if (_movie == null) return;
- 
-            var effectivePrice = GetEffectivePrice();
+            if (_movie == null)
+            {
+                return;
+            }
+
+            decimal effectivePrice = GetEffectivePrice();
             PriceBlock.Text = $"${effectivePrice:F2}";
- 
+
             if (_appliedDiscount > 0)
             {
                 OriginalPriceBlock.Visibility = Visibility.Visible;
@@ -91,32 +100,45 @@ namespace MovieApp.Features.MovieDetail.Views
 
         private decimal GetEffectivePrice()
         {
-            if (_movie == null) return 0;
+            if (_movie == null)
+            {
+                return 0;
+            }
+
             return _movie.Price * (1 - _appliedDiscount / 100);
         }
 
         private void TrySetPoster(string? url)
         {
             PosterImage.Source = null;
-            if (string.IsNullOrWhiteSpace(url)) return;
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return;
+            }
+
             try
             {
                 PosterImage.Source = new BitmapImage(new Uri(url, UriKind.Absolute));
             }
-            catch { }
+            catch
+            {
+            }
         }
 
         private async Task RefreshBuyButtonStateAsync()
         {
-            if (_movie == null) return;
+            if (_movie == null)
+            {
+                return;
+            }
 
-            var userId = SessionManager.CurrentUserID;
-            var loggedIn = SessionManager.IsLoggedIn;
-            var owned = await _movieRepo.UserOwnsMovieAsync(userId, _movie.Id);
-            var balance = SessionManager.CurrentUserBalance;
+            int userId = SessionManager.CurrentUserID;
+            bool loggedIn = SessionManager.IsLoggedIn;
+            bool owned = await _movieRepository.UserOwnsMovieAsync(userId, _movie.Id);
+            decimal balance = SessionManager.CurrentUserBalance;
 
-            var effectivePrice = GetEffectivePrice();
-            var insufficient = loggedIn && !owned && balance < effectivePrice;
+            decimal effectivePrice = GetEffectivePrice();
+            bool insufficient = loggedIn && !owned && balance < effectivePrice;
 
             if (owned)
             {
@@ -220,16 +242,16 @@ namespace MovieApp.Features.MovieDetail.Views
                 
                 Frame.Navigate(typeof(Features.Inventory.Views.InventoryPage));
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                var err = new ContentDialog
+                var error = new ContentDialog
                 {
                     Title = "Error",
-                    Content = ex.Message,
+                    Content = exception.Message,
                     PrimaryButtonText = "OK",
                     XamlRoot = XamlRoot
                 };
-                await err.ShowAsync();
+                await error.ShowAsync();
             }
         }
 

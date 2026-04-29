@@ -13,7 +13,7 @@ namespace MovieApp.Features.Marketplace.ViewModels
     public class SellEquipmentViewModel : INotifyPropertyChanged
     {
         private readonly IEquipmentService _equipmentService = App.Services.GetRequiredService<IEquipmentService>();
-        private readonly IUserRepository _userRepo = App.Services.GetRequiredService<IUserRepository>();
+        private readonly IUserRepository _userRepository = App.Services.GetRequiredService<IUserRepository>();
 
         private string _newItemTitle = string.Empty;
         private string _newItemDesc = string.Empty;
@@ -56,11 +56,14 @@ namespace MovieApp.Features.Marketplace.ViewModels
 
         public async Task SubmitListingAsync(string? category, string? condition, string imageUrl)
         {
-            var dbContext = App.Services.GetRequiredService<MovieApp.WebApi.Data.AppDbContext>();
-            var user = await dbContext.Users.FindAsync(SessionManager.CurrentUserID);
-            if (user == null) throw new InvalidOperationException("User not found.");
+            MovieApp.WebApi.Data.AppDbContext dbContext = App.Services.GetRequiredService<MovieApp.WebApi.Data.AppDbContext>();
+            User? user = await dbContext.Users.FindAsync(SessionManager.CurrentUserID);
+            if (user == null)
+            {
+                throw new InvalidOperationException("User not found.");
+            }
 
-            var newItem = new Equipment
+            Equipment newItem = new Equipment
             {
                 Seller = user,
                 Title = NewItemTitle,
@@ -107,7 +110,10 @@ namespace MovieApp.Features.Marketplace.ViewModels
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
+
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
     }
 }

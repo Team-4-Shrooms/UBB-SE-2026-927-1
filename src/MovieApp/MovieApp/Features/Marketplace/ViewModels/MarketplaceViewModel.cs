@@ -19,39 +19,39 @@ namespace MovieApp.Features.Marketplace.ViewModels
 
         public decimal UserBalance => 5000.00m; 
 
-        public MarketplaceViewModel(IEquipmentRepository equipmentRepo)
+        public MarketplaceViewModel(IEquipmentRepository equipmentRepository)
         {
-            _repository = equipmentRepo;
+            _repository = equipmentRepository;
             LoadData();
         }
 
         public void LoadData()
         {
-            var data = _repository.FetchAvailableEquipment() ?? new List<Equipment>();
-            _allOriginalItems = data;
+            List<Equipment>? fetchedData = _repository.FetchAvailableEquipment() ?? new List<Equipment>();
+            _allOriginalItems = fetchedData;
 
             UpdateDisplayList(_allOriginalItems);
         }
 
         public void FilterByCategory(string? category)
         {
-            var filtered = string.IsNullOrEmpty(category) || category == "All"
+            List<Equipment> filtered = string.IsNullOrEmpty(category) || category == "All"
                 ? _allOriginalItems
-                : _allOriginalItems.Where(x => x.Category == category).ToList();
-
+                : _allOriginalItems.Where(equipment => equipment.Category == category).ToList();
             UpdateDisplayList(filtered);
         }
 
         private void UpdateDisplayList(List<Equipment> items)
         {
             AvailableItems.Clear();
-            foreach (var item in items)
+            foreach (Equipment item in items)
             {
                 if (item != null)
                 {
                     AvailableItems.Add(item);
                 }
             }
+
             OnPropertyChanged(nameof(AvailableItems));
         }
 

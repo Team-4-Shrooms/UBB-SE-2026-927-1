@@ -85,9 +85,9 @@ namespace MovieApp.Features.MovieCatalog.Views
             ApplyFilterAndSort();
         }
 
-        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        protected override void OnNavigatedFrom(NavigationEventArgs @event)
         {
-            base.OnNavigatedFrom(e);
+            base.OnNavigatedFrom(@event);
             if (_flashSaleVm != null)
                 _flashSaleVm.PropertyChanged -= FlashSaleVm_PropertyChanged!;
         }
@@ -96,25 +96,43 @@ namespace MovieApp.Features.MovieCatalog.Views
 
         private void ApplyFilterAndSort()
         {
-            var q = (SearchBox.Text ?? "").Trim().ToLower();
-            var list = string.IsNullOrEmpty(q) ? _sourceMovies
-                                               : _sourceMovies.Where(m => m.Title.ToLower().Contains(q));
+            string query = (SearchBox.Text ?? "").Trim().ToLower();
+            IEnumerable<Movie> list = string.IsNullOrEmpty(query) ? _sourceMovies
+                                                : _sourceMovies.Where(movie => movie.Title.ToLower().Contains(query));
 
-            if (SortAscPrice.IsChecked == true) list = list.OrderBy(m => m.GetEffectivePrice());
-            else if (SortDescPrice.IsChecked == true) list = list.OrderByDescending(m => m.GetEffectivePrice());
-            else if (SortHighRating.IsChecked == true) list = list.OrderByDescending(m => m.Rating);
-            else if (SortLowRating.IsChecked == true) list = list.OrderBy(m => m.Rating);
-            else list = list.OrderBy(m => m.Title);
+            if (SortAscPrice.IsChecked == true)
+            {
+                list = list.OrderBy(movie => movie.GetEffectivePrice());
+            }
+            else if (SortDescPrice.IsChecked == true)
+            {
+                list = list.OrderByDescending(movie => movie.GetEffectivePrice());
+            }
+            else if (SortHighRating.IsChecked == true)
+            {
+                list = list.OrderByDescending(movie => movie.Rating);
+            }
+            else if (SortLowRating.IsChecked == true)
+            {
+                list = list.OrderBy(movie => movie.Rating);
+            }
+            else
+            {
+                list = list.OrderBy(movie => movie.Title);
+            }
 
             var orderedMovies = list.ToList();
             MoviesGrid.ItemsSource = orderedMovies
-                .Select(m => new MovieCatalogItem(m, _reviewCountByMovieId.TryGetValue(m.Id, out var c) ? c : 0))
+                .Select(movie => new MovieCatalogItem(movie, _reviewCountByMovieId.TryGetValue(movie.Id, out int reviewCount) ? reviewCount : 0))
                 .ToList();
         }
 
         private void MovieCard_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            if (sender is not Border border) return;
+            if (sender is not Border border)
+            {
+                return;
+            }
 
             border.BorderBrush = new SolidColorBrush(Color.FromArgb(255, 29, 185, 84));
             border.Background = new SolidColorBrush(Color.FromArgb(255, 48, 48, 48));
@@ -123,7 +141,10 @@ namespace MovieApp.Features.MovieCatalog.Views
 
         private void MovieCard_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            if (sender is not Border border) return;
+            if (sender is not Border border)
+            {
+                return;
+            }
 
             border.BorderBrush = new SolidColorBrush(Color.FromArgb(255, 64, 64, 64));
             border.Background = new SolidColorBrush(Color.FromArgb(255, 42, 42, 42));
@@ -145,21 +166,21 @@ namespace MovieApp.Features.MovieCatalog.Views
             
             foreach (var movie in allMovies)
             {
-                var sale = currentSales.FirstOrDefault(s => s.Movie.Id == movie.Id);
+                var sale = currentSales.FirstOrDefault(sale => sale.Movie.Id == movie.Id);
                 movie.ActiveSaleDiscountPercent = sale?.DiscountPercentage;
             }
  
             _context.ChangeTracker.Clear();
  
-            var movieIds = allMovies.Select(m => m.Id).ToList();
+            var movieIds = allMovies.Select(movie => movie.Id).ToList();
             _reviewCountByMovieId = await _reviewRepo.GetReviewCountsAsync(movieIds);
  
-            var onSaleIds = currentSales.Select(s => s.Movie.Id).ToHashSet();
-            _sourceMovies = allMovies.Where(m => onSaleIds.Contains(m.Id)).ToList();
+            var onSaleIds = currentSales.Select(sale => sale.Movie.Id).ToHashSet();
+            _sourceMovies = allMovies.Where(movie => onSaleIds.Contains(movie.Id)).ToList();
  
             if (currentSales.Any())
             {
-                var latestSale = currentSales.OrderByDescending(s => s.EndTime).First();
+                var latestSale = currentSales.OrderByDescending(sale => sale.EndTime).First();
                 if (_flashSaleVm == null)
                 {
                     _flashSaleVm = new FlashSaleViewModel(latestSale.EndTime, () => {

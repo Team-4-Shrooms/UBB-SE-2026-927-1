@@ -17,8 +17,8 @@ namespace MovieApp.Features.Events.Views
     public sealed partial class BuyTicketPage : Page
     {
         private MovieEvent? _event;
-        private readonly IEventRepository _eventRepo = App.Services.GetRequiredService<IEventRepository>();
-        private readonly IUserRepository _userRepo = App.Services.GetRequiredService<IUserRepository>();
+        private readonly IEventRepository _eventRepository = App.Services.GetRequiredService<IEventRepository>();
+        private readonly IUserRepository _userRepository = App.Services.GetRequiredService<IUserRepository>();
         private readonly IEventService _eventService = App.Services.GetRequiredService<IEventService>();
         private readonly AppDbContext _context = App.Services.GetRequiredService<AppDbContext>();
 
@@ -27,16 +27,23 @@ namespace MovieApp.Features.Events.Views
             InitializeComponent();
         }
 
-        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs @event)
         {
-            base.OnNavigatedTo(e);
+            base.OnNavigatedTo(@event);
 
-            if (e.Parameter is int id)
-                _event = await _eventRepo.GetEventByIdAsync(id);
-            else if (e.Parameter is MovieEvent me)
-                _event = me;
+            if (@event.Parameter is int id)
+            {
+                _event = await _eventRepository.GetEventByIdAsync(id);
+            }
+            else if (@event.Parameter is MovieEvent movieEvent)
+            {
+                _event = movieEvent;
+            }
 
-            if (_event == null) return;
+            if (_event == null)
+            {
+                return;
+            }
 
             PopulateUI();
             UpdateButtonState();
@@ -44,7 +51,10 @@ namespace MovieApp.Features.Events.Views
 
         private void PopulateUI()
         {
-            if (_event == null) return;
+            if (_event == null)
+            {
+                return;
+            }
 
             TitleText.Text = _event.Title;
             DescriptionText.Text = _event.Description ?? "";
@@ -58,7 +68,9 @@ namespace MovieApp.Features.Events.Views
                 {
                     PosterImage.Source = new BitmapImage(new Uri(_event.PosterUrl));
                 }
-                catch (UriFormatException) { }
+                catch (UriFormatException)
+                {
+                }
             }
         }
 
@@ -78,17 +90,21 @@ namespace MovieApp.Features.Events.Views
                 return;
             }
 
-            var balance = _userRepo.GetBalance(SessionManager.CurrentUserID);
-            var canBuy = balance >= _event.TicketPrice && _event.Date >= DateTime.Now;
+            decimal balance = _userRepository.GetBalance(SessionManager.CurrentUserID);
+            bool canBuy = balance >= _event.TicketPrice && _event.Date >= DateTime.Now;
             ConfirmButton.IsEnabled = canBuy;
- 
+
             if (!canBuy)
             {
                 if (_event.Date < DateTime.Now)
+                {
                     InsufficientText.Text = "This event has already passed.";
+                }
                 else
+                {
                     InsufficientText.Text = $"Insufficient funds. Balance: {balance:C} — Price: {_event.TicketPrice:C}";
-                
+                }
+
                 InsufficientText.Visibility = Visibility.Visible;
             }
             else
@@ -103,7 +119,7 @@ namespace MovieApp.Features.Events.Views
 
             if (!SessionManager.IsLoggedIn)
             {
-                var dlg = new ContentDialog
+                var dialog = new ContentDialog
                 {
                     Title = "Sign in",
                     Content = "Please sign in to continue.",
@@ -112,7 +128,7 @@ namespace MovieApp.Features.Events.Views
                     XamlRoot = XamlRoot
                 };
 
-                if (await dlg.ShowAsync() != ContentDialogResult.Primary)
+                if (await dialog.ShowAsync() != ContentDialogResult.Primary)
                     return;
 
                 SessionManager.CurrentUserID = 1;
@@ -127,8 +143,8 @@ namespace MovieApp.Features.Events.Views
                     ?? throw new Exception("User not found.");
                 
                 var movieEvent = await _context.MovieEvents
-                    .Include(ev => ev.Movie)
-                    .FirstOrDefaultAsync(ev => ev.Id == _event.Id)
+                    .Include(@event => @event.Movie)
+                    .FirstOrDefaultAsync(@event => @event.Id == _event.Id)
                     ?? throw new Exception("Event not found.");
 
                 if (user.Balance < movieEvent.TicketPrice)
@@ -173,16 +189,16 @@ namespace MovieApp.Features.Events.Views
  
                 Frame.GoBack();
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException exception)
             {
-                var err = new ContentDialog
+                var error = new ContentDialog
                 {
                     Title = "Cannot complete purchase",
-                    Content = ex.Message,
+                    Content = exception.Message,
                     CloseButtonText = "OK",
                     XamlRoot = XamlRoot
                 };
-                await err.ShowAsync();
+                await error.ShowAsync();
             }
         }
     }
