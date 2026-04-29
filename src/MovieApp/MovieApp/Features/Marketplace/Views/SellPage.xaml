@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="MovieApp.Features.Marketplace.Views.SellPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="#1E1E1E">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Padding="40" Spacing="20" MaxWidth="600" HorizontalAlignment="Center">
+
+                <TextBlock Text="List Your Gear" FontSize="32" FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
+
+                <TextBox x:Name="TitleInput" Header="Equipment Title" 
+                         Text="{x:Bind ViewModel.NewItemTitle, Mode=TwoWay}" Foreground="White"/>
+
+                <Grid ColumnSpacing="20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox x:Name="CategoryInput" Header="Category" HorizontalAlignment="Stretch" Grid.Column="0">
+                        <ComboBoxItem Content="Cameras" IsSelected="True"/>
+                        <ComboBoxItem Content="Microphones"/>
+                        <ComboBoxItem Content="Lighting"/>
+                        <ComboBoxItem Content="Accessories"/>
+                    </ComboBox>
+                    <ComboBox x:Name="ConditionInput" Header="Condition" HorizontalAlignment="Stretch" Grid.Column="1">
+                        <ComboBoxItem Content="New" IsSelected="True"/>
+                        <ComboBoxItem Content="Used - Like New"/>
+                        <ComboBoxItem Content="Used - Good"/>
+                    </ComboBox>
+                </Grid>
+
+                <TextBox x:Name="DescriptionInput" Header="Description" AcceptsReturn="True" Height="100" 
+                         TextWrapping="Wrap" Text="{x:Bind ViewModel.NewItemDesc, Mode=TwoWay}"/>
+
+                <StackPanel Spacing="5">
+                    <TextBox x:Name="PriceInput" Header="Price ($)" 
+                             Text="{x:Bind ViewModel.PriceInput, Mode=TwoWay}"/>
+                    <TextBlock Text="{x:Bind ViewModel.PriceErrorMessage, Mode=OneWay}" 
+                               Foreground="#FF5252" FontSize="12" MinHeight="16"/>
+                </StackPanel>
+
+                <TextBlock Text="Equipment Photo" FontWeight="SemiBold" FontSize="14" Foreground="White"/>
+                <Grid x:Name="ImageUploadContainer" Height="120">
+                    <Rectangle Stroke="Gray" StrokeThickness="2" StrokeDashArray="4,2" RadiusX="8" RadiusY="8" Fill="#1A1A1A"/>
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="5">
+                        <FontIcon Glyph="&#xEB9F;" FontSize="32" Foreground="Gray"/>
+                        <TextBlock x:Name="FileNameLabel" Text="Click to select gear photo" Foreground="Gray" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+
+                <TextBox x:Name="ImageUrlInput" Header="Or Image URL" PlaceholderText="Paste link here..." Foreground="White"/>
+
+                <StackPanel Spacing="10" Margin="0,20,0,0">
+                    <Button Content="SUBMIT LISTING" Click="SubmitButton_Click" 
+                            IsEnabled="{x:Bind ViewModel.CanPost, Mode=OneWay}"
+                            Background="DarkGreen" Foreground="White" HorizontalAlignment="Stretch" Height="50" FontWeight="Bold"/>
+                    <Button Content="CANCEL / BACK" Click="BackButton_Click" 
+                            Background="Transparent" BorderBrush="Gray" BorderThickness="1" HorizontalAlignment="Stretch" Height="40"/>
+                </StackPanel>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>
