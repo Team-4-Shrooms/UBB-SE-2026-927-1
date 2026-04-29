@@ -46,7 +46,6 @@ namespace MovieApp.Features.MovieDetail.Views
 
             if (_movie == null) return;
 
-            // Apply discounts logic
             var discountMap = _activeSalesService.GetBestDiscountPercentByMovieId();
             if (discountMap.TryGetValue(_movie.Id, out decimal discount))
             {
@@ -171,7 +170,6 @@ namespace MovieApp.Features.MovieDetail.Views
 
             try
             {
-                // Bypass service for manual tracking fix in Features
                 var userId = SessionManager.CurrentUserID;
                 var user = await _context.Users.FindAsync(userId) 
                     ?? throw new Exception("User not found.");

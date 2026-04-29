@@ -17,7 +17,7 @@ namespace MovieApp.Features.Marketplace.ViewModels
 
         public ObservableCollection<Equipment> AvailableItems { get; set; } = new ObservableCollection<Equipment>();
 
-        public decimal UserBalance => 5000.00m; // Hardcoded for now as in original
+        public decimal UserBalance => 5000.00m; 
 
         public MarketplaceViewModel(IEquipmentRepository equipmentRepo)
         {

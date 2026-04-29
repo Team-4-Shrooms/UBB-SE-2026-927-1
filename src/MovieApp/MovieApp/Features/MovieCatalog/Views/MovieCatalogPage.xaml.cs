@@ -79,7 +79,6 @@ namespace MovieApp.Features.MovieCatalog.Views
                 _showOnlySales = args.ShowOnlySales;
             }
 
-            // Only discounted movies should be shown on this page.
             await LoadDiscountedMoviesAsync();
  
             SortAscPrice.IsChecked = true;
@@ -144,14 +143,12 @@ namespace MovieApp.Features.MovieCatalog.Views
             var allMovies = await _movieRepo.SearchMoviesAsync("", 100);
             var currentSales = _salesRepo.GetCurrentSales();
             
-            // Apply discounts to movie models (simple mapping)
             foreach (var movie in allMovies)
             {
                 var sale = currentSales.FirstOrDefault(s => s.Movie.Id == movie.Id);
                 movie.ActiveSaleDiscountPercent = sale?.DiscountPercentage;
             }
  
-            // Detach entities to avoid tracking conflicts in other pages/services
             _context.ChangeTracker.Clear();
  
             var movieIds = allMovies.Select(m => m.Id).ToList();
@@ -160,7 +157,6 @@ namespace MovieApp.Features.MovieCatalog.Views
             var onSaleIds = currentSales.Select(s => s.Movie.Id).ToHashSet();
             _sourceMovies = allMovies.Where(m => onSaleIds.Contains(m.Id)).ToList();
  
-            // Update flash sale banner
             if (currentSales.Any())
             {
                 var latestSale = currentSales.OrderByDescending(s => s.EndTime).First();
@@ -206,7 +202,6 @@ namespace MovieApp.Features.MovieCatalog.Views
                 return;
             }
 
-            // Flash sale ended: remove movies and show message.
             MoviesGrid.ItemsSource = null;
             _sourceMovies = new List<Movie>();
             FlashSaleEndedText.Visibility = Microsoft.UI.Xaml.Visibility.Visible;

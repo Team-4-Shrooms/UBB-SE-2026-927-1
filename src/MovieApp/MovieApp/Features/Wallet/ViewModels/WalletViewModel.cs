@@ -17,7 +17,6 @@ namespace MovieApp.Features.Wallet.ViewModels
         private void OnPropertyChanged(string name) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
-        // --- Balance ---
         private decimal _balance;
         public decimal Balance
         {
@@ -31,7 +30,6 @@ namespace MovieApp.Features.Wallet.ViewModels
         }
         public string DisplayBalance => Balance.ToString("C");
 
-        // --- TopUp Form Fields ---
         private string _cardHolderName = string.Empty;
         public string CardHolderName
         {
@@ -67,7 +65,6 @@ namespace MovieApp.Features.Wallet.ViewModels
             set { _topUpAmount = value; OnPropertyChanged(nameof(TopUpAmount)); }
         }
 
-        // --- Feedback Messages ---
         private string _errorMessage = string.Empty;
         public string ErrorMessage
         {
