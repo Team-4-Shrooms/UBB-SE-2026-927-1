@@ -3,15 +3,71 @@
     x:Class="MovieApp.Features.ReelsFeed.Views.ReelsFeedPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:MovieApp.Features.ReelsFeed.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:MovieApp.Features.ReelsFeed.Views"
+    xmlns:messages="using:MovieApp"
+    xmlns:models="using:MovieApp.Logic.Models"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="Black">
 
     <Grid>
-        <StackPanel Spacing="10">
-            <TextBlock Text="Reels Feed" Style="{StaticResource PageHeaderStyle}"/>
+        <!-- The Feed -->
+        <FlipView x:Name="FeedFlipView"
+                  ItemsSource="{x:Bind ViewModel.ReelQueue, Mode=OneWay}"
+                  SelectedItem="{x:Bind ViewModel.CurrentReel, Mode=TwoWay}"
+                  SelectionChanged="FlipView_SelectionChanged">
+            <FlipView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Vertical" />
+                </ItemsPanelTemplate>
+            </FlipView.ItemsPanel>
+            <FlipView.ItemTemplate>
+                <DataTemplate x:DataType="models:Reel">
+                    <local:ReelItemView Reel="{x:Bind}" />
+                </DataTemplate>
+            </FlipView.ItemTemplate>
+        </FlipView>
+
+        <!-- Loading Overlay -->
+        <ProgressRing IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
+                      Width="64" Height="64" Foreground="White"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+        <!-- Error State (icon + message + retry) -->
+        <StackPanel x:Name="ErrorPanel"
+                    Visibility="{x:Bind ViewModel.HasError, Mode=OneWay}"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Spacing="12">
+            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE783;"
+                      FontSize="48" Foreground="LightCoral"
+                      HorizontalAlignment="Center" />
+            <TextBlock Text="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}"
+                       Foreground="LightCoral" FontWeight="Bold"
+                       TextWrapping="Wrap" MaxWidth="300"
+                       HorizontalAlignment="Center" TextAlignment="Center" />
+            <Button Content="Retry" Click="RetryButton_Click"
+                    HorizontalAlignment="Center"
+                    Style="{StaticResource AccentButtonStyle}" />
+        </StackPanel>
+
+        <StackPanel x:Name="EmptyPanel"
+                    Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay}"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Spacing="12">
+            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE714;"
+                      FontSize="64" Foreground="#88FFFFFF"
+                      HorizontalAlignment="Center" />
+            <TextBlock Text="No Reels Found"
+                       Foreground="White" FontSize="20" FontWeight="SemiBold"
+                       HorizontalAlignment="Center" />
+            <TextBlock Text="Check back later for new content!"
+                       Foreground="#88FFFFFF" FontSize="14"
+                       HorizontalAlignment="Center" />
+            <Button Content="Refresh" Click="RetryButton_Click"
+                    HorizontalAlignment="Center"
+                    Style="{StaticResource AccentButtonStyle}"
+                    Margin="0,8,0,0" />
         </StackPanel>
     </Grid>
 </Page>

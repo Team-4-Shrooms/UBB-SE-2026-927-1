@@ -1,8 +1,11 @@
-//using CommunityToolkit.Mvvm.ComponentModel;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MovieApp.Logic.Models
 {
-    public partial class Reel //: ObservableObject
+    public partial class Reel : ObservableObject
     {
         public int Id { get; set; }
         public string VideoUrl { get; set; } = string.Empty;
@@ -17,18 +20,22 @@ namespace MovieApp.Logic.Models
         public DateTime CreatedAt { get; set; }
         public DateTime? LastEditedAt { get; set; }
 
-        public Movie Movie { get; set; }
-        public User CreatorUser { get; set; }
+        public Movie Movie { get; set; } = null!;
+        public User CreatorUser { get; set; } = null!;
 
         public ICollection<UserMoviePreference> MoviePreferences { get; set; } = new List<UserMoviePreference>();
 
-        /*
         // ── Client-side state (changes at runtime, needs UI notification) ──
-        [ObservableProperty]
-        private bool _isLiked;
 
+        // The [property: NotMapped] attribute tells Entity Framework to ignore this,
+        // preventing database crashes, while still generating the UI property!
+
+        [property: NotMapped]
         [ObservableProperty]
-        private int _likeCount;
-        */
+        private bool isLiked;
+
+        [property: NotMapped]
+        [ObservableProperty]
+        private int likeCount;
     }
 }

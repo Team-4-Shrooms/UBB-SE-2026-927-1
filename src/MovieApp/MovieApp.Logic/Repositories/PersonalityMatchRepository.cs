@@ -62,5 +62,26 @@ namespace MovieApp.Logic.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<MoviePreferenceDisplay>> GetTopPreferencesWithTitlesAsync(int userId, int count)
+        {
+            return await _context.UserMoviePreferences
+                .Where(p => p.User.Id == userId)
+                .OrderByDescending(p => p.Score)
+                .Take(count)
+                .Select(p => new MoviePreferenceDisplay
+                {
+                    MovieId = p.Movie.Id,
+                    Title = p.Movie.Title,
+                    Score = p.Score
+                })
+                .ToListAsync();
+        }
+
+        public async Task<string> GetUsernameAsync(int userId)
+        {
+            User? user = await _context.Users.FindAsync(userId);
+            return user?.Username ?? $"{FallbackUsernamePrefix} {userId}";
+        }
+
     }
 }

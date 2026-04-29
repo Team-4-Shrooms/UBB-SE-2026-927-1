@@ -15,5 +15,15 @@ namespace MovieApp.Logic.Interfaces.Repositories
         Task<List<UserMoviePreference>> GetCurrentUserPreferencesAsync(int userId);
         Task<UserProfile?> GetUserProfileAsync(int userId);
         Task<List<int>> GetRandomUserIdsAsync(int excludedUserId, int userIdsCount);
+
+        /// <summary>
+        /// Retrieves the top preferences for a user, mapped to display models containing the movie titles.
+        /// </summary>
+        Task<List<MoviePreferenceDisplay>> GetTopPreferencesWithTitlesAsync(int userId, int count);
+
+        /// <summary>
+        /// Retrieves the username for a specific user ID.
+        /// </summary>
+        Task<string> GetUsernameAsync(int userId);
     }
 }

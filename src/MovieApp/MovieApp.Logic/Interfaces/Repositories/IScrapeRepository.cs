@@ -5,7 +5,7 @@ namespace MovieApp.Logic.Interfaces.Repositories
     /// <summary>
     /// Repository for managing ScrapeJob and ScrapeJobLog records.
     /// </summary>
-    public interface IScrapeJobRepository
+    public interface IScrapeRepository
     {
         /// <summary>
         /// Creates a new scrape job and returns its auto-generated ID.

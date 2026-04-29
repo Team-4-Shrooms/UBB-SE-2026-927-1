@@ -3,15 +3,102 @@
     x:Class="MovieApp.Features.ReelsUpload.Views.ReelsUploadPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:MovieApp.Features.ReelsUpload.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:MovieApp.Logic.Models"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
-        <StackPanel Spacing="10">
-            <TextBlock Text="Reels Upload" Style="{StaticResource PageHeaderStyle}"/>
-        </StackPanel>
+    <Grid Padding="32">
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="24" MaxWidth="600" HorizontalAlignment="Left">
+                
+                <!-- Header -->
+                <StackPanel Spacing="8">
+                    <TextBlock Text="🎬 Upload a New Reel" Style="{StaticResource TitleTextBlockStyle}" FontWeight="Bold"/>
+                    <TextBlock Text="Share your favorite movie moments with the community." 
+                               Style="{StaticResource BodyTextBlockStyle}" 
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                </StackPanel>
+
+                <!-- Video Selection Section -->
+                <StackPanel Spacing="12" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                            Padding="24" CornerRadius="8" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    <TextBlock Text="1. Select Video" Style="{StaticResource SubtitleTextBlockStyle}" FontWeight="SemiBold"/>
+                    <TextBlock Text="Choose an MP4 video under 60 seconds." Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Button Content="📁 Browse Files" 
+                                Command="{x:Bind ViewModel.SelectVideoFileCommand}" 
+                                Style="{StaticResource AccentButtonStyle}" />
+                        <TextBlock Text="{x:Bind ViewModel.LocalVideoFilePath, Mode=OneWay}" 
+                                   VerticalAlignment="Center" 
+                                   FontStyle="Italic" 
+                                   TextWrapping="Wrap"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Details Section -->
+                <StackPanel Spacing="16" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                            Padding="24" CornerRadius="8" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    <TextBlock Text="2. Reel Details" Style="{StaticResource SubtitleTextBlockStyle}" FontWeight="SemiBold"/>
+                    
+                    <TextBox Header="Title" 
+                             PlaceholderText="Give your reel a catchy title" 
+                             Text="{x:Bind ViewModel.ReelTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <TextBox Header="Caption" 
+                             PlaceholderText="Write a caption (optional)" 
+                             AcceptsReturn="True" Height="80" TextWrapping="Wrap"
+                             Text="{x:Bind ViewModel.ReelCaption, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <AutoSuggestBox Header="Link a Movie" 
+                                    PlaceholderText="Search for a movie..." 
+                                    ItemsSource="{x:Bind ViewModel.SuggestedMovies, Mode=OneWay}"
+                                    TextMemberPath="Title"
+                                    TextChanged="MovieAutoSuggestBox_TextChanged"
+                                    SuggestionChosen="MovieAutoSuggestBox_SuggestionChosen">
+                        <AutoSuggestBox.ItemTemplate>
+                            <DataTemplate x:DataType="models:Movie">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="{x:Bind Title}" FontWeight="SemiBold" />
+                                    <TextBlock Text="{x:Bind ReleaseYear}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </AutoSuggestBox.ItemTemplate>
+                    </AutoSuggestBox>
+                    
+                    <!-- Show selected movie confirmation securely via x:Bind -->
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="Linked: " Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <TextBlock Text="{x:Bind ViewModel.LinkedMovie.Title, Mode=OneWay, FallbackValue='(None)'}" 
+                                   Foreground="{ThemeResource SystemFillColorSuccessBrush}" 
+                                   FontWeight="SemiBold" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Submit Section -->
+                <StackPanel Spacing="16" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                            Padding="24" CornerRadius="8" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    <TextBlock Text="3. Finish" Style="{StaticResource SubtitleTextBlockStyle}" FontWeight="SemiBold"/>
+                    
+                    <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                        <Button Content="🚀 Upload Reel" 
+                                Command="{x:Bind ViewModel.UploadReelCommand}" 
+                                Style="{StaticResource AccentButtonStyle}" 
+                                Width="150" Height="40"/>
+                                
+                        <ProgressRing IsActive="{x:Bind ViewModel.UploadReelCommand.IsRunning, Mode=OneWay}" />
+                        
+                        <TextBlock Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}" 
+                                   VerticalAlignment="Center" 
+                                   TextWrapping="Wrap"
+                                   FontWeight="SemiBold" />
+                    </StackPanel>
+                </StackPanel>
+
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>

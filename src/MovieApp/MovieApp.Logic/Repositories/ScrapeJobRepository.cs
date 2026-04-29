@@ -10,7 +10,7 @@ namespace MovieApp.Logic.Repositories
     /// <summary>
     /// EF Core implementation of <see cref="IScrapeJobRepository"/>.
     /// </summary>
-    public class ScrapeJobRepository : IScrapeJobRepository
+    public class ScrapeJobRepository : IScrapeRepository
     {
         private const int MaxLogsToRetrieve = 200;
         private const int MaxMoviesToSearch = 20;

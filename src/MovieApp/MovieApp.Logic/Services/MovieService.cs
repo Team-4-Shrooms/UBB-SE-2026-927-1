@@ -7,55 +7,58 @@ using MovieApp.Logic.Interfaces.Repositories;
 using MovieApp.Logic.Interfaces.Services;
 using MovieApp.Logic.Models;
 
-public class MovieService : IMovieService
+namespace MovieApp.Logic.Services
 {
-    private readonly IMovieRepository _movieRepo;
-    private readonly IUserRepository _userRepo;
-
-    public MovieService(IMovieRepository movieRepo, IUserRepository userRepo)
+    public class MovieService : IMovieService
     {
-        _movieRepo = movieRepo;
-        _userRepo = userRepo;
-    }
-    public async Task PurchaseMovieAsync(int userId, int movieId, decimal price)
-    {
-        var user = await _userRepo.GetUserByIdAsync(userId)
-                   ?? throw new KeyNotFoundException("User not found.");
+        private readonly IMovieRepository _movieRepo;
+        private readonly IUserRepository _userRepo;
 
-        var movie = await _movieRepo.GetMovieByIdAsync(movieId)
-                    ?? throw new KeyNotFoundException("Movie not found.");
-
-        if (await _movieRepo.UserOwnsMovieAsync(userId, movieId))
-            throw new InvalidOperationException("Movie already owned.");
-
-        if (user.Balance < price)
-            throw new InvalidOperationException("Insufficient balance.");
-
-        user.Balance -= price;
-
-        await _movieRepo.AddOwnedMovieAsync(new OwnedMovie
+        public MovieService(IMovieRepository movieRepo, IUserRepository userRepo)
         {
-            User = user,
-            Movie = movie,
-            PurchaseDate = DateTime.UtcNow
-        });
-
-        await _movieRepo.AddTransactionAsync(new Transaction
+            _movieRepo = movieRepo;
+            _userRepo = userRepo;
+        }
+        public async Task PurchaseMovieAsync(int userId, int movieId, decimal price)
         {
-            Buyer = user,
-            Movie = movie,
-            Amount = -price,
-            Type = "MoviePurchase",
-            Status = "Completed",
-            Timestamp = DateTime.UtcNow
-        });
+            var user = await _userRepo.GetUserByIdAsync(userId)
+                       ?? throw new KeyNotFoundException("User not found.");
 
-        await _movieRepo.SaveChangesAsync();
+            var movie = await _movieRepo.GetMovieByIdAsync(movieId)
+                        ?? throw new KeyNotFoundException("Movie not found.");
+
+            if (await _movieRepo.UserOwnsMovieAsync(userId, movieId))
+                throw new InvalidOperationException("Movie already owned.");
+
+            if (user.Balance < price)
+                throw new InvalidOperationException("Insufficient balance.");
+
+            user.Balance -= price;
+
+            await _movieRepo.AddOwnedMovieAsync(new OwnedMovie
+            {
+                User = user,
+                Movie = movie,
+                PurchaseDate = DateTime.UtcNow
+            });
+
+            await _movieRepo.AddTransactionAsync(new Transaction
+            {
+                Buyer = user,
+                Movie = movie,
+                Amount = -price,
+                Type = "MoviePurchase",
+                Status = "Completed",
+                Timestamp = DateTime.UtcNow
+            });
+
+            await _movieRepo.SaveChangesAsync();
+        }
+
+        public async Task<List<Movie>> SearchMoviesAsync(string? query)
+        {
+            return await _movieRepo.SearchMoviesAsync(query ?? string.Empty, 10);
+        }
+
     }
-
-    public async Task<List<Movie>> SearchMoviesAsync(string? query)
-    {
-        return await _movieRepo.SearchMoviesAsync(query ?? string.Empty, 10);
-    }
-
 }

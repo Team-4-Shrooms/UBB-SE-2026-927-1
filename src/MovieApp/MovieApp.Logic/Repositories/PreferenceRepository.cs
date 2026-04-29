@@ -63,5 +63,15 @@ namespace MovieApp.Logic.Repositories
 
             await _context.SaveChangesAsync();
         }
+
+        /// <inheritdoc />
+        public async Task<List<Movie>> GetMovieFeedAsync(int userId, int count)
+        {
+            // Query the database for movies that do NOT have a preference record for this user
+            return await _context.Movies
+                .Where(movie => !_context.UserMoviePreferences.Any(pref => pref.User.Id == userId && pref.Movie.Id == movie.Id))
+                .Take(count)
+                .ToListAsync();
+        }
     }
 }
