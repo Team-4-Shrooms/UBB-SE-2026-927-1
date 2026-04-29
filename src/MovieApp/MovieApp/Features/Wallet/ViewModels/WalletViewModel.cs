@@ -14,8 +14,11 @@ namespace MovieApp.Features.Wallet.ViewModels
     public class WalletViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
-        private void OnPropertyChanged(string name) =>
+
+        private void OnPropertyChanged(string name)
+        {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
 
         private decimal _balance;
         public decimal Balance
@@ -115,12 +118,14 @@ namespace MovieApp.Features.Wallet.ViewModels
                 var result = await Task.Run(() => _transactionRepo.GetTransactionsByUserId(SessionManager.CurrentUserID));
 
                 Transactions.Clear();
-                foreach (var t in result.OrderByDescending(t => t.Timestamp))
-                    Transactions.Add(t);
+                foreach (Transaction transaction in result.OrderByDescending(t => t.Timestamp))
+                {
+                    Transactions.Add(transaction);
+                }
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                ErrorMessage = $"Failed to load transactions: {ex.Message}";
+                ErrorMessage = $"Failed to load transactions: {exception.Message}";
             }
             finally
             {
@@ -134,19 +139,24 @@ namespace MovieApp.Features.Wallet.ViewModels
             SuccessMessage = string.Empty;
 
             if (!ValidateCard())
+            {
                 return;
+            }
 
             decimal amount = (decimal)TopUpAmount;
-            
+
             try
             {
-                var dbContext = App.Services.GetRequiredService<MovieApp.WebApi.Data.AppDbContext>();
-                var user = await dbContext.Users.FindAsync(SessionManager.CurrentUserID);
-                if (user == null) return;
+                MovieApp.WebApi.Data.AppDbContext dbContext = App.Services.GetRequiredService<MovieApp.WebApi.Data.AppDbContext>();
+                User? user = await dbContext.Users.FindAsync(SessionManager.CurrentUserID);
+                if (user == null)
+                {
+                    return;
+                }
 
                 user.Balance += amount;
-                
-                var transaction = new Transaction
+
+                Transaction transaction = new Transaction
                 {
                     Buyer = user,
                     Amount = amount,
@@ -160,7 +170,7 @@ namespace MovieApp.Features.Wallet.ViewModels
 
                 Balance = user.Balance;
                 SessionManager.CurrentUserBalance = Balance;
-                
+
                 Transactions.Insert(0, transaction);
 
                 SuccessMessage = $"Successfully added {amount:C} to your wallet!";

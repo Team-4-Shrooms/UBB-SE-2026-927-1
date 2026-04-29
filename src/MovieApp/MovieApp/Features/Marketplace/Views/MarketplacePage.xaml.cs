@@ -21,8 +21,8 @@ namespace MovieApp.Features.Marketplace.Views
         {
             if (CategoryFilter?.SelectedItem is ComboBoxItem selectedItem)
             {
-                string category = selectedItem.Content.ToString()!;
-                ViewModel.FilterByCategory(category == "All" ? null : category);
+                string categoryContent = selectedItem.Content.ToString() ?? "";
+                ViewModel.FilterByCategory(categoryContent == "All" ? null : categoryContent);
             }
         }
 

@@ -16,7 +16,7 @@ namespace MovieApp.Features.Inventory.Views
 {
     public sealed partial class InventoryPage : Page
     {
-        private readonly IInventoryRepository _repo = App.Services.GetRequiredService<IInventoryRepository>();
+        private readonly IInventoryRepository _repository = App.Services.GetRequiredService<IInventoryRepository>();
         private readonly IInventoryService _inventoryService = App.Services.GetRequiredService<IInventoryService>();
         private readonly AppDbContext _context = App.Services.GetRequiredService<AppDbContext>();
 
@@ -33,17 +33,21 @@ namespace MovieApp.Features.Inventory.Views
 
         private async Task LoadDataAsync()
         {
-            var userId = SessionManager.CurrentUserID;
-            if (userId <= 0) return;
+            int userId = SessionManager.CurrentUserID;
+            if (userId <= 0)
+            {
+                return;
+            }
 
-            MoviesGrid.ItemsSource = await _repo.GetOwnedMoviesAsync(userId);
-            
-            TicketsGrid.ItemsSource = await _context.OwnedTickets
+            MoviesGrid.ItemsSource = await _repository.GetOwnedMoviesAsync(userId);
+
+            List<OwnedTicket> tickets = await _context.OwnedTickets
                 .Include(ot => ot.Event)
                 .Where(ot => ot.User.Id == userId)
                 .ToListAsync();
-                
-            var boughtEquipmentIds = await _context.Transactions
+            TicketsGrid.ItemsSource = tickets;
+
+            List<int> boughtEquipmentIds = await _context.Transactions
                 .Where(t => t.Buyer.Id == userId && t.Type == "EquipmentPurchase")
                 .Select(t => t.Equipment.Id)
                 .ToListAsync();
@@ -51,6 +55,7 @@ namespace MovieApp.Features.Inventory.Views
             EquipmentGrid.ItemsSource = await _context.Equipment
                 .Where(e => boughtEquipmentIds.Contains(e.Id))
                 .ToListAsync();
+            EquipmentGrid.ItemsSource = equipment;
 
             _context.ChangeTracker.Clear();
         }
@@ -65,37 +70,37 @@ namespace MovieApp.Features.Inventory.Views
 
         private async void RemoveMovie_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            if (sender is Microsoft.UI.Xaml.FrameworkElement fe && fe.DataContext is Movie m)
+            if (sender is Microsoft.UI.Xaml.FrameworkElement frameworkElement && frameworkElement.DataContext is Movie movie)
             {
-                var dlg = new ContentDialog
+                ContentDialog removeDialog = new ContentDialog
                 {
                     Title = "Remove movie",
-                    Content = $"Are you sure you want to remove '{m.Title}' from your library? This will allow you to purchase it again.",
+                    Content = $"Are you sure you want to remove '{movie.Title}' from your library? This will allow you to purchase it again.",
                     PrimaryButtonText = "Remove",
                     CloseButtonText = "Cancel",
                     XamlRoot = XamlRoot
                 };
 
-                if (await dlg.ShowAsync() == ContentDialogResult.Primary)
+                if (await removeDialog.ShowAsync() == ContentDialogResult.Primary)
                 {
                     try
                     {
-                        var userId = SessionManager.CurrentUserID;
-                        var ownerships = await _context.OwnedMovies
-                            .Where(om => om.User.Id == userId && om.Movie.Id == m.Id)
+                        int userId = SessionManager.CurrentUserID;
+                        List<OwnedMovie> ownerships = await _context.OwnedMovies
+                            .Where(om => om.User.Id == userId && om.Movie.Id == movie.Id)
                             .ToListAsync();
 
                         if (ownerships.Any())
                         {
                             _context.OwnedMovies.RemoveRange(ownerships);
 
-                            var user = await _context.Users.FindAsync(userId);
-                            var movie = await _context.Movies.FindAsync(m.Id);
+                            User? user = await _context.Users.FindAsync(userId);
+                            Movie? dbMovie = await _context.Movies.FindAsync(movie.Id);
 
-                            var transaction = new Transaction
+                            Transaction transaction = new Transaction
                             {
                                 Buyer = user,
-                                Movie = movie,
+                                Movie = dbMovie,
                                 Amount = 0m,
                                 Type = "RemoveOwnedMovie",
                                 Status = "Completed",

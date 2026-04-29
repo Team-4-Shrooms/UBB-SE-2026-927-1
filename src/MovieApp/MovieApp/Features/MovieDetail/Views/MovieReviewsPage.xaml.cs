@@ -15,8 +15,8 @@ namespace MovieApp.Features.MovieDetail.Views
     public sealed partial class MovieReviewsPage : Page
     {
         private Movie? _movie;
-        private readonly IReviewRepository _reviewRepo = App.Services.GetRequiredService<IReviewRepository>();
-        private readonly IUserRepository _userRepo = App.Services.GetRequiredService<IUserRepository>();
+        private readonly IReviewRepository _reviewRepository = App.Services.GetRequiredService<IReviewRepository>();
+        private readonly IUserRepository _userRepository = App.Services.GetRequiredService<IUserRepository>();
         private readonly IReviewService _reviewService = App.Services.GetRequiredService<IReviewService>();
         private readonly IMovieService _movieService = App.Services.GetRequiredService<IMovieService>();
 
@@ -42,19 +42,29 @@ namespace MovieApp.Features.MovieDetail.Views
 
         private void BackButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            if (Frame.CanGoBack) Frame.GoBack();
+            if (Frame.CanGoBack)
+            {
+                Frame.GoBack();
+            }
         }
 
         private async Task LoadReviewsAsync()
         {
-            if (_movie == null) return;
-            var reviews = await _reviewRepo.GetReviewsForMovieAsync(_movie.Id);
+            if (_movie == null)
+            {
+                return;
+            }
+
+            List<Review> reviews = await _reviewRepository.GetReviewsForMovieAsync(_movie.Id);
             ReviewsList.ItemsSource = reviews.OrderByDescending(r => r.CreatedAt).ToList();
         }
 
         private async void AddReviewButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            if (!SessionManager.IsLoggedIn || _movie == null) return;
+            if (!SessionManager.IsLoggedIn || _movie == null)
+            {
+                return;
+            }
 
             while (true)
             {
@@ -104,12 +114,13 @@ namespace MovieApp.Features.MovieDetail.Views
         {
             rating = 0;
             error = "";
-            var s = (text ?? "").Trim();
-            if (!int.TryParse(s, out rating) || rating < 1 || rating > 10)
+            string trimmedText = (text ?? "").Trim();
+            if (!int.TryParse(trimmedText, out rating) || rating < 1 || rating > 10)
             {
                 error = "Please enter a rating between 1 and 10.";
                 return false;
             }
+
             return true;
         }
     }
