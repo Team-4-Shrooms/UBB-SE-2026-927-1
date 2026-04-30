@@ -50,6 +50,11 @@ namespace MovieApp.Features.Marketplace.Views
             }
         }
 
+        private async void ImageUploadButton_Click(object sender, RoutedEventArgs e)
+        {
+            await ViewModel.SelectImageAsync();
+        }
+
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             Frame.GoBack();
