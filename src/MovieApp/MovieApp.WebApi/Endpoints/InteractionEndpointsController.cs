@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using MovieApp.WebApi.DTOs;
+using Microsoft.EntityFrameworkCore;
+using MovieApp.WebDTOs.DTOs;
 using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Interfaces;
 using MovieApp.DataLayer.Models;
@@ -64,7 +65,8 @@ public sealed class InteractionEndpointsController : ControllerBase
     [HttpGet("users/{userId:int}/reels/{reelId:int}")]
     public async Task<IActionResult> GetInteractionAsync(int userId, int reelId)
     {
-        return Ok(await _repository.GetInteractionAsync(userId, reelId));
+        UserReelInteraction? interaction = await _repository.GetInteractionAsync(userId, reelId);
+        return Ok(interaction?.ToDto());
     }
 
     [HttpGet("reels/{reelId:int}/likes")]
@@ -77,5 +79,16 @@ public sealed class InteractionEndpointsController : ControllerBase
     public async Task<IActionResult> GetReelMovieIdAsync(int reelId)
     {
         return Ok(await _repository.GetReelMovieIdAsync(reelId));
+    }
+
+    [HttpGet("users/{userId:int}")]
+    public async Task<IActionResult> GetInteractionsForUser(int userId)
+    {
+        var interactions = await _context.UserReelInteractions
+            .Include(i => i.User)
+            .Include(i => i.Reel)
+            .Where(i => i.User.Id == userId)
+            .ToListAsync();
+        return Ok(interactions.Select(i => i.ToDto()));
     }
 }

@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using MovieApp.WebApi.DTOs;
-using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Repositories;
 
 namespace MovieApp.WebApi.Endpoints;
@@ -19,7 +17,32 @@ public sealed class ActiveSalesEndpointsController : ControllerBase
     [HttpGet("current")]
     public IActionResult GetCurrentSales()
     {
-        var currentSales = _repository.GetCurrentSales().Select(sale => sale.ToDto());
+        var currentSales = _repository.GetCurrentSales()
+            .Select(sale => new ActiveSaleResponse
+            {
+                Id = sale.Id,
+                DiscountPercentage = sale.DiscountPercentage,
+                StartTime = sale.StartTime,
+                EndTime = sale.EndTime,
+                Movie = sale.Movie is null ? null : new MovieReferenceResponse
+                {
+                    Id = sale.Movie.Id
+                }
+            });
         return Ok(currentSales);
+    }
+
+    private sealed class ActiveSaleResponse
+    {
+        public int Id { get; set; }
+        public decimal DiscountPercentage { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public MovieReferenceResponse? Movie { get; set; }
+    }
+
+    private sealed class MovieReferenceResponse
+    {
+        public int Id { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using MovieApp.WebApi.DTOs;
+using MovieApp.WebDTOs.DTOs;
 using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Repositories;
 

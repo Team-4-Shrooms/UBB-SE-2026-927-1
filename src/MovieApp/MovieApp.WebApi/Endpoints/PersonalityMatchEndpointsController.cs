@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using MovieApp.WebApi.DTOs;
+using MovieApp.WebDTOs.DTOs;
 using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Repositories;
 
@@ -34,5 +34,24 @@ public sealed class PersonalityMatchEndpointsController : ControllerBase
     public async Task<IActionResult> GetRandomUserIdsAsync(int excludedUserId, [FromQuery] int userIdsCount)
     {
         return Ok(await _repository.GetRandomUserIdsAsync(excludedUserId, userIdsCount));
+    }
+
+    [HttpGet("users/{excludedUserId:int}/others-preferences")]
+    public async Task<IActionResult> GetAllPreferencesExceptUser(int excludedUserId)
+    {
+        var preferences = await _repository.GetAllPreferencesExceptUserAsync(excludedUserId);
+        return Ok(preferences.Select(p => p.ToDto()));
+    }
+
+    [HttpGet("users/{userId:int}/top-preferences")]
+    public async Task<IActionResult> GetTopPreferencesWithTitlesAsync(int userId, [FromQuery] int count)
+    {
+        return Ok(await _repository.GetTopPreferencesWithTitlesAsync(userId, count));
+    }
+
+    [HttpGet("users/{userId:int}/username")]
+    public async Task<IActionResult> GetUsernameAsync(int userId)
+    {
+        return Ok(await _repository.GetUsernameAsync(userId));
     }
 }

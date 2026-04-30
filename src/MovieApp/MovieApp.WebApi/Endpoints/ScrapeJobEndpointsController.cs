@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using MovieApp.WebApi.DTOs;
+using MovieApp.DataLayer.Interfaces;
+using MovieApp.WebDTOs.DTOs;
 using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Models;
 using MovieApp.DataLayer.Repositories;
@@ -11,16 +12,19 @@ namespace MovieApp.WebApi.Endpoints;
 public sealed class ScrapeJobEndpointsController : ControllerBase
 {
     private readonly ScrapeJobRepository _repository;
+    private readonly IMovieAppDbContext _context;
 
-    public ScrapeJobEndpointsController(ScrapeJobRepository repository)
+    public ScrapeJobEndpointsController(ScrapeJobRepository repository, IMovieAppDbContext context)
     {
         _repository = repository;
+        _context = context;
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateJobAsync([FromBody] ScrapeJobRequestBody job)
     {
-        return Ok(await _repository.CreateJobAsync(job.ToModel()));
+        var createdJob = await _repository.CreateJobAsync(job.ToModel());
+        return Ok(createdJob);
     }
 
     [HttpPut("{jobId:int}")]
@@ -36,7 +40,13 @@ public sealed class ScrapeJobEndpointsController : ControllerBase
     [HttpPost("logs")]
     public async Task<IActionResult> AddLogEntryAsync([FromBody] AddLogEntryRequestBody log)
     {
-        await _repository.AddLogEntryAsync(log.ToModel());
+        ScrapeJob scrapeJob = await _context.ScrapeJobs.FindAsync(log.ScrapeJobId)
+            ?? throw new InvalidOperationException($"Scrape job {log.ScrapeJobId} not found.");
+
+        ScrapeJobLog logModel = log.ToModel();
+        logModel.ScrapeJob = scrapeJob;
+
+        await _repository.AddLogEntryAsync(logModel);
         return Ok();
     }
 
@@ -89,7 +99,16 @@ public sealed class ScrapeJobEndpointsController : ControllerBase
     [HttpPost("reels")]
     public async Task<IActionResult> InsertScrapedReelAsync([FromBody] InsertReelRequestBody reel)
     {
-        return Ok(await _repository.InsertScrapedReelAsync(reel.ToModel()));
+        Movie movie = await _context.Movies.FindAsync(reel.MovieId)
+            ?? throw new InvalidOperationException($"Movie {reel.MovieId} not found.");
+        User creatorUser = await _context.Users.FindAsync(reel.CreatorUserId)
+            ?? throw new InvalidOperationException($"User {reel.CreatorUserId} not found.");
+
+        Reel reelModel = reel.ToModel();
+        reelModel.Movie = movie;
+        reelModel.CreatorUser = creatorUser;
+
+        return Ok(await _repository.InsertScrapedReelAsync(reelModel));
     }
 
     [HttpGet("movies")]

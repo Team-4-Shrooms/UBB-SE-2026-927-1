@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using MovieApp.WebApi.DTOs;
+using MovieApp.WebDTOs.DTOs;
 using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Repositories;
 
@@ -14,6 +14,13 @@ public sealed class UserEndpointsController : ControllerBase
     public UserEndpointsController(UserRepository repository)
     {
         _repository = repository;
+    }
+
+    [HttpGet("{userId:int}")]
+    public async Task<IActionResult> GetUserById(int userId)
+    {
+        var user = await _repository.GetUserByIdAsync(userId);
+        return Ok(user?.ToDto());
     }
 
     [HttpGet("{userId:int}/balance")]

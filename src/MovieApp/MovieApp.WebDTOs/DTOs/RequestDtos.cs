@@ -1,4 +1,4 @@
-namespace MovieApp.WebApi.DTOs;
+namespace MovieApp.WebDTOs.DTOs;
 
 public sealed class EquipmentListItemRequestBody
 {
@@ -152,4 +152,16 @@ public sealed class UpdateTransactionStatusRequestBody
 public sealed class UpdateBalanceRequestBody
 {
     public decimal NewBalance { get; set; }
+}
+
+public sealed class AddOwnedMovieRequestBody
+{
+    public int UserId { get; set; }
+    public int MovieId { get; set; }
+}
+
+public sealed class AddOwnedTicketRequestBody
+{
+    public int UserId { get; set; }
+    public int EventId { get; set; }
 }

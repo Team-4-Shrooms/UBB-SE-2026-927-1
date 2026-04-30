@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using MovieApp.WebApi.DTOs;
+using MovieApp.WebDTOs.DTOs;
 using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Repositories;
 
@@ -34,5 +34,12 @@ public sealed class PreferenceEndpointsController : ControllerBase
     {
         await _repository.UpdatePreferenceAsync(userId, movieId, request.Boost);
         return Ok();
+    }
+
+    [HttpGet("users/{userId:int}/feed")]
+    public async Task<IActionResult> GetMovieFeedAsync(int userId, [FromQuery] int count)
+    {
+        var feed = await _repository.GetMovieFeedAsync(userId, count);
+        return Ok(feed.Select(movie => movie.ToDto()));
     }
 }

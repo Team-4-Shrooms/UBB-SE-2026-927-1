@@ -1,4 +1,4 @@
-namespace MovieApp.WebApi.DTOs;
+namespace MovieApp.WebDTOs.DTOs;
 
 public sealed class ActiveSaleDto
 {
@@ -199,4 +199,12 @@ public sealed class MoviePreferenceDisplayDto
     public string Title { get; set; } = string.Empty;
     public decimal Score { get; set; }
     public bool IsBestMovie { get; set; }
+}
+
+public sealed class UserDto
+{
+    public int Id { get; set; }
+    public string Username { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public decimal Balance { get; set; }
 }

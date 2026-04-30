@@ -1,4 +1,4 @@
-namespace MovieApp.WebApi.DTOs;
+namespace MovieApp.WebDTOs.DTOs;
 
 public sealed class UserReferenceDto
 {
