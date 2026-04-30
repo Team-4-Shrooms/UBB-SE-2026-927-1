@@ -10,9 +10,9 @@ namespace MovieApp.DataLayer.Interfaces.Repositories
     {
         Task<List<Movie>> GetOwnedMoviesAsync(int userId);
         Task<List<OwnedMovie>> GetMovieOwnershipsAsync(int userId, int movieId);
-        void RemoveMovieOwnerships(IEnumerable<OwnedMovie> ownerships);
+        Task RemoveMovieOwnershipsAsync(IEnumerable<OwnedMovie> ownerships);
         Task<List<OwnedTicket>> GetTicketOwnershipsAsync(int userId, int eventId);
-        void RemoveTicketOwnerships(IEnumerable<OwnedTicket> ownerships);
+        Task RemoveTicketOwnershipsAsync(IEnumerable<OwnedTicket> ownerships);
         Task AddTransactionAsync(Transaction transaction);
         Task<int> SaveChangesAsync();
     }

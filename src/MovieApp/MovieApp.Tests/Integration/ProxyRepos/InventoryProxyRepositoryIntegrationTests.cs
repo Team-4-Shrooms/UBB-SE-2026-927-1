@@ -21,7 +21,7 @@ public sealed class InventoryProxyRepositoryIntegrationTests
         });
 
         List<OwnedMovie> ownerships = await inventoryRepository.GetMovieOwnershipsAsync(ProxyRepoSeedIds.SeededUserId, movie.Id);
-        inventoryRepository.RemoveMovieOwnerships(ownerships);
+        await inventoryRepository.RemoveMovieOwnershipsAsync(ownerships);
 
         List<OwnedMovie> remainingOwnerships = await inventoryRepository.GetMovieOwnershipsAsync(ProxyRepoSeedIds.SeededUserId, movie.Id);
 
@@ -44,7 +44,7 @@ public sealed class InventoryProxyRepositoryIntegrationTests
         });
 
         List<OwnedTicket> ownerships = await inventoryRepository.GetTicketOwnershipsAsync(ProxyRepoSeedIds.SeededUserId, eventId);
-        inventoryRepository.RemoveTicketOwnerships(ownerships);
+        await inventoryRepository.RemoveTicketOwnershipsAsync(ownerships);
 
         List<OwnedTicket> remainingOwnerships = await inventoryRepository.GetTicketOwnershipsAsync(ProxyRepoSeedIds.SeededUserId, eventId);
 

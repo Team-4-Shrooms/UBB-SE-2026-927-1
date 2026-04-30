@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Interfaces.Repositories;
-using MovieApp.DataLayer.Interfaces.Services;
+using MovieApp.Logic.Interfaces.Services;
 using MovieApp.DataLayer.Models;
 
-namespace MovieApp.DataLayer.Services
+namespace MovieApp.Logic.Services
 {
     public class InventoryService : IInventoryService
     {
@@ -36,7 +36,7 @@ namespace MovieApp.DataLayer.Services
 
             List<OwnedMovie> ownerships = await _inventoryRepo.GetMovieOwnershipsAsync(userId, movieId);
 
-            _inventoryRepo.RemoveMovieOwnerships(ownerships);
+            await _inventoryRepo.RemoveMovieOwnershipsAsync(ownerships);
 
             await _inventoryRepo.AddTransactionAsync(new Transaction
             {
@@ -61,7 +61,7 @@ namespace MovieApp.DataLayer.Services
 
             List<OwnedTicket> ownerships = await _inventoryRepo.GetTicketOwnershipsAsync(userId, eventId);
 
-            _inventoryRepo.RemoveTicketOwnerships(ownerships);
+            await _inventoryRepo.RemoveTicketOwnershipsAsync(ownerships);
 
             await _inventoryRepo.AddTransactionAsync(new Transaction
             {

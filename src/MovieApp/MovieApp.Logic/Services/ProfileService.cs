@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Interfaces.Repositories;
-using MovieApp.DataLayer.Interfaces.Services;
+using MovieApp.Logic.Interfaces.Services;
 using MovieApp.DataLayer.Models;
 
-namespace MovieApp.DataLayer.Services
+namespace MovieApp.Logic.Services
 {
     public class ProfileService : IProfileService
     {

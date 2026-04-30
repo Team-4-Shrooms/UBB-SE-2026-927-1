@@ -11,7 +11,7 @@ namespace MovieApp.DataLayer.Interfaces.Repositories
         /// Retrieves a list of currently active sales.
         /// </summary>
         /// <returns>A list of <see cref="ActiveSale"/> objects representing the currently active sales. The list will be empty if there are no active sales.</returns>
-        List<ActiveSale> GetCurrentSales();
+        Task<List<ActiveSale>> GetCurrentSalesAsync();
     }
 }
 

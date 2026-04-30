@@ -7,18 +7,18 @@ namespace MovieApp.Tests.Repositories
     public sealed class ActiveSalesRepositoryTests
     {
         [Fact]
-        public void GetCurrentSales_NoSalesExist_ReturnsEmptyList()
+        public async Task GetCurrentSalesAsync_NoSalesExist_ReturnsEmptyList()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             ActiveSalesRepository repository = new ActiveSalesRepository(context);
 
-            List<ActiveSale> currentSales = repository.GetCurrentSales();
+            List<ActiveSale> currentSales = await repository.GetCurrentSalesAsync();
 
             Assert.Empty(currentSales);
         }
 
         [Fact]
-        public void GetCurrentSales_OneCurrentOneExpired_ReturnsSingleSale()
+        public async Task GetCurrentSalesAsync_OneCurrentOneExpired_ReturnsSingleSale()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             DateTime now = DateTime.UtcNow;
@@ -31,13 +31,13 @@ namespace MovieApp.Tests.Repositories
             context.SaveChanges();
 
             ActiveSalesRepository repository = new ActiveSalesRepository(context);
-            List<ActiveSale> currentSales = repository.GetCurrentSales();
+            List<ActiveSale> currentSales = await repository.GetCurrentSalesAsync();
 
             Assert.Single(currentSales);
         }
 
         [Fact]
-        public void GetCurrentSales_OneCurrentOneExpired_ReturnedSaleHasCorrectDiscount()
+        public async Task GetCurrentSalesAsync_OneCurrentOneExpired_ReturnedSaleHasCorrectDiscount()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             DateTime now = DateTime.UtcNow;
@@ -50,7 +50,7 @@ namespace MovieApp.Tests.Repositories
             context.SaveChanges();
 
             ActiveSalesRepository repository = new ActiveSalesRepository(context);
-            List<ActiveSale> currentSales = repository.GetCurrentSales();
+            List<ActiveSale> currentSales = await repository.GetCurrentSalesAsync();
 
             Assert.Equal(20m, currentSales[0].DiscountPercentage);
         }

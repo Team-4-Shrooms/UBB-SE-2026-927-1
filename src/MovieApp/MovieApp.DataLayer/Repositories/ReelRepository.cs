@@ -42,8 +42,9 @@ namespace MovieApp.DataLayer.Repositories
         /// <inheritdoc />
         public async Task<int> UpdateReelEditsAsync(int reelId, string cropDataJson, int? backgroundMusicId, string videoUrl)
         {
-            Reel reel = await _context.Reels.FindAsync(reelId)
-                ?? throw new KeyNotFoundException($"Reel {reelId} not found.");
+            Reel? reel = await _context.Reels.FindAsync(reelId);
+            if (reel == null)
+                return 0;
 
             reel.CropDataJson = cropDataJson;
             reel.BackgroundMusicId = backgroundMusicId;
@@ -56,8 +57,9 @@ namespace MovieApp.DataLayer.Repositories
         /// <inheritdoc />
         public async Task DeleteReelAsync(int reelId)
         {
-            Reel reel = await _context.Reels.FindAsync(reelId)
-                ?? throw new KeyNotFoundException($"Reel {reelId} not found.");
+            Reel? reel = await _context.Reels.FindAsync(reelId);
+            if (reel == null)
+                return;
 
             List<UserReelInteraction> interactions = await _context.UserReelInteractions
                 .Where(interaction => interaction.Reel.Id == reelId)

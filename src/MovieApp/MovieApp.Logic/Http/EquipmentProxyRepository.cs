@@ -14,9 +14,9 @@ namespace MovieApp.Logic.Http
             _apiClient = apiClient;
         }
 
-        public List<Equipment> FetchAvailableEquipment()
+        public async Task<List<Equipment>> FetchAvailableEquipmentAsync()
         {
-            return _apiClient.GetAllAsync<Equipment>("api/equipment/available").GetAwaiter().GetResult();
+            return await _apiClient.GetAllAsync<Equipment>("api/equipment/available");
         }
 
         public async Task<Equipment?> GetByIdAsync(int id)

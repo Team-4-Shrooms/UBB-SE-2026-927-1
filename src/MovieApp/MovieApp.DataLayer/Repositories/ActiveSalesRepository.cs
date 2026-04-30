@@ -13,16 +13,16 @@ namespace MovieApp.DataLayer.Repositories
             _context = context;
         }
 
-        public List<ActiveSale> GetCurrentSales()
+        public async Task<List<ActiveSale>> GetCurrentSalesAsync()
         {
             DateTime now = DateTime.UtcNow;
 
-            return _context.ActiveSales
+            return await _context.ActiveSales
                 .AsNoTracking()
                 .Include(sale => sale.Movie)
                 .Where(sale => sale.StartTime <= now && sale.EndTime > now)
                 .OrderBy(sale => sale.EndTime)
-                .ToList();
+                .ToListAsync();
         }
     }
 }

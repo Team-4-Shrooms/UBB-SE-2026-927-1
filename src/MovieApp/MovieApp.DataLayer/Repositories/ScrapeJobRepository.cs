@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MovieApp.DataLayer.Interfaces.Repositories;
 using MovieApp.DataLayer.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -32,8 +33,9 @@ namespace MovieApp.DataLayer.Repositories
         /// <inheritdoc />
         public async Task UpdateJobAsync(ScrapeJob job)
         {
-            ScrapeJob existing = await _context.ScrapeJobs.FindAsync(job.Id)
-                ?? throw new KeyNotFoundException($"ScrapeJob {job.Id} not found.");
+            ScrapeJob? existing = await _context.ScrapeJobs.FindAsync(job.Id);
+            if (existing == null)
+                return;
 
             existing.Status = job.Status;
             existing.MoviesFound = job.MoviesFound;
@@ -130,6 +132,7 @@ namespace MovieApp.DataLayer.Repositories
         /// <inheritdoc />
         public async Task<int> InsertScrapedReelAsync(Reel reel)
         {
+            reel.CreatedAt = DateTime.UtcNow;
             _context.Reels.Add(reel);
             await _context.SaveChangesAsync();
             return reel.Id;

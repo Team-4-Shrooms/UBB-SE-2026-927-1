@@ -15,9 +15,9 @@ public sealed class ActiveSalesEndpointsController : ControllerBase
     }
 
     [HttpGet("current")]
-    public IActionResult GetCurrentSales()
+    public async Task<IActionResult> GetCurrentSales()
     {
-        var currentSales = _repository.GetCurrentSales()
+        var currentSales = (await _repository.GetCurrentSalesAsync())
             .Select(sale => new ActiveSaleResponse
             {
                 Id = sale.Id,

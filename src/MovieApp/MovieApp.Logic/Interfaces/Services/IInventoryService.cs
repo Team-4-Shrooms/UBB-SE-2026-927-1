@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MovieApp.DataLayer.Interfaces.Services
+namespace MovieApp.Logic.Interfaces.Services
 {
     public interface IInventoryService
     {

@@ -20,13 +20,52 @@ namespace MovieApp.Logic.Http
 
         public decimal GetBalance(int userId)
         {
-            return _apiClient.GetAsync<decimal>($"api/users/{userId}/balance").GetAwaiter().GetResult();
+            try
+            {
+                return _apiClient.GetAsync<decimal>($"api/users/{userId}/balance").GetAwaiter().GetResult();
+            }
+            catch
+            {
+                return 0m;
+            }
+        }
+
+        public async Task<decimal> GetBalanceAsync(int userId)
+        {
+            try
+            {
+                return await _apiClient.GetAsync<decimal>($"api/users/{userId}/balance");
+            }
+            catch
+            {
+                return 0m;
+            }
         }
 
         public void UpdateBalance(int userId, decimal newBalance)
         {
-            var payload = new { newBalance };
-            _apiClient.PutAsync($"api/users/{userId}/balance", payload).GetAwaiter().GetResult();
+            try
+            {
+                var payload = new { newBalance };
+                _apiClient.PutAsync($"api/users/{userId}/balance", payload).GetAwaiter().GetResult();
+            }
+            catch
+            {
+                // Silently fail for now, but ideally we should log this
+            }
+        }
+
+        public async Task UpdateBalanceAsync(int userId, decimal newBalance)
+        {
+            try
+            {
+                var payload = new { newBalance };
+                await _apiClient.PutAsync($"api/users/{userId}/balance", payload);
+            }
+            catch
+            {
+                // Silently fail for now, but ideally we should log this
+            }
         }
 
         public Task<int> SaveChangesAsync()

@@ -7,18 +7,18 @@ namespace MovieApp.Tests.Repositories
     public sealed class EquipmentRepositoryTests
     {
         [Fact]
-        public void FetchAvailableEquipment_NoItemsExist_ReturnsEmptyList()
+        public async Task FetchAvailableEquipmentAsync_NoItemsExist_ReturnsEmptyList()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             EquipmentRepository repository = new EquipmentRepository(context);
 
-            List<Equipment> availableEquipment = repository.FetchAvailableEquipment();
+            List<Equipment> availableEquipment = await repository.FetchAvailableEquipmentAsync();
 
             Assert.Empty(availableEquipment);
         }
 
         [Fact]
-        public void FetchAvailableEquipment_TwoAvailableOneUnavailable_ReturnsTwoItems()
+        public async Task FetchAvailableEquipmentAsync_TwoAvailableOneUnavailable_ReturnsTwoItems()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             User seller = BuildSeller();
@@ -30,13 +30,13 @@ namespace MovieApp.Tests.Repositories
             context.SaveChanges();
 
             EquipmentRepository repository = new EquipmentRepository(context);
-            List<Equipment> availableEquipment = repository.FetchAvailableEquipment();
+            List<Equipment> availableEquipment = await repository.FetchAvailableEquipmentAsync();
 
             Assert.Equal(2, availableEquipment.Count);
         }
 
         [Fact]
-        public void FetchAvailableEquipment_MixedStatuses_AllReturnedItemsAreAvailable()
+        public async Task FetchAvailableEquipmentAsync_MixedStatuses_AllReturnedItemsAreAvailable()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             User seller = BuildSeller();
@@ -48,7 +48,7 @@ namespace MovieApp.Tests.Repositories
             context.SaveChanges();
 
             EquipmentRepository repository = new EquipmentRepository(context);
-            List<Equipment> availableEquipment = repository.FetchAvailableEquipment();
+            List<Equipment> availableEquipment = await repository.FetchAvailableEquipmentAsync();
 
             bool allAreAvailable = availableEquipment.All(item => item.Status == EquipmentStatus.Available);
 

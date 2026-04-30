@@ -11,7 +11,7 @@ namespace MovieApp.DataLayer.Interfaces.Repositories
         /// Retrieves a list of available equipment for purchase.
         /// </summary>
         /// <returns>A list of <see cref="Equipment"/> objects representing the equipment available for purchase.</returns>
-        List<Equipment> FetchAvailableEquipment();
+        Task<List<Equipment>> FetchAvailableEquipmentAsync();
 
         Task<Equipment?> GetByIdAsync(int id);
         Task AddAsync(Equipment item);

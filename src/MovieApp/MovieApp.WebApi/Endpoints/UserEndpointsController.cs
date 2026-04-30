@@ -24,15 +24,15 @@ public sealed class UserEndpointsController : ControllerBase
     }
 
     [HttpGet("{userId:int}/balance")]
-    public IActionResult GetBalance(int userId)
+    public async Task<IActionResult> GetBalance(int userId)
     {
-        return Ok(_repository.GetBalance(userId));
+        return Ok(await _repository.GetBalanceAsync(userId));
     }
 
     [HttpPut("{userId:int}/balance")]
-    public IActionResult UpdateBalance(int userId, [FromBody] UpdateBalanceRequestBody request)
+    public async Task<IActionResult> UpdateBalance(int userId, [FromBody] UpdateBalanceRequestBody request)
     {
-        _repository.UpdateBalance(userId, request.NewBalance);
+        await _repository.UpdateBalanceAsync(userId, request.NewBalance);
         return Ok();
     }
 }

@@ -9,7 +9,7 @@ namespace MovieApp.Tests.Repositories
         private const int UnknownUserId = 999;
 
         [Fact]
-        public void GetBalance_ExistingUser_ReturnsBalance()
+        public async Task GetBalanceAsync_ExistingUser_ReturnsBalance()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             User user = new User
@@ -23,7 +23,7 @@ namespace MovieApp.Tests.Repositories
             context.SaveChanges();
 
             UserRepository repository = new UserRepository(context);
-            decimal balance = repository.GetBalance(user.Id);
+            decimal balance = await repository.GetBalanceAsync(user.Id);
 
             Assert.Equal(250.50m, balance);
         }
@@ -56,7 +56,7 @@ namespace MovieApp.Tests.Repositories
         }
 
         [Fact]
-        public void UpdateBalance_ExistingUser_UpdatesBalance()
+        public async Task UpdateBalanceAsync_ExistingUser_UpdatesBalance()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             User user = new User
@@ -70,7 +70,7 @@ namespace MovieApp.Tests.Repositories
             context.SaveChanges();
 
             UserRepository repository = new UserRepository(context);
-            repository.UpdateBalance(user.Id, 999.99m);
+            await repository.UpdateBalanceAsync(user.Id, 999.99m);
 
             Assert.Equal(999.99m, context.Users.Single().Balance);
         }

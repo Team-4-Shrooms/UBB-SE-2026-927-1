@@ -24,7 +24,7 @@ public sealed class MovieEndpointsController : ControllerBase
         var movie = await _repository.GetMovieByIdAsync(movieId);
 
         if (movie == null) {
-            return NotFound($"Movie {movieId} does not exist");
+            return NoContent();
         }
 
         return Ok(movie.ToDto());

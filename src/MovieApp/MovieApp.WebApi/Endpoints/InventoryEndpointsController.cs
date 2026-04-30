@@ -26,7 +26,7 @@ public sealed class InventoryEndpointsController : ControllerBase
     public async Task<IActionResult> GetOwnedMovies(int userId)
     {
         var movies = await _repository.GetOwnedMoviesAsync(userId);
-        return Ok(movies.Select(movie => movie.ToOwnedMovieDto(userId)));
+        return Ok(movies.Select(movie => movie.ToDto()));
     }
 
     [HttpGet("users/{userId:int}/movies/{movieId:int}/ownerships")]
@@ -40,7 +40,7 @@ public sealed class InventoryEndpointsController : ControllerBase
     public async Task<IActionResult> RemoveMovieOwnerships([FromBody] List<int> ownershipIds)
     {
         var ownerships = ownershipIds.Select(id => new OwnedMovie { Id = id }).ToList();
-        _repository.RemoveMovieOwnerships(ownerships);
+        await _repository.RemoveMovieOwnershipsAsync(ownerships);
         await _repository.SaveChangesAsync();
         return Ok();
     }
@@ -56,7 +56,7 @@ public sealed class InventoryEndpointsController : ControllerBase
     public async Task<IActionResult> RemoveTicketOwnerships([FromBody] List<int> ownershipIds)
     {
         var ownerships = ownershipIds.Select(id => new OwnedTicket { Id = id }).ToList();
-        _repository.RemoveTicketOwnerships(ownerships);
+        await _repository.RemoveTicketOwnershipsAsync(ownerships);
         await _repository.SaveChangesAsync();
         return Ok();
     }

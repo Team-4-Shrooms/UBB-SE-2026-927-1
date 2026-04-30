@@ -30,7 +30,7 @@ namespace MovieApp
         {
 
             ["MovieCatalog"] = typeof(MovieCatalogPage),
-            ["Events"] = typeof(EventsPage),
+            ["Events"] = typeof(MovieEventsPage),
             ["Inventory"] = typeof(InventoryPage),
             ["Marketplace"] = typeof(MarketplacePage),
             ["Wallet"] = typeof(WalletPage),
