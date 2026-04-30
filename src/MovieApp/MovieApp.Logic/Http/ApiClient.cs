@@ -162,8 +162,8 @@ namespace MovieApp.Logic.Http
         private string AppendUserIdQuery(string endpoint)
         {
             return endpoint.Contains('?')
-                ? $"{endpoint}&userId={_userId}"
-                : $"{endpoint}?userId={_userId}";
+                ? $"http://localhost:4544/{endpoint}&userId={_userId}"
+                : $"http://localhost:4544/{endpoint}?userId={_userId}";
         }
 
         private static JsonSerializerOptions CreateJsonOptions()

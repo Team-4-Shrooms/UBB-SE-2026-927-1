@@ -42,4 +42,16 @@ public sealed class PersonalityMatchEndpointsController : ControllerBase
         var preferences = await _repository.GetAllPreferencesExceptUserAsync(excludedUserId);
         return Ok(preferences.Select(p => p.ToDto()));
     }
+
+    [HttpGet("users/{userId:int}/top-preferences")]
+    public async Task<IActionResult> GetTopPreferencesWithTitlesAsync(int userId, [FromQuery] int count)
+    {
+        return Ok(await _repository.GetTopPreferencesWithTitlesAsync(userId, count));
+    }
+
+    [HttpGet("users/{userId:int}/username")]
+    public async Task<IActionResult> GetUsernameAsync(int userId)
+    {
+        return Ok(await _repository.GetUsernameAsync(userId));
+    }
 }

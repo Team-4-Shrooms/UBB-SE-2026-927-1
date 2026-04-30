@@ -36,18 +36,24 @@ namespace MovieApp.DataLayer.Repositories
         {
             return await _context.Reels
                 .Include(reel => reel.Movie)
+                .Include(reel => reel.CreatorUser)
                 .ToListAsync();
         }
 
         /// <inheritdoc />
         public async Task<Dictionary<int, decimal>> GetUserPreferenceScoresAsync(int userId)
         {
-            return await _context.UserMoviePreferences
-                .Include(preference => preference.Movie) 
+            var preferences = await _context.UserMoviePreferences
                 .Where(preference => preference.User.Id == userId)
-                .ToDictionaryAsync(
-                    preference => preference.Movie.Id,
-                    preference => preference.Score);
+                .Select(preference => new { MovieId = preference.Movie.Id, preference.Score })
+                .ToListAsync();
+
+            // Use GroupBy to handle cases where multiple preferences might exist for the same movie
+            return preferences
+                .GroupBy(p => p.MovieId)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.First().Score);
         }
 
         /// <inheritdoc />

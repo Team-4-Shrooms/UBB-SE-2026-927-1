@@ -65,7 +65,8 @@ public sealed class InteractionEndpointsController : ControllerBase
     [HttpGet("users/{userId:int}/reels/{reelId:int}")]
     public async Task<IActionResult> GetInteractionAsync(int userId, int reelId)
     {
-        return Ok(await _repository.GetInteractionAsync(userId, reelId));
+        UserReelInteraction? interaction = await _repository.GetInteractionAsync(userId, reelId);
+        return Ok(interaction?.ToDto());
     }
 
     [HttpGet("reels/{reelId:int}/likes")]

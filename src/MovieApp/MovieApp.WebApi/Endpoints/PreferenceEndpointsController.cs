@@ -35,4 +35,11 @@ public sealed class PreferenceEndpointsController : ControllerBase
         await _repository.UpdatePreferenceAsync(userId, movieId, request.Boost);
         return Ok();
     }
+
+    [HttpGet("users/{userId:int}/feed")]
+    public async Task<IActionResult> GetMovieFeedAsync(int userId, [FromQuery] int count)
+    {
+        var feed = await _repository.GetMovieFeedAsync(userId, count);
+        return Ok(feed.Select(movie => movie.ToDto()));
+    }
 }

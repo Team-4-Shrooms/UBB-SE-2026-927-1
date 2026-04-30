@@ -23,7 +23,8 @@ public sealed class ScrapeJobEndpointsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateJobAsync([FromBody] ScrapeJobRequestBody job)
     {
-        return Ok(await _repository.CreateJobAsync(job.ToModel()));
+        var createdJob = await _repository.CreateJobAsync(job.ToModel());
+        return Ok(createdJob);
     }
 
     [HttpPut("{jobId:int}")]

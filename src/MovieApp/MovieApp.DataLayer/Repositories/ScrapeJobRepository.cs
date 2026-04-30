@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace MovieApp.DataLayer.Repositories
 {
     /// <summary>
-    /// EF Core implementation of <see cref="IScrapeJobRepository"/>.
+    /// EF Core implementation of <see cref="IScrapeRepository"/>.
     /// </summary>
     public class ScrapeJobRepository : IScrapeRepository
     {

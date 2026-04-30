@@ -5,7 +5,7 @@ using MovieApp.DataLayer.Models;
 
 namespace MovieApp.Logic.Http
 {
-    public class ScrapeJobProxyRepository : IScrapeJobRepository
+    public class ScrapeJobProxyRepository : IScrapeRepository
     {
         private readonly ApiClient _apiClient;
 

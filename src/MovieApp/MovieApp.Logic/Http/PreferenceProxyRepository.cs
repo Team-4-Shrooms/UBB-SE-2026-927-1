@@ -29,5 +29,10 @@ namespace MovieApp.Logic.Http
             var payload = new { boost };
             await _apiClient.PutAsync($"api/preferences/users/{userId}/movies/{movieId}/boost", payload);
         }
+
+        public async Task<List<Movie>> GetMovieFeedAsync(int userId, int count)
+        {
+            return await _apiClient.GetAllAsync<Movie>($"api/preferences/users/{userId}/feed?count={count}");
+        }
     }
 }

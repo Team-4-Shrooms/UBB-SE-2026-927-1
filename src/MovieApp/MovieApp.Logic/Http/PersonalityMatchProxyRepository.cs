@@ -33,5 +33,15 @@ namespace MovieApp.Logic.Http
         {
             return await _apiClient.GetAllAsync<int>($"api/personality-match/users/{excludedUserId}/random-user-ids?userIdsCount={userIdsCount}");
         }
+
+        public async Task<List<MoviePreferenceDisplay>> GetTopPreferencesWithTitlesAsync(int userId, int count)
+        {
+            return await _apiClient.GetAllAsync<MoviePreferenceDisplay>($"api/personality-match/users/{userId}/top-preferences?count={count}");
+        }
+
+        public async Task<string> GetUsernameAsync(int userId)
+        {
+            return await _apiClient.GetAsync<string>($"api/personality-match/users/{userId}/username") ?? string.Empty;
+        }
     }
 }
