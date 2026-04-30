@@ -257,3 +257,7 @@ dotnet_naming_rule.camel_case.style = camel_style
 dotnet_naming_symbols.camel_symbols.applicable_kinds = parameter, local
 dotnet_naming_symbols.camel_symbols.applicable_accessibilities = *
 dotnet_naming_style.camel_style.capitalization = camel_case
+# Exclude Migrations from analysis
+[src/MovieApp/MovieApp.WebApi/Migrations/*.cs]
+generated_code = true
+dotnet_analyzer_diagnostic.severity = none

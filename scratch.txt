@@ -1,0 +1,89 @@
+﻿
+            return _apiClient.GetAllAsync<ActiveSale>("api/active-sales/current").GetAwaiter().GetResult();
+            return await _apiClient.GetAllAsync<MusicTrack>("api/audio-library/tracks");
+            return await _apiClient.GetByIdAsync<MusicTrack>("api/audio-library/tracks", musicTrackId);
+            return _apiClient.GetAllAsync<Equipment>("api/equipment/available").GetAwaiter().GetResult();
+            return await _apiClient.GetByIdAsync<Equipment>("api/equipment", id);
+            await _apiClient.PostAsync("api/equipment", item);
+            await _apiClient.PostAsync("api/transactions", transaction);
+            return await _apiClient.GetAllAsync<MovieEvent>($"api/events/movie/{movieId}");
+            return await _apiClient.GetAllAsync<MovieEvent>("api/events");
+            return await _apiClient.GetByIdAsync<MovieEvent>("api/events", eventId);
+            var results = await _apiClient.GetAllAsync<bool>($"api/events/{eventId}/tickets/{userId}");
+            await _apiClient.PostAsync("api/events/tickets", ticket);
+            await _apiClient.PostAsync("api/transactions", transaction);
+            await _apiClient.PostAsync("api/interactions", interaction);
+            await _apiClient.PostAsync($"api/interactions/users/{userId}/reels/{reelId}", new { });
+            await _apiClient.PutAsync($"api/interactions/users/{userId}/reels/{reelId}/like", new { });
+            await _apiClient.PutAsync($"api/interactions/users/{userId}/reels/{reelId}/view", payload);
+            var results = await 
+_apiClient.GetAllAsync<UserReelInteraction>($"api/interactions/users/{userId}/reels/{reelId}");
+            var results = await _apiClient.GetAllAsync<int>($"api/interactions/reels/{reelId}/likes");
+            var results = await _apiClient.GetAllAsync<int?>($"api/interactions/reels/{reelId}/movie-id");
+            return await _apiClient.GetAllAsync<Movie>($"api/inventory/users/{userId}/movies");
+            return await 
+_apiClient.GetAllAsync<OwnedMovie>($"api/inventory/users/{userId}/movies/{movieId}/ownerships");
+            await _apiClient.PostAsync("api/inventory/movies/ownerships/remove", ownerships);
+            return await _apiClient.GetAllAsync<OwnedTicket>($"api/inventory/users/{userId}/events/{eventId}/tickets");
+            await _apiClient.PostAsync("api/inventory/events/tickets/remove", ownerships);
+            await _apiClient.PostAsync("api/transactions", transaction);
+            return await _apiClient.GetByIdAsync<Movie>("api/movies", movieId);
+            return await _apiClient.GetAllAsync<Movie>($"api/movies/search?partialMovieName={query}&limit={limit}");
+            var results = await _apiClient.GetAllAsync<bool>($"api/movies/{movieId}/owned/{userId}");
+            await _apiClient.PostAsync("api/inventory/ownedmovies", ownership);
+            await _apiClient.PostAsync("api/transactions", transaction);
+            var results = await _apiClient.GetAllAsync<int>($"api/movie-tournament/users/{userId}/pool-size");
+            return await 
+_apiClient.GetAllAsync<Movie>($"api/movie-tournament/users/{userId}/pool?poolSize={poolSize}");
+            await _apiClient.PostAsync($"api/movie-tournament/users/{userId}/movies/{movieId}/boost", new { scoreBoost 
+});
+            return await 
+_apiClient.GetAllAsync<UserMoviePreference>($"api/personality-match/users/{excludedUserId}/others-preferences");
+            return await 
+_apiClient.GetAllAsync<UserMoviePreference>($"api/personality-match/users/{userId}/current-preferences");
+            return await _apiClient.GetByIdAsync<UserProfile>("api/personality-match/users", userId, "profile");
+            return await _apiClient.GetAllAsync<int>($"api/personality-match/users/{excludedUserId}/random-user-ids?use
+rIdsCount={userIdsCount}");
+            var results = await 
+_apiClient.GetAllAsync<bool>($"api/preferences/users/{userId}/movies/{movieId}/exists");
+            await _apiClient.PostAsync("api/preferences", payload);
+            await _apiClient.PutAsync($"api/preferences/users/{userId}/movies/{movieId}/boost", payload);
+            var results = await _apiClient.GetAllAsync<UserProfile>($"api/profiles/users/{userId}");
+            return await _apiClient.GetAllAsync<UserReelInteraction>($"api/interactions/users/{userId}");
+            await _apiClient.PostAsync("api/profiles", profile);
+            var results = await _apiClient.GetAllAsync<bool>($"api/recommendations/users/{userId}/has-preferences");
+            var results = await _apiClient.GetAllAsync<Reel>("api/recommendations/reels");
+            var results = await _apiClient.GetAllAsync<Dictionary<int, 
+decimal>>($"api/recommendations/users/{userId}/preference-scores");
+            var results = await _apiClient.GetAllAsync<Dictionary<int, int>>("api/recommendations/like-counts");
+            return await _apiClient.GetAllAsync<UserReelInteraction>($"api/recommendations/likes/within/{days}");
+            return await _apiClient.GetAllAsync<Reel>($"api/reels/users/{userId}");
+            var results = await _apiClient.GetAllAsync<Reel>($"api/reels/{reelId}");
+            await _apiClient.PutAsync($"api/reels/{reelId}", payload);
+            await _apiClient.DeleteAsync($"api/reels/{reelId}");
+            return await _apiClient.GetAllAsync<MovieReview>($"api/reviews/movie/{movieId}");
+            return await _apiClient.GetAllAsync<decimal>($"api/reviews/movie/{movieId}/ratings");
+            var results = await _apiClient.PostAsync<Dictionary<int, int>>("api/reviews/counts", new { movieIds });
+            await _apiClient.PostAsync("api/reviews", review);
+            var createdJob = await _apiClient.PostAsync<ScrapeJob>("api/scrape-jobs", job);
+            await _apiClient.PutAsync($"api/scrape-jobs/{job.Id}", job);
+            await _apiClient.PostAsync("api/scrape-jobs/logs", log);
+            return await _apiClient.GetAllAsync<ScrapeJob>("api/scrape-jobs");
+            return await _apiClient.GetAllAsync<ScrapeJobLog>($"api/scrape-jobs/{jobId}/logs");
+            return await _apiClient.GetAllAsync<ScrapeJobLog>("api/scrape-jobs/logs");
+            var results = await _apiClient.GetAllAsync<DashboardStatsModel>("api/scrape-jobs/dashboard-stats");
+            return await _apiClient.GetAllAsync<Movie>($"api/scrape-jobs/search-movies?partialName={partialName}");
+            var results = await _apiClient.GetAllAsync<int?>($"api/scrape-jobs/movie-id?title={title}");
+            var results = await _apiClient.GetAllAsync<bool>($"api/scrape-jobs/reel-exists?videoUrl={videoUrl}");
+            var createdReel = await _apiClient.PostAsync<Reel>("api/scrape-jobs/reels", reel);
+            return await _apiClient.GetAllAsync<Movie>("api/scrape-jobs/movies");
+            return await _apiClient.GetAllAsync<Reel>("api/scrape-jobs/reels");
+            _apiClient.PostAsync("api/transactions", transaction).GetAwaiter().GetResult();
+            return _apiClient.GetAllAsync<Transaction>($"api/transactions/users/{userId}").GetAwaiter().GetResult();
+            _apiClient.PutAsync($"api/transactions/{transactionId}/status", payload).GetAwaiter().GetResult();
+            var results = await _apiClient.GetAllAsync<User>($"api/users/{id}");
+            var results = _apiClient.GetAllAsync<decimal>($"api/users/{userId}/balance").GetAwaiter().GetResult();
+            _apiClient.PutAsync($"api/users/{userId}/balance", payload).GetAwaiter().GetResult();
+            var result = await _apiClient.PostAsync<Reel>("api/video-storage/reels", reel);
+
+
