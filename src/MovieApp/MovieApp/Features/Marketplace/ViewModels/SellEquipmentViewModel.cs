@@ -7,6 +7,8 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using MovieApp.Features.Shared.Models;
+using Windows.Storage.Pickers;
+using WinRT.Interop;
 
 namespace MovieApp.Features.Marketplace.ViewModels
 {
@@ -20,6 +22,8 @@ namespace MovieApp.Features.Marketplace.ViewModels
         private string _priceInput = string.Empty;
         private decimal _validatedPrice;
         private string _priceErrorMessage = string.Empty;
+        private string _selectedImagePath = string.Empty;
+        private string _selectedFileName = "Click to select gear photo";
         private bool _canPost;
 
         public string NewItemTitle
@@ -46,6 +50,18 @@ namespace MovieApp.Features.Marketplace.ViewModels
             set { _priceErrorMessage = value; OnPropertyChanged(); }
         }
 
+        public string SelectedImagePath
+        {
+            get => _selectedImagePath;
+            set { _selectedImagePath = value; OnPropertyChanged(); ValidateForm(); }
+        }
+
+        public string SelectedFileName
+        {
+            get => _selectedFileName;
+            set { _selectedFileName = value; OnPropertyChanged(); }
+        }
+
         public bool CanPost
         {
             get => _canPost;
@@ -63,6 +79,9 @@ namespace MovieApp.Features.Marketplace.ViewModels
                 throw new InvalidOperationException("User not found.");
             }
 
+            // Use the URL if provided, otherwise use the local path
+            string finalImageUrl = !string.IsNullOrWhiteSpace(imageUrl) ? imageUrl : SelectedImagePath;
+
             Equipment newItem = new Equipment
             {
                 Seller = user,
@@ -71,11 +90,31 @@ namespace MovieApp.Features.Marketplace.ViewModels
                 Price = ValidatedPrice,
                 Category = category ?? "Unknown",
                 Condition = condition ?? "Unknown",
-                ImageUrl = imageUrl,
+                ImageUrl = finalImageUrl,
                 Status = EquipmentStatus.Available
             };
 
             await _equipmentService.ListItemAsync(newItem);
+        }
+
+        public async Task SelectImageAsync()
+        {
+            var filePicker = new Windows.Storage.Pickers.FileOpenPicker();
+            filePicker.FileTypeFilter.Add(".jpg");
+            filePicker.FileTypeFilter.Add(".jpeg");
+            filePicker.FileTypeFilter.Add(".png");
+            filePicker.FileTypeFilter.Add(".webp");
+
+            // Initialize with window handle
+            IntPtr windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+            WinRT.Interop.InitializeWithWindow.Initialize(filePicker, windowHandle);
+
+            var file = await filePicker.PickSingleFileAsync();
+            if (file != null)
+            {
+                SelectedImagePath = file.Path;
+                SelectedFileName = file.Name;
+            }
         }
 
         private void ValidateForm()

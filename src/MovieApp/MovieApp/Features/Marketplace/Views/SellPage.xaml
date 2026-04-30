@@ -45,13 +45,18 @@
                 </StackPanel>
 
                 <TextBlock Text="Equipment Photo" FontWeight="SemiBold" FontSize="14" Foreground="White"/>
-                <Grid x:Name="ImageUploadContainer" Height="120">
-                    <Rectangle Stroke="Gray" StrokeThickness="2" StrokeDashArray="4,2" RadiusX="8" RadiusY="8" Fill="#1A1A1A"/>
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="5">
-                        <FontIcon Glyph="&#xEB9F;" FontSize="32" Foreground="Gray"/>
-                        <TextBlock x:Name="FileNameLabel" Text="Click to select gear photo" Foreground="Gray" HorizontalAlignment="Center"/>
-                    </StackPanel>
-                </Grid>
+                <Button x:Name="ImageUploadButton" Click="ImageUploadButton_Click" 
+                        HorizontalAlignment="Stretch" Height="120" Padding="0" 
+                        Background="Transparent" BorderThickness="0">
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <Rectangle Stroke="Gray" StrokeThickness="2" StrokeDashArray="4,2" RadiusX="8" RadiusY="8" Fill="#1A1A1A"/>
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="5">
+                            <FontIcon Glyph="&#xEB9F;" FontSize="32" Foreground="Gray"/>
+                            <TextBlock x:Name="FileNameLabel" Text="{x:Bind ViewModel.SelectedFileName, Mode=OneWay}" 
+                                       Foreground="Gray" HorizontalAlignment="Center" TextWrapping="WrapWholeWords"/>
+                        </StackPanel>
+                    </Grid>
+                </Button>
 
                 <TextBox x:Name="ImageUrlInput" Header="Or Image URL" PlaceholderText="Paste link here..." Foreground="White"/>
 
