@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="MovieApp StyleCop Rules" Description="Enforces coding style for MovieApp." ToolsVersion="14.0">
+  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+    <!-- Indentation and spacing -->
+    <Rule Id="SA1000" Action="Warning" /> <!-- Keywords should be spaced correctly -->
+    <Rule Id="SA1027" Action="Warning" /> <!-- Use spaces instead of tabs -->
+    <Rule Id="SA1028" Action="Warning" /> <!-- Code should not contain trailing whitespace -->
+    
+    <!-- Layout -->
+    <Rule Id="SA1500" Action="Warning" /> <!-- Braces for multi-line statements should not share line -->
+    <Rule Id="SA1513" Action="Warning" /> <!-- Closing brace should be followed by blank line -->
+    <Rule Id="SA1516" Action="Warning" /> <!-- Elements should be separated by blank line -->
+    <Rule Id="SA1517" Action="Warning" /> <!-- Code should not contain blank lines at start of file -->
+    <Rule Id="SA1518" Action="Warning" /> <!-- Use newline at end of file -->
+    
+    <!-- Naming -->
+    <Rule Id="SA1300" Action="Warning" /> <!-- Element should begin with upper-case letter -->
+    <Rule Id="SA1306" Action="Warning" /> <!-- Field names should begin with lower-case letter -->
+    <Rule Id="SA1309" Action="None" />    <!-- Field names should not begin with underscore (Disabled because we WANT underscore) -->
+    <Rule Id="SA1310" Action="None" />    <!-- Field names should not contain underscore (Disabled for s_ and _) -->
+    <Rule Id="SA1311" Action="Warning" /> <!-- Static readonly fields should begin with upper-case letter (Disabled in stylecop.json/config usually, but here we prefer s_) -->
+    
+    <!-- Documentation (Disabled as not requested) -->
+    <Rule Id="SA1600" Action="None" />
+    <Rule Id="SA1633" Action="None" />
+    
+    <!-- Maintainability -->
+    <Rule Id="SA1101" Action="None" /> <!-- Prefix local calls with this (Banned by most modern styles, not mentioned in ours) -->
+    <Rule Id="SA1121" Action="Warning" /> <!-- Use built-in type alias -->
+    
+    <!-- Braces -->
+    <Rule Id="SA1503" Action="Warning" /> <!-- Braces should not be omitted -->
+  </Rules>
+</RuleSet>
