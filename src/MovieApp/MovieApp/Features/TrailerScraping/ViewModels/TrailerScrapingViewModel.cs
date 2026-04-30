@@ -6,7 +6,7 @@ namespace MovieApp.Features.TrailerScraping.ViewModels
     using CommunityToolkit.Mvvm.ComponentModel;
     using CommunityToolkit.Mvvm.Input;
     using MovieApp.DataLayer.Models;
-    using MovieApp.Features.TrailerScraping.Services;
+    using MovieApp.Logic.Features.TrailerScraping;
 
     /// <summary>
     /// ViewModel for the Trailer Scraping admin dashboard.

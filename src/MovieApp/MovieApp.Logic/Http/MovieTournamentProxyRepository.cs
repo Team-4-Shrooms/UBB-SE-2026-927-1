@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Interfaces.Repositories;
 using MovieApp.DataLayer.Models;
+using MovieApp.WebDTOs.DTOs;
 
 namespace MovieApp.Logic.Http
 {
@@ -26,7 +27,8 @@ namespace MovieApp.Logic.Http
 
         public async Task BoostMovieScoreAsync(int userId, int movieId, decimal scoreBoost)
         {
-            await _apiClient.PostAsync($"api/movie-tournament/users/{userId}/movies/{movieId}/boost", (object)new { scoreBoost });
+            var requestBody = new BoostMovieScoreRequestBody { ScoreBoost = scoreBoost };
+            await _apiClient.PostAsync($"api/movie-tournament/users/{userId}/movies/{movieId}/boost", (object)requestBody);
         }
     }
 }

@@ -5,7 +5,7 @@ namespace MovieApp.Features.ReelsEditing.ViewModels
     using CommunityToolkit.Mvvm.ComponentModel;
     using CommunityToolkit.Mvvm.Input;
     using MovieApp.DataLayer.Models;
-    using MovieApp.Features.ReelsEditing.Services;
+    using MovieApp.Logic.Features.ReelsEditing;
 
     /// <summary>
     /// ViewModel for the music selection dialog.

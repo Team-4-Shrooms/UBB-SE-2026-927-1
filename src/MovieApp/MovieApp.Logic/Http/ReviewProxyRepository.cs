@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Interfaces.Repositories;
 using MovieApp.DataLayer.Models;
+using MovieApp.WebDTOs.DTOs;
 
 namespace MovieApp.Logic.Http
 {
@@ -26,18 +27,18 @@ namespace MovieApp.Logic.Http
 
         public async Task<Dictionary<int, int>> GetReviewCountsAsync(IEnumerable<int> movieIds)
         {
-            var results = await _apiClient.PostAsync<Dictionary<int, int>>("api/reviews/counts", new { movieIds });
+            var results = await _apiClient.PostAsync<Dictionary<int, int>>("api/reviews/counts", new GetReviewCountsRequestBody { MovieIds = movieIds });
             return results ?? new Dictionary<int, int>();
         }
 
         public async Task AddReviewAsync(MovieReview review)
         {
-            await _apiClient.PostAsync("api/reviews", (object)new
+            await _apiClient.PostAsync("api/reviews", new AddReviewRequestBody
             {
-                movieId = review.Movie?.Id ?? 0,
-                userId = review.User?.Id ?? 0,
-                starRating = (int)review.StarRating,
-                comment = review.Comment,
+                MovieId = review.Movie?.Id ?? 0,
+                UserId = review.User?.Id ?? 0,
+                StarRating = (int)review.StarRating,
+                Comment = review.Comment,
             });
         }
 

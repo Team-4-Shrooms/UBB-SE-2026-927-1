@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
-using MovieApp.Features.PersonalityMatch.Models;
+using MovieApp.Logic.Features.PersonalityMatch;
 using MovieApp.Features.PersonalityMatch.ViewModels;
 using CommunityToolkit.Mvvm.DependencyInjection;
 

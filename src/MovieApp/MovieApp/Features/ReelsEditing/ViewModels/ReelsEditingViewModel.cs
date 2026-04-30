@@ -8,7 +8,7 @@ namespace MovieApp.Features.ReelsEditing.ViewModels
     using CommunityToolkit.Mvvm.Input;
     using MovieApp.DataLayer.Models;
     using MovieApp.Features.ReelsEditing.Models;
-    using MovieApp.Features.ReelsEditing.Services;
+    using MovieApp.Logic.Features.ReelsEditing;
 
     /// <summary>
     /// ViewModel for the reels editing interface.

@@ -2,7 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MovieApp.DataLayer.Models;
-using MovieApp.Features.MovieSwipe.Services;
+using MovieApp.Logic.Features.MovieSwipe;
 
 namespace MovieApp.Features.MovieSwipe.ViewModels
 {

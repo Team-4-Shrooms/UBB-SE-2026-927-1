@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Interfaces.Repositories;
 using MovieApp.DataLayer.Models;
+using MovieApp.WebDTOs.DTOs;
 
 namespace MovieApp.Logic.Http
 {
@@ -15,14 +16,14 @@ namespace MovieApp.Logic.Http
 
         public async Task InsertInteractionAsync(UserReelInteraction interaction)
         {
-            await _apiClient.PostAsync("api/interactions", (object)new
+            await _apiClient.PostAsync("api/interactions", new InsertInteractionRequestBody
             {
-                isLiked = interaction.IsLiked,
-                watchDurationSeconds = interaction.WatchDurationSeconds,
-                watchPercentage = interaction.WatchPercentage,
-                viewedAt = interaction.ViewedAt,
-                userId = interaction.User?.Id ?? 0,
-                reelId = interaction.Reel?.Id ?? 0,
+                IsLiked = interaction.IsLiked,
+                WatchDurationSeconds = interaction.WatchDurationSeconds,
+                WatchPercentage = interaction.WatchPercentage,
+                ViewedAt = interaction.ViewedAt,
+                UserId = interaction.User?.Id ?? 0,
+                ReelId = interaction.Reel?.Id ?? 0,
             });
         }
 
@@ -38,7 +39,7 @@ namespace MovieApp.Logic.Http
 
         public async Task UpdateViewDataAsync(int userId, int reelId, decimal watchDurationSeconds, decimal watchPercentage)
         {
-            var payload = new { watchDurationSeconds, watchPercentage };
+            var payload = new UpdateViewDataRequestBody { WatchDurationSeconds = watchDurationSeconds, WatchPercentage = watchPercentage };
             await _apiClient.PutAsync($"api/interactions/users/{userId}/reels/{reelId}/view", payload);
         }
 
