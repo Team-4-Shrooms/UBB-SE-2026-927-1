@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Models;
 
-namespace MovieApp.DataLayer.Interfaces.Services
+namespace MovieApp.Logic.Interfaces.Services
 {
     public interface IMovieService
     {

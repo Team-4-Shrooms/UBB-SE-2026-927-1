@@ -13,9 +13,9 @@ namespace MovieApp.Logic.Http
             _apiClient = apiClient;
         }
 
-        public List<ActiveSale> GetCurrentSales()
+        public async Task<List<ActiveSale>> GetCurrentSalesAsync()
         {
-            return _apiClient.GetAllAsync<ActiveSale>("api/active-sales/current").GetAwaiter().GetResult();
+            return await _apiClient.GetAllAsync<ActiveSale>("api/active-sales/current");
         }
     }
 }

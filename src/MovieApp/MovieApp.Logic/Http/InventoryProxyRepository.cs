@@ -25,10 +25,10 @@ namespace MovieApp.Logic.Http
             return await _apiClient.GetAllAsync<OwnedMovie>($"api/inventory/users/{userId}/movies/{movieId}/ownerships");
         }
 
-        public void RemoveMovieOwnerships(IEnumerable<OwnedMovie> ownerships)
+        public async Task RemoveMovieOwnershipsAsync(IEnumerable<OwnedMovie> ownerships)
         {
             var ids = ownerships.Select(o => o.Id).ToList();
-            _apiClient.PostAsync("api/inventory/movies/ownerships/remove", (object)ids).GetAwaiter().GetResult();
+            await _apiClient.PostAsync("api/inventory/movies/ownerships/remove", (object)ids);
         }
 
         public async Task<List<OwnedTicket>> GetTicketOwnershipsAsync(int userId, int eventId)
@@ -36,10 +36,10 @@ namespace MovieApp.Logic.Http
             return await _apiClient.GetAllAsync<OwnedTicket>($"api/inventory/users/{userId}/events/{eventId}/tickets");
         }
 
-        public void RemoveTicketOwnerships(IEnumerable<OwnedTicket> ownerships)
+        public async Task RemoveTicketOwnershipsAsync(IEnumerable<OwnedTicket> ownerships)
         {
             var ids = ownerships.Select(o => o.Id).ToList();
-            _apiClient.PostAsync("api/inventory/events/tickets/remove", (object)ids).GetAwaiter().GetResult();
+            await _apiClient.PostAsync("api/inventory/events/tickets/remove", (object)ids);
         }
 
         public async Task AddTransactionAsync(Transaction transaction)

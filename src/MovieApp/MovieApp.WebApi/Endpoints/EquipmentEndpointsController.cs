@@ -21,9 +21,9 @@ public sealed class EquipmentEndpointsController : ControllerBase
     }
 
     [HttpGet("available")]
-    public IActionResult FetchAvailableEquipment()
+    public async Task<IActionResult> FetchAvailableEquipment()
     {
-        return Ok(_repository.FetchAvailableEquipment().Select(equipment => equipment.ToDto()));
+        return Ok((await _repository.FetchAvailableEquipmentAsync()).Select(equipment => equipment.ToDto()));
     }
 
     [HttpGet("{id:int}")]

@@ -33,7 +33,6 @@ namespace MovieApp
             var connectionString = "Server=localhost\\SQLEXPRESS;Database=MovieApp;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;";
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 
-<<<<<<< HEAD
             services.AddHttpClient<ApiClient>(client =>
             {
                 client.BaseAddress = new Uri("https://localhost:7196/");
@@ -60,6 +59,13 @@ namespace MovieApp
 
             // Logic Services
             services.AddTransient<IEquipmentService, EquipmentService>();
+            services.AddTransient<IMovieService, MovieService>();
+            services.AddTransient<IActiveSalesService, ActiveSalesService>();
+            services.AddTransient<IReviewService, ReviewService>();
+            services.AddTransient<IInventoryService, InventoryService>();
+            services.AddTransient<IEventService, EventService>();
+            services.AddTransient<IProfileService, ProfileService>();
+            services.AddTransient<IPersonalityMatchService, PersonalityMatchService>();
 
             // Reels Upload
             services.AddTransient<MovieApp.Features.ReelsUpload.Services.IVideoStorageService, MovieApp.Features.ReelsUpload.Services.VideoStorageService>();

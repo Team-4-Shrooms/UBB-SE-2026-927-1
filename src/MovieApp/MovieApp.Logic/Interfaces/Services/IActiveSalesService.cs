@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MovieApp.DataLayer.Interfaces.Services
+namespace MovieApp.Logic.Interfaces.Services
 {
     public interface IActiveSalesService
     {
@@ -12,7 +12,7 @@ namespace MovieApp.DataLayer.Interfaces.Services
         /// Retrieves a dictionary mapping movie IDs to their best available discount percentages.
         /// </summary>
         /// <returns>Dictionary where the key is the movie ID and the value is the best discount percentage available for that movie.</returns>
-        Dictionary<int, decimal> GetBestDiscountPercentByMovieId();
+        Task<Dictionary<int, decimal>> GetBestDiscountPercentByMovieIdAsync();
     }
 }
 

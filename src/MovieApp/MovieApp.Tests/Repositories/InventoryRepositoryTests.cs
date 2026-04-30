@@ -60,7 +60,7 @@ namespace MovieApp.Tests.Repositories
         }
 
         [Fact]
-        public void RemoveMovieOwnerships_OneOwnershipProvided_RemovesOwnershipFromDatabase()
+        public async Task RemoveMovieOwnershipsAsync_OneOwnershipProvided_RemovesOwnershipFromDatabase()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             User user = BuildUser();
@@ -72,7 +72,7 @@ namespace MovieApp.Tests.Repositories
             context.SaveChanges();
 
             InventoryRepository repository = new InventoryRepository(context);
-            repository.RemoveMovieOwnerships(new[] { ownership });
+            await repository.RemoveMovieOwnershipsAsync(new[] { ownership });
             context.SaveChanges();
 
             Assert.Empty(context.OwnedMovies);
@@ -116,7 +116,7 @@ namespace MovieApp.Tests.Repositories
         }
 
         [Fact]
-        public void RemoveTicketOwnerships_OneOwnershipProvided_RemovesOwnershipFromDatabase()
+        public async Task RemoveTicketOwnershipsAsync_OneOwnershipProvided_RemovesOwnershipFromDatabase()
         {
             using AppDbContext context = TestDbContextFactory.Create();
             User user = BuildUser();
@@ -130,7 +130,7 @@ namespace MovieApp.Tests.Repositories
             context.SaveChanges();
 
             InventoryRepository repository = new InventoryRepository(context);
-            repository.RemoveTicketOwnerships(new[] { ownership });
+            await repository.RemoveTicketOwnershipsAsync(new[] { ownership });
             context.SaveChanges();
 
             Assert.Empty(context.OwnedTickets);

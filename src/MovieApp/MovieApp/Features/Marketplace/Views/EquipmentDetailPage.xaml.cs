@@ -25,17 +25,17 @@ namespace MovieApp.Features.Marketplace.Views
             this.InitializeComponent();
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             if (e.Parameter is Equipment item)
             {
                 _selectedItem = item;
-                PopulateUI();
+                await PopulateUIAsync();
             }
         }
 
-        private void PopulateUI()
+        private async Task PopulateUIAsync()
         {
             if (_selectedItem == null)
             {
@@ -59,7 +59,7 @@ namespace MovieApp.Features.Marketplace.Views
                 }
             }
 
-            decimal balance = _userRepo.GetBalance(SessionManager.CurrentUserID);
+            decimal balance = await _userRepo.GetBalanceAsync(SessionManager.CurrentUserID);
             bool canAfford = balance >= _selectedItem.Price;
             ConfirmBuyButton.IsEnabled = canAfford;
             ErrorText.Visibility = canAfford ? Visibility.Collapsed : Visibility.Visible;

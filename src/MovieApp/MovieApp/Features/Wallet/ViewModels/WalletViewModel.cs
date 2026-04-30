@@ -115,6 +115,10 @@ namespace MovieApp.Features.Wallet.ViewModels
 
             try
             {
+                decimal currentBalance = await _userRepo.GetBalanceAsync(SessionManager.CurrentUserID);
+                Balance = currentBalance;
+                SessionManager.CurrentUserBalance = currentBalance;
+
                 var result = await Task.Run(() => _transactionRepo.GetTransactionsByUserId(SessionManager.CurrentUserID));
 
                 Transactions.Clear();

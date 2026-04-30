@@ -28,7 +28,21 @@ namespace MovieApp.Features.Inventory.Views
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            await LoadDataAsync();
+            try
+            {
+                await LoadDataAsync();
+            }
+            catch (Exception ex)
+            {
+                var err = new ContentDialog
+                {
+                    Title = "Error loading inventory",
+                    Content = ex.Message,
+                    CloseButtonText = "OK",
+                    XamlRoot = XamlRoot
+                };
+                await err.ShowAsync();
+            }
         }
 
         private async Task LoadDataAsync()
@@ -39,6 +53,8 @@ namespace MovieApp.Features.Inventory.Views
                 return;
             }
 
+            _context.ChangeTracker.Clear();
+
             MoviesGrid.ItemsSource = await _repository.GetOwnedMoviesAsync(userId);
 
             List<OwnedTicket> tickets = await _context.OwnedTickets
@@ -48,16 +64,13 @@ namespace MovieApp.Features.Inventory.Views
             TicketsGrid.ItemsSource = tickets;
 
             List<int> boughtEquipmentIds = await _context.Transactions
-                .Where(t => t.Buyer.Id == userId && t.Type == "EquipmentPurchase")
-                .Select(t => t.Equipment.Id)
+                .Where(t => t.Buyer.Id == userId && t.Type == "EquipmentPurchase" && t.Equipment != null)
+                .Select(t => t.Equipment!.Id)
                 .ToListAsync();
 
             EquipmentGrid.ItemsSource = await _context.Equipment
                 .Where(e => boughtEquipmentIds.Contains(e.Id))
                 .ToListAsync();
-            EquipmentGrid.ItemsSource = equipment;
-
-            _context.ChangeTracker.Clear();
         }
 
         private void MoviesGrid_ItemClick(object sender, ItemClickEventArgs e)

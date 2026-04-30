@@ -16,13 +16,13 @@ public sealed class UserProxyRepositoryIntegrationTests
     }
 
     [Fact]
-    public void UpdateBalance_ExistingUser_ChangesBalance()
+    public async Task UpdateBalanceAsync_ExistingUser_ChangesBalance()
     {
         using ProxyRepoIntegrationTestContext testContext = new ProxyRepoIntegrationTestContext();
         UserProxyRepository userRepository = new UserProxyRepository(testContext.ApiClient);
 
-        userRepository.UpdateBalance(ProxyRepoSeedIds.SeededUserId, 123.45m);
-        decimal updatedBalance = userRepository.GetBalance(ProxyRepoSeedIds.SeededUserId);
+        await userRepository.UpdateBalanceAsync(ProxyRepoSeedIds.SeededUserId, 123.45m);
+        decimal updatedBalance = await userRepository.GetBalanceAsync(ProxyRepoSeedIds.SeededUserId);
 
         Assert.Equal(123.45m, updatedBalance);
     }

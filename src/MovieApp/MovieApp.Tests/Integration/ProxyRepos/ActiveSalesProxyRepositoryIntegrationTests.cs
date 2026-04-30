@@ -5,12 +5,12 @@ namespace MovieApp.Tests.Integration.ProxyRepos;
 public sealed class ActiveSalesProxyRepositoryIntegrationTests
 {
     [Fact]
-    public void GetCurrentSales_SeededDatabase_ReturnsNonEmptyList()
+    public async Task GetCurrentSalesAsync_SeededDatabase_ReturnsNonEmptyList()
     {
         using ProxyRepoIntegrationTestContext testContext = new ProxyRepoIntegrationTestContext();
         ActiveSalesProxyRepository activeSalesRepository = new ActiveSalesProxyRepository(testContext.ApiClient);
 
-        List<MovieApp.DataLayer.Models.ActiveSale> currentSales = activeSalesRepository.GetCurrentSales();
+        List<MovieApp.DataLayer.Models.ActiveSale> currentSales = await activeSalesRepository.GetCurrentSalesAsync();
 
         Assert.NotEmpty(currentSales);
     }

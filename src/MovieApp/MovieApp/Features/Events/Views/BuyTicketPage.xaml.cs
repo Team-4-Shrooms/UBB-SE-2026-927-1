@@ -31,22 +31,37 @@ namespace MovieApp.Features.Events.Views
         {
             base.OnNavigatedTo(@event);
 
-            if (@event.Parameter is int id)
+            try
             {
-                _event = await _eventRepository.GetEventByIdAsync(id);
-            }
-            else if (@event.Parameter is MovieEvent movieEvent)
-            {
-                _event = movieEvent;
-            }
+                if (@event.Parameter is int id)
+                {
+                    _event = await _eventRepository.GetEventByIdAsync(id);
+                }
+                else if (@event.Parameter is MovieEvent movieEvent)
+                {
+                    _event = movieEvent;
+                }
 
-            if (_event == null)
-            {
-                return;
-            }
+                if (_event == null)
+                {
+                    return;
+                }
 
-            PopulateUI();
-            UpdateButtonState();
+                PopulateUI();
+                UpdateButtonState();
+            }
+            catch (Exception ex)
+            {
+                ContentDialog errorDialog = new ContentDialog
+                {
+                    Title = "Error loading event",
+                    Content = "Could not load event details. Please ensure the backend server is running.",
+                    CloseButtonText = "OK",
+                    XamlRoot = XamlRoot
+                };
+                await errorDialog.ShowAsync();
+                if (Frame.CanGoBack) Frame.GoBack();
+            }
         }
 
         private void PopulateUI()
@@ -90,7 +105,7 @@ namespace MovieApp.Features.Events.Views
                 return;
             }
 
-            decimal balance = _userRepository.GetBalance(SessionManager.CurrentUserID);
+            decimal balance = SessionManager.CurrentUserBalance;
             bool canBuy = balance >= _event.TicketPrice && _event.Date >= DateTime.Now;
             ConfirmButton.IsEnabled = canBuy;
 

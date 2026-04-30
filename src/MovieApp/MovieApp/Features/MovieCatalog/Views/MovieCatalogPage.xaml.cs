@@ -162,7 +162,7 @@ namespace MovieApp.Features.MovieCatalog.Views
         private async Task LoadDiscountedMoviesAsync()
         {
             var allMovies = await _movieRepo.SearchMoviesAsync("", 100);
-            var currentSales = _salesRepo.GetCurrentSales();
+            var currentSales = await _salesRepo.GetCurrentSalesAsync();
             
             foreach (var movie in allMovies)
             {

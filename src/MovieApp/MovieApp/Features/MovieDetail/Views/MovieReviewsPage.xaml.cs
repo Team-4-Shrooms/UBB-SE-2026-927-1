@@ -55,7 +55,7 @@ namespace MovieApp.Features.MovieDetail.Views
                 return;
             }
 
-            List<Review> reviews = await _reviewRepository.GetReviewsForMovieAsync(_movie.Id);
+            List<MovieReview> reviews = await _reviewRepository.GetReviewsForMovieAsync(_movie.Id);
             ReviewsList.ItemsSource = reviews.OrderByDescending(r => r.CreatedAt).ToList();
         }
 

@@ -4,18 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Interfaces.Repositories;
-using MovieApp.DataLayer.Interfaces.Services;
+using MovieApp.Logic.Interfaces.Services;
 using MovieApp.DataLayer.Models;
 
-namespace MovieApp.DataLayer.Services
+namespace MovieApp.Logic.Services
 {
     public class ActiveSalesService  : IActiveSalesService
     {
         private readonly IActiveSalesRepository _repository;
         public ActiveSalesService(IActiveSalesRepository repository) => _repository = repository;
-        public Dictionary<int, decimal> GetBestDiscountPercentByMovieId()
+        public async Task<Dictionary<int, decimal>> GetBestDiscountPercentByMovieIdAsync()
         {
-            List<ActiveSale> sales = _repository.GetCurrentSales();
+            List<ActiveSale> sales = await _repository.GetCurrentSalesAsync();
 
             Dictionary<int, decimal> bestByMovieId = new Dictionary<int, decimal>();
             foreach (ActiveSale sale in sales)

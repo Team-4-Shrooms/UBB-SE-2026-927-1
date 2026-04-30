@@ -11,9 +11,8 @@ public sealed class EquipmentProxyRepositoryIntegrationTests
         using ProxyRepoIntegrationTestContext testContext = new ProxyRepoIntegrationTestContext();
         EquipmentProxyRepository equipmentRepository = new EquipmentProxyRepository(testContext.ApiClient);
 
-        List<Equipment> availableEquipment = equipmentRepository.FetchAvailableEquipment();
+        List<Equipment> availableEquipment = await equipmentRepository.FetchAvailableEquipmentAsync();
 
-        await Task.CompletedTask;
         Assert.NotEmpty(availableEquipment);
     }
 
@@ -35,7 +34,7 @@ public sealed class EquipmentProxyRepositoryIntegrationTests
             Seller = new User { Id = ProxyRepoSeedIds.SeededUserId },
         });
 
-        List<Equipment> availableEquipment = equipmentRepository.FetchAvailableEquipment();
+        List<Equipment> availableEquipment = await equipmentRepository.FetchAvailableEquipmentAsync();
 
         Assert.True(availableEquipment.Any(equipment => equipment.Title == uniqueTitle));
     }

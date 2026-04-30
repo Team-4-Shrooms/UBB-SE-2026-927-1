@@ -49,7 +49,7 @@ namespace MovieApp.Features.MovieDetail.Views
                 return;
             }
 
-            Dictionary<int, decimal> discountMap = _activeSalesService.GetBestDiscountPercentByMovieId();
+            Dictionary<int, decimal> discountMap = await _activeSalesService.GetBestDiscountPercentByMovieIdAsync();
             if (discountMap.TryGetValue(_movie.Id, out decimal discount))
             {
                 _appliedDiscount = discount;
@@ -58,7 +58,7 @@ namespace MovieApp.Features.MovieDetail.Views
             PopulateUI();
             await RefreshBuyButtonStateAsync();
 
-            FrameworkElement? tooltip = await BuildStarDistributionTooltipAsync(_movie.Id);
+            string tooltip = await BuildStarDistributionTooltipAsync(_movie.Id);
             ToolTipService.SetToolTip(ReviewsButton, tooltip);
         }
 

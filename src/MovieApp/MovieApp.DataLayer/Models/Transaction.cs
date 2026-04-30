@@ -20,10 +20,13 @@ namespace MovieApp.DataLayer.Models
         [NotMapped]
         public string DisplayTimestamp => Timestamp.ToString("g");
 
-        /*
-        public string DisplayType => MovieShop.Services.TransactionTypeMapper.ToDisplayString(Type);
-        public string DisplayStatus => MovieShop.Services.TransactionTypeMapper.StatusToDisplayString(Status);
-        public string DisplayAmount => MovieShop.Services.TransactionTypeMapper.FormatAmount(Amount);
-        */
+        [NotMapped]
+        public string DisplayType => Type ?? string.Empty;
+
+        [NotMapped]
+        public string DisplayStatus => Status ?? string.Empty;
+
+        [NotMapped]
+        public string DisplayAmount => Amount.ToString("C");
     }
 }

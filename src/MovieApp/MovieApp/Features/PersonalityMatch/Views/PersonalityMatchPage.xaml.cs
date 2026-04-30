@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MovieApp.Features.PersonalityMatch.Models;
@@ -10,7 +10,8 @@ namespace MovieApp.Features.PersonalityMatch.Views
     /// <summary>
     /// A page that displays the personality match list for the currently active user,
     /// including top compatibility matches, fallback random users, and an account switcher panel.
-    /// </summary>`n    public sealed partial class PersonalityMatchPage : Page
+    /// </summary>
+    public sealed partial class PersonalityMatchPage : Page
     {
         private const double AccountPickerListViewHeight = 200;
         private const string AccountPickerItemTemplateKey = "AccountPickerItemTemplate";

@@ -13,13 +13,13 @@ namespace MovieApp.DataLayer.Repositories
             _context = context;
         }
 
-        public List<Equipment> FetchAvailableEquipment()
+        public async Task<List<Equipment>> FetchAvailableEquipmentAsync()
         {
-            return _context.Equipment
+            return await _context.Equipment
                 .AsNoTracking()
                 .Include(equipment => equipment.Seller)
                 .Where(equipment => equipment.Status == EquipmentStatus.Available)
-                .ToList();
+                .ToListAsync();
         }
 
         public async Task<Equipment?> GetByIdAsync(int id)

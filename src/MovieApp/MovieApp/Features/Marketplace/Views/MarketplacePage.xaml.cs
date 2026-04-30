@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 using MovieApp.DataLayer.Models;
 using MovieApp.Features.Marketplace.ViewModels;
 using System;
@@ -14,7 +15,12 @@ namespace MovieApp.Features.Marketplace.Views
         public MarketplacePage()
         {
             this.InitializeComponent();
-            ViewModel.LoadData();
+        }
+
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            await ViewModel.LoadDataAsync();
         }
 
         private void CategoryFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)

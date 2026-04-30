@@ -33,13 +33,27 @@ namespace MovieApp.Features.Events.Views
         {
             base.OnNavigatedTo(@event);
 
-            if (@event.Parameter is MovieEventsNavArgs args)
+            try
             {
-                _movie = args.Movie;
-            }
+                if (@event.Parameter is MovieEventsNavArgs args)
+                {
+                    _movie = args.Movie;
+                }
 
-            await LoadEventsAsync();
-            ApplyFilters();
+                await LoadEventsAsync();
+                ApplyFilters();
+            }
+            catch (Exception ex)
+            {
+                ContentDialog errorDialog = new ContentDialog
+                {
+                    Title = "Error loading events",
+                    Content = "Could not load events. Please ensure the backend server is running.",
+                    CloseButtonText = "OK",
+                    XamlRoot = XamlRoot
+                };
+                await errorDialog.ShowAsync();
+            }
         }
 
         private async Task LoadEventsAsync()
@@ -113,7 +127,7 @@ namespace MovieApp.Features.Events.Views
                 }
 
                 MovieEvent? @event = item as MovieEvent;
-                decimal balance = _userRepository.GetBalance(userId);
+                decimal balance = SessionManager.CurrentUserBalance;
                 bool canBuy = @event != null && balance >= @event.TicketPrice && @event.Date >= DateTime.Now;
                 buyTicketButton.IsEnabled = canBuy;
                 buyTicketButton.Opacity = canBuy ? 1.0 : 0.55;

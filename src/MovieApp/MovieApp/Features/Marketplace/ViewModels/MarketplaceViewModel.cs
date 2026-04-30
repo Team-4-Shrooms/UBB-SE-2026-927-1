@@ -22,12 +22,11 @@ namespace MovieApp.Features.Marketplace.ViewModels
         public MarketplaceViewModel(IEquipmentRepository equipmentRepository)
         {
             _repository = equipmentRepository;
-            LoadData();
         }
 
-        public void LoadData()
+        public async Task LoadDataAsync()
         {
-            List<Equipment>? fetchedData = _repository.FetchAvailableEquipment() ?? new List<Equipment>();
+            List<Equipment> fetchedData = await _repository.FetchAvailableEquipmentAsync();
             _allOriginalItems = fetchedData;
 
             UpdateDisplayList(_allOriginalItems);
