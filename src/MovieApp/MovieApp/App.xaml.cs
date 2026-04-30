@@ -2,6 +2,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using MovieApp.Http; // Ensures ApiClient is recognized
+using MovieApp.DataLayer.Interfaces.Repositories;
+
 
 namespace MovieApp
 {
@@ -34,6 +36,28 @@ namespace MovieApp
             // Note: When you get your ViewModels back, you'll register them here!
             // e.g., services.AddTransient<MyViewModel>();
 
+            // 4. Register your Repository
+            // services.AddScoped<MovieApp.DataLayer.Interfaces.Repositories.IMovieRepository, MovieApp.Http.MovieProxyRepository>();
+            
+            services.AddTransient<IMovieRepository, MovieProxyRepository>();
+            services.AddTransient<IActiveSalesRepository, ActiveSalesProxyRepository>();
+            services.AddTransient<IAudioLibraryRepository, AudioLibraryProxyRepository>();
+            services.AddTransient<IEquipmentRepository, EquipmentProxyRepository>();
+            services.AddTransient<IEventRepository, EventProxyRepository>();
+            services.AddTransient<IInteractionRepository, InteractionProxyRepository>();
+            services.AddTransient<IInventoryRepository, InventoryProxyRepository>();
+            services.AddTransient<IMovieTournamentRepository, MovieTournamentProxyRepository>();
+            services.AddTransient<IPersonalityMatchRepository, PersonalityMatchProxyRepository>();
+            services.AddTransient<IPreferenceRepository, PreferenceProxyRepository>();
+            services.AddTransient<IProfileRepository, ProfileProxyRepository>();
+            services.AddTransient<IRecommendationRepository, RecommendationProxyRepository>();
+            services.AddTransient<IReelRepository, ReelProxyRepository>();
+            services.AddTransient<IReviewRepository, ReviewProxyRepository>();
+            services.AddTransient<IScrapeJobRepository, ScrapeJobProxyRepository>();
+            services.AddTransient<ITransactionRepository, TransactionProxyRepository>();
+            services.AddTransient<IUserRepository, UserProxyRepository>();
+            services.AddTransient<IVideoStorageRepository, VideoStorageProxyRepository>();
+            
             return services.BuildServiceProvider();
         }
 
