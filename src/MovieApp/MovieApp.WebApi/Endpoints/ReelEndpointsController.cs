@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using MovieApp.WebDTOs.DTOs;
+using MovieApp.WebDTOs.DTOs.RequestDTOs;
 using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Repositories;
+using MovieApp.WebDTOs.DTOs;
 
 namespace MovieApp.WebApi.Endpoints;
 

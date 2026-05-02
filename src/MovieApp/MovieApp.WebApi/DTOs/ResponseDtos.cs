@@ -1,4 +1,4 @@
-namespace MovieApp.WebDTOs.DTOs;
+namespace MovieApp.WebApi.DTOs;
 
 public sealed class ActiveSaleDto
 {

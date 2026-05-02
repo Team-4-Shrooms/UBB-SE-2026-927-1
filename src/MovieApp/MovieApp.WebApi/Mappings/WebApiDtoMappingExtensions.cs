@@ -1,5 +1,6 @@
 using MovieApp.DataLayer.Models;
-using MovieApp.WebDTOs.DTOs;
+using MovieApp.WebApi.DTOs;
+using MovieApp.WebDTOs.DTOs.RequestDTOs;
 
 namespace MovieApp.WebApi.Mappings;
 

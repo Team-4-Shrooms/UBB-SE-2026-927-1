@@ -1,7 +1,9 @@
 using System.Text.Json;
-using MovieApp.WebDTOs.DTOs;
+using MovieApp.WebDTOs.DTOs.RequestDTOs;
 using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Models;
+using MovieApp.WebDTOs.DTOs;
+using MovieApp.WebApi.DTOs;
 
 namespace MovieApp.Tests.DTO;
 
