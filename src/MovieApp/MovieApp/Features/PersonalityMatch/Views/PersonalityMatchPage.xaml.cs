@@ -1,9 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using MovieApp.Features.PersonalityMatch.Models;
+using MovieApp.Logic.Features.PersonalityMatch;
 using MovieApp.Features.PersonalityMatch.ViewModels;
 using CommunityToolkit.Mvvm.DependencyInjection;
+using MovieApp.Features.PersonalityMatch.Models;
 
 namespace MovieApp.Features.PersonalityMatch.Views
 {

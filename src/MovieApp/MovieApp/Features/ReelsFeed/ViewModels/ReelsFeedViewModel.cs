@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MovieApp;
 using MovieApp.DataLayer.Models;
-using MovieApp.Features.ReelsFeed.Services;
+using MovieApp.Logic.Features.ReelsFeed;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 

@@ -5,9 +5,8 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Data.SqlClient;
 using MovieApp.DataLayer.Models;
 using MovieApp.DataLayer.Interfaces.Repositories;
-using MovieApp.Features.ReelsUpload.Services;
+using MovieApp.Logic.Features.ReelsUpload;
 using System.Runtime.InteropServices;
-using MovieApp.Features.ReelsUpload.Models;
 
 namespace MovieApp.Features.ReelsUpload.ViewModels
 {
@@ -110,7 +109,7 @@ namespace MovieApp.Features.ReelsUpload.ViewModels
                 // 2. If valid, proceed with the upload!
                 StatusMessage = "Uploading to Blob Storage & saving metadata...";
 
-                ReelUploadRequest request = new Models.ReelUploadRequest
+                ReelUploadRequest request = new ReelUploadRequest
                 {
                     LocalFilePath = LocalVideoFilePath,
                     Title = ReelTitle,

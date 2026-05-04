@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using MovieApp.Features.MovieTournament.Services;
+using MovieApp.Logic.Features.MovieTournament;
 using CommunityToolkit.Mvvm.DependencyInjection;
 
 namespace MovieApp.Features.MovieTournament.Views

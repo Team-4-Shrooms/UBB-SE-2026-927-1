@@ -68,44 +68,44 @@ namespace MovieApp
             services.AddTransient<IPersonalityMatchService, PersonalityMatchService>();
 
             // Reels Upload
-            services.AddTransient<MovieApp.Features.ReelsUpload.Services.IVideoStorageService, MovieApp.Features.ReelsUpload.Services.VideoStorageService>();
+            services.AddTransient<MovieApp.Logic.Features.ReelsUpload.IVideoStorageService, MovieApp.Logic.Features.ReelsUpload.VideoStorageService>();
             services.AddTransient<MovieApp.Features.ReelsUpload.ViewModels.ReelsUploadViewModel>();
 
             // Trailer Scraping
-            services.AddTransient<MovieApp.Features.TrailerScraping.Services.IYouTubeScraperService>(provider =>
-                new MovieApp.Features.TrailerScraping.Services.YouTubeScraperService("YOUR_YOUTUBE_API_KEY"));
-            services.AddTransient<MovieApp.Features.TrailerScraping.Services.IVideoDownloadService, MovieApp.Features.TrailerScraping.Services.VideoDownloadService>();
-            services.AddTransient<MovieApp.Features.TrailerScraping.Services.IVideoIngestionService, MovieApp.Features.TrailerScraping.Services.VideoIngestionService>();
+            services.AddTransient<MovieApp.Logic.Features.TrailerScraping.IYouTubeScraperService>(provider =>
+                new MovieApp.Logic.Features.TrailerScraping.YouTubeScraperService("YOUR_YOUTUBE_API_KEY"));
+            services.AddTransient<MovieApp.Logic.Features.TrailerScraping.IVideoDownloadService, MovieApp.Logic.Features.TrailerScraping.VideoDownloadService>();
+            services.AddTransient<MovieApp.Logic.Features.TrailerScraping.IVideoIngestionService, MovieApp.Logic.Features.TrailerScraping.VideoIngestionService>();
             services.AddTransient<MovieApp.Features.TrailerScraping.ViewModels.TrailerScrapingViewModel>();
 
             // Reels Editing
-            services.AddTransient<MovieApp.Features.ReelsEditing.Services.IVideoProcessingService, MovieApp.Features.ReelsEditing.Services.VideoProcessingService>();
+            services.AddTransient<MovieApp.Logic.Features.ReelsEditing.IVideoProcessingService, MovieApp.Logic.Features.ReelsEditing.VideoProcessingService>();
             services.AddTransient<MovieApp.Features.ReelsEditing.ViewModels.ReelsEditingViewModel>();
             services.AddTransient<MovieApp.Features.ReelsEditing.ViewModels.ReelGalleryViewModel>();
             services.AddTransient<MovieApp.Features.ReelsEditing.ViewModels.MusicSelectionDialogViewModel>();
 
             // Movie Swipe
-            services.AddTransient<MovieApp.Features.MovieSwipe.Services.ISwipeService, MovieApp.Features.MovieSwipe.Services.SwipeService>();
-            services.AddTransient<MovieApp.Features.MovieSwipe.Services.IMovieCardFeedService, MovieApp.Features.MovieSwipe.Services.MovieCardFeedService>();
+            services.AddTransient<MovieApp.Logic.Features.MovieSwipe.ISwipeService, MovieApp.Logic.Features.MovieSwipe.SwipeService>();
+            services.AddTransient<MovieApp.Logic.Features.MovieSwipe.IMovieCardFeedService, MovieApp.Logic.Features.MovieSwipe.MovieCardFeedService>();
             services.AddTransient<MovieApp.Features.MovieSwipe.ViewModels.MovieSwipeViewModel>();
 
             // Movie Tournament
-            services.AddSingleton<MovieApp.Features.MovieTournament.Services.ITournamentLogicService, MovieApp.Features.MovieTournament.Services.TournamentLogicService>();
+            services.AddSingleton<MovieApp.Logic.Features.MovieTournament.ITournamentLogicService, MovieApp.Logic.Features.MovieTournament.TournamentLogicService>();
             services.AddTransient<MovieApp.Features.MovieTournament.ViewModels.MovieTournamentViewModel>();
             services.AddTransient<MovieApp.Features.MovieTournament.ViewModels.TournamentMatchViewModel>();
             services.AddTransient<MovieApp.Features.MovieTournament.ViewModels.TournamentSetupViewModel>();
             services.AddTransient<MovieApp.Features.MovieTournament.ViewModels.TournamentWinnerViewModel>();
 
             // Personality Match
-            services.AddTransient<MovieApp.Features.PersonalityMatch.Services.IPersonalityMatchingService, MovieApp.Features.PersonalityMatch.Services.PersonalityMatchingService>();
+            services.AddTransient<MovieApp.Logic.Features.PersonalityMatch.IPersonalityMatchingService, MovieApp.Logic.Features.PersonalityMatch.PersonalityMatchingService>();
             services.AddTransient<MovieApp.Features.PersonalityMatch.ViewModels.PersonalityMatchViewModel>();
             services.AddTransient<MovieApp.Features.PersonalityMatch.ViewModels.MatchedUserDetailViewModel>();
 
             // Reels Feed
-            services.AddTransient<MovieApp.Features.ReelsFeed.Services.IClipPlaybackService, MovieApp.Features.ReelsFeed.Services.ClipPlaybackService>();
-            services.AddTransient<MovieApp.Features.ReelsFeed.Services.IEngagementProfileService, MovieApp.Features.ReelsFeed.Services.EngagementProfileService>();
-            services.AddTransient<MovieApp.Features.ReelsFeed.Services.IRecommendationService, MovieApp.Features.ReelsFeed.Services.RecommendationService>();
-            services.AddTransient<MovieApp.Features.ReelsFeed.Services.IReelInteractionService, MovieApp.Features.ReelsFeed.Services.ReelInteractionService>();
+            services.AddTransient<MovieApp.Logic.Features.ReelsFeed.IClipPlaybackService, MovieApp.Logic.Features.ReelsFeed.ClipPlaybackService>();
+            services.AddTransient<MovieApp.Logic.Features.ReelsFeed.IEngagementProfileService, MovieApp.Logic.Features.ReelsFeed.EngagementProfileService>();
+            services.AddTransient<MovieApp.Logic.Features.ReelsFeed.IRecommendationService, MovieApp.Logic.Features.ReelsFeed.RecommendationService>();
+            services.AddTransient<MovieApp.Logic.Features.ReelsFeed.IReelInteractionService, MovieApp.Logic.Features.ReelsFeed.ReelInteractionService>();
             services.AddTransient<MovieApp.Features.ReelsFeed.ViewModels.ReelsFeedViewModel>();
             services.AddTransient<MovieApp.Features.ReelsFeed.ViewModels.UserProfileViewModel>();
 

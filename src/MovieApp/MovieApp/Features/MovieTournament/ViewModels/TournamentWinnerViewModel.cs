@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using MovieApp.DataLayer.Models;
-using MovieApp.Features.MovieTournament.Services;
+using MovieApp.Logic.Features.MovieTournament;
 
 namespace MovieApp.Features.MovieTournament.ViewModels
 {

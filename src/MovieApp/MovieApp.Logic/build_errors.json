@@ -1,0 +1,659 @@
+{
+  "$schema": "http://json.schemastore.org/sarif-1.0.0",
+  "version": "1.0.0",
+  "runs": [
+    {
+      "tool": {
+        "name": "Microsoft (R) Visual C# Compiler",
+        "version": "4.14.0.0",
+        "fileVersion": "4.14.0-3.25413.5 (b828a8df)",
+        "semanticVersion": "4.14.0",
+        "language": "en-US"
+      },
+      "results": [
+        {
+          "ruleId": "CS0234",
+          "level": "error",
+          "message": "The type or namespace name 'WebDTOs' does not exist in the namespace 'MovieApp' (are you missing an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Http/EquipmentProxyRepository.cs",
+                "region": {
+                  "startLine": 5,
+                  "startColumn": 16,
+                  "endLine": 5,
+                  "endColumn": 23
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0234",
+          "level": "error",
+          "message": "The type or namespace name 'WebDTOs' does not exist in the namespace 'MovieApp' (are you missing an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Http/EventProxyRepository.cs",
+                "region": {
+                  "startLine": 5,
+                  "startColumn": 16,
+                  "endLine": 5,
+                  "endColumn": 23
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0234",
+          "level": "error",
+          "message": "The type or namespace name 'WebDTOs' does not exist in the namespace 'MovieApp' (are you missing an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Http/InteractionProxyRepository.cs",
+                "region": {
+                  "startLine": 4,
+                  "startColumn": 16,
+                  "endLine": 4,
+                  "endColumn": 23
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0234",
+          "level": "error",
+          "message": "The type or namespace name 'WebDTOs' does not exist in the namespace 'MovieApp' (are you missing an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Http/InventoryProxyRepository.cs",
+                "region": {
+                  "startLine": 6,
+                  "startColumn": 16,
+                  "endLine": 6,
+                  "endColumn": 23
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0234",
+          "level": "error",
+          "message": "The type or namespace name 'WebDTOs' does not exist in the namespace 'MovieApp' (are you missing an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Http/MovieProxyRepository.cs",
+                "region": {
+                  "startLine": 5,
+                  "startColumn": 16,
+                  "endLine": 5,
+                  "endColumn": 23
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0234",
+          "level": "error",
+          "message": "The type or namespace name 'WebDTOs' does not exist in the namespace 'MovieApp' (are you missing an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Http/MovieTournamentProxyRepository.cs",
+                "region": {
+                  "startLine": 5,
+                  "startColumn": 16,
+                  "endLine": 5,
+                  "endColumn": 23
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0234",
+          "level": "error",
+          "message": "The type or namespace name 'WebDTOs' does not exist in the namespace 'MovieApp' (are you missing an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Http/PreferenceProxyRepository.cs",
+                "region": {
+                  "startLine": 4,
+                  "startColumn": 16,
+                  "endLine": 4,
+                  "endColumn": 23
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0234",
+          "level": "error",
+          "message": "The type or namespace name 'WebDTOs' does not exist in the namespace 'MovieApp' (are you missing an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Http/ProfileProxyRepository.cs",
+                "region": {
+                  "startLine": 5,
+                  "startColumn": 16,
+                  "endLine": 5,
+                  "endColumn": 23
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0234",
+          "level": "error",
+          "message": "The type or namespace name 'WebDTOs' does not exist in the namespace 'MovieApp' (are you missing an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Http/ReelProxyRepository.cs",
+                "region": {
+                  "startLine": 5,
+                  "startColumn": 16,
+                  "endLine": 5,
+                  "endColumn": 23
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0234",
+          "level": "error",
+          "message": "The type or namespace name 'WebDTOs' does not exist in the namespace 'MovieApp' (are you missing an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Http/ReviewProxyRepository.cs",
+                "region": {
+                  "startLine": 5,
+                  "startColumn": 16,
+                  "endLine": 5,
+                  "endColumn": 23
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0234",
+          "level": "error",
+          "message": "The type or namespace name 'WebDTOs' does not exist in the namespace 'MovieApp' (are you missing an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Http/ScrapeJobProxyRepository.cs",
+                "region": {
+                  "startLine": 5,
+                  "startColumn": 16,
+                  "endLine": 5,
+                  "endColumn": 23
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0234",
+          "level": "error",
+          "message": "The type or namespace name 'WebDTOs' does not exist in the namespace 'MovieApp' (are you missing an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Http/TransactionProxyRepository.cs",
+                "region": {
+                  "startLine": 4,
+                  "startColumn": 16,
+                  "endLine": 4,
+                  "endColumn": 23
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0234",
+          "level": "error",
+          "message": "The type or namespace name 'WebDTOs' does not exist in the namespace 'MovieApp' (are you missing an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Http/UserProxyRepository.cs",
+                "region": {
+                  "startLine": 4,
+                  "startColumn": 16,
+                  "endLine": 4,
+                  "endColumn": 23
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0234",
+          "level": "error",
+          "message": "The type or namespace name 'WebDTOs' does not exist in the namespace 'MovieApp' (are you missing an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Http/VideoStorageProxyRepository.cs",
+                "region": {
+                  "startLine": 4,
+                  "startColumn": 16,
+                  "endLine": 4,
+                  "endColumn": 23
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0246",
+          "level": "error",
+          "message": "The type or namespace name 'IPreferenceRepository' could not be found (are you missing a using directive or an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Features/MovieSwipe/SwipeService.cs",
+                "region": {
+                  "startLine": 15,
+                  "startColumn": 26,
+                  "endLine": 15,
+                  "endColumn": 47
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0246",
+          "level": "error",
+          "message": "The type or namespace name 'IPreferenceRepository' could not be found (are you missing a using directive or an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Features/MovieSwipe/SwipeService.cs",
+                "region": {
+                  "startLine": 17,
+                  "startColumn": 29,
+                  "endLine": 17,
+                  "endColumn": 50
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0246",
+          "level": "error",
+          "message": "The type or namespace name 'IPersonalityMatchRepository' could not be found (are you missing a using directive or an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Features/PersonalityMatch/PersonalityMatchingService.cs",
+                "region": {
+                  "startLine": 15,
+                  "startColumn": 26,
+                  "endLine": 15,
+                  "endColumn": 53
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0246",
+          "level": "error",
+          "message": "The type or namespace name 'IPersonalityMatchRepository' could not be found (are you missing a using directive or an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Features/PersonalityMatch/PersonalityMatchingService.cs",
+                "region": {
+                  "startLine": 40,
+                  "startColumn": 43,
+                  "endLine": 40,
+                  "endColumn": 70
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0246",
+          "level": "error",
+          "message": "The type or namespace name 'IAudioLibraryRepository' could not be found (are you missing a using directive or an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Features/ReelsEditing/VideoProcessingService.cs",
+                "region": {
+                  "startLine": 66,
+                  "startColumn": 26,
+                  "endLine": 66,
+                  "endColumn": 49
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0246",
+          "level": "error",
+          "message": "The type or namespace name 'IAudioLibraryRepository' could not be found (are you missing a using directive or an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Features/ReelsEditing/VideoProcessingService.cs",
+                "region": {
+                  "startLine": 68,
+                  "startColumn": 39,
+                  "endLine": 68,
+                  "endColumn": 62
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0246",
+          "level": "error",
+          "message": "The type or namespace name 'IVideoStorageRepository' could not be found (are you missing a using directive or an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Features/ReelsUpload/VideoStorageService.cs",
+                "region": {
+                  "startLine": 13,
+                  "startColumn": 26,
+                  "endLine": 13,
+                  "endColumn": 49
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0246",
+          "level": "error",
+          "message": "The type or namespace name 'IMovieTournamentRepository' could not be found (are you missing a using directive or an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Features/MovieTournament/TournamentLogicService.cs",
+                "region": {
+                  "startLine": 17,
+                  "startColumn": 26,
+                  "endLine": 17,
+                  "endColumn": 52
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0246",
+          "level": "error",
+          "message": "The type or namespace name 'IProfileRepository' could not be found (are you missing a using directive or an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Features/ReelsFeed/EngagementProfileService.cs",
+                "region": {
+                  "startLine": 12,
+                  "startColumn": 26,
+                  "endLine": 12,
+                  "endColumn": 44
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0246",
+          "level": "error",
+          "message": "The type or namespace name 'IRecommendationRepository' could not be found (are you missing a using directive or an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Features/ReelsFeed/RecommendationService.cs",
+                "region": {
+                  "startLine": 15,
+                  "startColumn": 26,
+                  "endLine": 15,
+                  "endColumn": 51
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0246",
+          "level": "error",
+          "message": "The type or namespace name 'IInteractionRepository' could not be found (are you missing a using directive or an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Features/ReelsFeed/ReelInteractionService.cs",
+                "region": {
+                  "startLine": 14,
+                  "startColumn": 26,
+                  "endLine": 14,
+                  "endColumn": 48
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0246",
+          "level": "error",
+          "message": "The type or namespace name 'IVideoStorageRepository' could not be found (are you missing a using directive or an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Features/ReelsUpload/VideoStorageService.cs",
+                "region": {
+                  "startLine": 22,
+                  "startColumn": 36,
+                  "endLine": 22,
+                  "endColumn": 59
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0246",
+          "level": "error",
+          "message": "The type or namespace name 'IProfileRepository' could not be found (are you missing a using directive or an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Features/ReelsFeed/EngagementProfileService.cs",
+                "region": {
+                  "startLine": 14,
+                  "startColumn": 41,
+                  "endLine": 14,
+                  "endColumn": 59
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0246",
+          "level": "error",
+          "message": "The type or namespace name 'IMovieTournamentRepository' could not be found (are you missing a using directive or an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Features/MovieTournament/TournamentLogicService.cs",
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 39,
+                  "endLine": 21,
+                  "endColumn": 65
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0246",
+          "level": "error",
+          "message": "The type or namespace name 'IRecommendationRepository' could not be found (are you missing a using directive or an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Features/ReelsFeed/RecommendationService.cs",
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 38,
+                  "endLine": 21,
+                  "endColumn": 63
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0246",
+          "level": "error",
+          "message": "The type or namespace name 'IPreferenceRepository' could not be found (are you missing a using directive or an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Features/ReelsFeed/ReelInteractionService.cs",
+                "region": {
+                  "startLine": 15,
+                  "startColumn": 26,
+                  "endLine": 15,
+                  "endColumn": 47
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0246",
+          "level": "error",
+          "message": "The type or namespace name 'IScrapeRepository' could not be found (are you missing a using directive or an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Features/TrailerScraping/VideoIngestionService.cs",
+                "region": {
+                  "startLine": 45,
+                  "startColumn": 26,
+                  "endLine": 45,
+                  "endColumn": 43
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0246",
+          "level": "error",
+          "message": "The type or namespace name 'IScrapeRepository' could not be found (are you missing a using directive or an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Features/TrailerScraping/VideoIngestionService.cs",
+                "region": {
+                  "startLine": 50,
+                  "startColumn": 13,
+                  "endLine": 50,
+                  "endColumn": 30
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0246",
+          "level": "error",
+          "message": "The type or namespace name 'IInteractionRepository' could not be found (are you missing a using directive or an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Features/ReelsFeed/ReelInteractionService.cs",
+                "region": {
+                  "startLine": 18,
+                  "startColumn": 13,
+                  "endLine": 18,
+                  "endColumn": 35
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS0246",
+          "level": "error",
+          "message": "The type or namespace name 'IPreferenceRepository' could not be found (are you missing a using directive or an assembly reference?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/waytoounoriginal/source/repos/UBB-SE-2026-927-1/src/MovieApp/MovieApp.Logic/Features/ReelsFeed/ReelInteractionService.cs",
+                "region": {
+                  "startLine": 19,
+                  "startColumn": 13,
+                  "endLine": 19,
+                  "endColumn": 34
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "rules": {
+        "CS0234": {
+          "id": "CS0234",
+          "defaultLevel": "error",
+          "helpUri": "https://msdn.microsoft.com/query/roslyn.query?appId=roslyn&k=k(CS0234)",
+          "properties": {
+            "category": "Compiler",
+            "isEnabledByDefault": true,
+            "tags": [
+              "Compiler",
+              "Telemetry",
+              "NotConfigurable"
+            ]
+          }
+        },
+        "CS0246": {
+          "id": "CS0246",
+          "defaultLevel": "error",
+          "helpUri": "https://msdn.microsoft.com/query/roslyn.query?appId=roslyn&k=k(CS0246)",
+          "properties": {
+            "category": "Compiler",
+            "isEnabledByDefault": true,
+            "tags": [
+              "Compiler",
+              "Telemetry",
+              "NotConfigurable"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

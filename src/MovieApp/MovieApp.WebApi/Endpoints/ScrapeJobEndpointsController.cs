@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MovieApp.DataLayer.Interfaces;
-using MovieApp.WebDTOs.DTOs;
+using MovieApp.WebDTOs.DTOs.RequestDTOs;
 using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Models;
 using MovieApp.DataLayer.Repositories;

@@ -1,8 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MovieApp.DataLayer.Models;
-using MovieApp.Features.PersonalityMatch.Models;
-using MovieApp.Features.PersonalityMatch.Services;
+using MovieApp.Logic.Features.PersonalityMatch;
 
 namespace MovieApp.Features.PersonalityMatch.ViewModels
 {

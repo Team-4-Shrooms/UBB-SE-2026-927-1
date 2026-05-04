@@ -1,4 +1,4 @@
-namespace MovieApp.WebDTOs.DTOs;
+namespace MovieApp.WebDTOs.DTOs.RequestDTOs;
 
 public sealed class EquipmentListItemRequestBody
 {

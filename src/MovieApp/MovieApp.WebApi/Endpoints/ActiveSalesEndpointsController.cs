@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MovieApp.DataLayer.Repositories;
+using MovieApp.WebApi.Mappings;
 
 namespace MovieApp.WebApi.Endpoints;
 
@@ -18,31 +19,7 @@ public sealed class ActiveSalesEndpointsController : ControllerBase
     public async Task<IActionResult> GetCurrentSales()
     {
         var currentSales = (await _repository.GetCurrentSalesAsync())
-            .Select(sale => new ActiveSaleResponse
-            {
-                Id = sale.Id,
-                DiscountPercentage = sale.DiscountPercentage,
-                StartTime = sale.StartTime,
-                EndTime = sale.EndTime,
-                Movie = sale.Movie is null ? null : new MovieReferenceResponse
-                {
-                    Id = sale.Movie.Id
-                }
-            });
+            .Select(sale => sale.ToDto());
         return Ok(currentSales);
-    }
-
-    private sealed class ActiveSaleResponse
-    {
-        public int Id { get; set; }
-        public decimal DiscountPercentage { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
-        public MovieReferenceResponse? Movie { get; set; }
-    }
-
-    private sealed class MovieReferenceResponse
-    {
-        public int Id { get; set; }
     }
 }

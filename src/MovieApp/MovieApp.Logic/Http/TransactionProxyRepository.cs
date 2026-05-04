@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using MovieApp.DataLayer.Interfaces.Repositories;
 using MovieApp.DataLayer.Models;
+using MovieApp.WebDTOs.DTOs.RequestDTOs;
 
 namespace MovieApp.Logic.Http
 {
@@ -15,18 +16,18 @@ namespace MovieApp.Logic.Http
 
         public void LogTransaction(Transaction transaction)
         {
-            _apiClient.PostAsync("api/transactions", (object)new
+            _apiClient.PostAsync("api/transactions", new LogTransactionRequestBody
             {
-                amount = transaction.Amount,
-                type = transaction.Type,
-                status = transaction.Status,
-                timestamp = transaction.Timestamp,
-                shippingAddress = transaction.ShippingAddress,
-                buyerId = transaction.Buyer?.Id ?? 0,
-                sellerId = transaction.Seller?.Id,
-                equipmentId = transaction.Equipment?.Id,
-                movieId = transaction.Movie?.Id,
-                eventId = transaction.Event?.Id,
+                Amount = transaction.Amount,
+                Type = transaction.Type,
+                Status = transaction.Status,
+                Timestamp = transaction.Timestamp,
+                ShippingAddress = transaction.ShippingAddress,
+                BuyerId = transaction.Buyer?.Id ?? 0,
+                SellerId = transaction.Seller?.Id,
+                EquipmentId = transaction.Equipment?.Id,
+                MovieId = transaction.Movie?.Id,
+                EventId = transaction.Event?.Id,
             }).GetAwaiter().GetResult();
         }
 
@@ -37,7 +38,7 @@ namespace MovieApp.Logic.Http
 
         public void UpdateTransactionStatus(int transactionId, string newStatus)
         {
-            var payload = new { newStatus };
+            var payload = new UpdateTransactionStatusRequestBody { NewStatus = newStatus };
             _apiClient.PutAsync($"api/transactions/{transactionId}/status", payload).GetAwaiter().GetResult();
         }
     }

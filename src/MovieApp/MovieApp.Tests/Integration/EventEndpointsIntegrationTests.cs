@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
-using MovieApp.WebDTOs.DTOs;
+using MovieApp.WebApi.DTOs;
+using MovieApp.WebDTOs.DTOs.RequestDTOs;
 
 namespace MovieApp.Tests.Integration
 {

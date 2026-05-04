@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Interfaces.Repositories;
 using MovieApp.DataLayer.Models;
+using MovieApp.WebDTOs.DTOs.RequestDTOs;
 
 namespace MovieApp.Logic.Http
 {
@@ -67,21 +68,21 @@ namespace MovieApp.Logic.Http
 
         public async Task<int> InsertScrapedReelAsync(Reel reel)
         {
-            int? createdReelId = await _apiClient.PostAsync<int>("api/scrape-jobs/reels", new
+            int? createdReelId = await _apiClient.PostAsync<int>("api/scrape-jobs/reels", new InsertReelRequestBody
             {
-                videoUrl = reel.VideoUrl,
-                thumbnailUrl = reel.ThumbnailUrl,
-                title = reel.Title,
-                caption = reel.Caption,
-                featureDurationSeconds = reel.FeatureDurationSeconds,
-                cropDataJson = reel.CropDataJson,
-                backgroundMusicId = reel.BackgroundMusicId,
-                source = reel.Source,
-                genre = reel.Genre,
-                createdAt = reel.CreatedAt,
-                lastEditedAt = reel.LastEditedAt,
-                movieId = reel.Movie?.Id ?? 0,
-                creatorUserId = reel.CreatorUser?.Id ?? 0,
+                VideoUrl = reel.VideoUrl,
+                ThumbnailUrl = reel.ThumbnailUrl,
+                Title = reel.Title,
+                Caption = reel.Caption,
+                FeatureDurationSeconds = reel.FeatureDurationSeconds,
+                CropDataJson = reel.CropDataJson,
+                BackgroundMusicId = reel.BackgroundMusicId,
+                Source = reel.Source,
+                Genre = reel.Genre,
+                CreatedAt = reel.CreatedAt,
+                LastEditedAt = reel.LastEditedAt,
+                MovieId = reel.Movie?.Id ?? 0,
+                CreatorUserId = reel.CreatorUser?.Id ?? 0,
             });
             return createdReelId ?? 0;
         }

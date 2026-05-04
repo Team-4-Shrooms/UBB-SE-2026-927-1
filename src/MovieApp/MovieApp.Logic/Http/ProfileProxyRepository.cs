@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Interfaces.Repositories;
 using MovieApp.DataLayer.Models;
+using MovieApp.WebDTOs.DTOs.RequestDTOs;
 
 namespace MovieApp.Logic.Http
 {
@@ -26,15 +27,15 @@ namespace MovieApp.Logic.Http
 
         public async Task AddProfileAsync(UserProfile profile)
         {
-            await _apiClient.PostAsync("api/profiles", (object)new
+            await _apiClient.PostAsync("api/profiles", new UpsertProfileRequestBody
             {
-                totalLikes = profile.TotalLikes,
-                totalWatchTimeSeconds = profile.TotalWatchTimeSeconds,
-                averageWatchTimeSeconds = profile.AverageWatchTimeSeconds,
-                totalClipsViewed = profile.TotalClipsViewed,
-                likeToViewRatio = profile.LikeToViewRatio,
-                lastUpdated = profile.LastUpdated,
-                userId = profile.User?.Id ?? 0,
+                TotalLikes = profile.TotalLikes,
+                TotalWatchTimeSeconds = profile.TotalWatchTimeSeconds,
+                AverageWatchTimeSeconds = profile.AverageWatchTimeSeconds,
+                TotalClipsViewed = profile.TotalClipsViewed,
+                LikeToViewRatio = profile.LikeToViewRatio,
+                LastUpdated = profile.LastUpdated,
+                UserId = profile.User?.Id ?? 0,
             });
         }
 

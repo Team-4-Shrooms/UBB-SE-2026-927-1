@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Interfaces.Repositories;
 using MovieApp.DataLayer.Models;
+using MovieApp.WebDTOs.DTOs.RequestDTOs;
 
 namespace MovieApp.Logic.Http
 {
@@ -31,27 +32,27 @@ namespace MovieApp.Logic.Http
 
         public async Task AddOwnedMovieAsync(OwnedMovie ownership)
         {
-            await _apiClient.PostAsync("api/inventory/ownedmovies", (object)new
+            await _apiClient.PostAsync("api/inventory/ownedmovies", new AddOwnedMovieRequestBody
             {
-                userId = ownership.User?.Id ?? 0,
-                movieId = ownership.Movie?.Id ?? 0,
+                UserId = ownership.User?.Id ?? 0,
+                MovieId = ownership.Movie?.Id ?? 0,
             });
         }
 
         public async Task AddTransactionAsync(Transaction transaction)
         {
-            await _apiClient.PostAsync("api/transactions", (object)new
+            await _apiClient.PostAsync("api/transactions", new LogTransactionRequestBody
             {
-                amount = transaction.Amount,
-                type = transaction.Type,
-                status = transaction.Status,
-                timestamp = transaction.Timestamp,
-                shippingAddress = transaction.ShippingAddress,
-                buyerId = transaction.Buyer?.Id ?? 0,
-                sellerId = transaction.Seller?.Id,
-                equipmentId = transaction.Equipment?.Id,
-                movieId = transaction.Movie?.Id,
-                eventId = transaction.Event?.Id,
+                Amount = transaction.Amount,
+                Type = transaction.Type,
+                Status = transaction.Status,
+                Timestamp = transaction.Timestamp,
+                ShippingAddress = transaction.ShippingAddress,
+                BuyerId = transaction.Buyer?.Id ?? 0,
+                SellerId = transaction.Seller?.Id,
+                EquipmentId = transaction.Equipment?.Id,
+                MovieId = transaction.Movie?.Id,
+                EventId = transaction.Event?.Id,
             });
         }
 

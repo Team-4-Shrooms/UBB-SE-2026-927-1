@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Interfaces.Repositories;
 using MovieApp.DataLayer.Models;
+using MovieApp.WebDTOs.DTOs.RequestDTOs;
 
 namespace MovieApp.Logic.Http
 {
@@ -26,11 +27,11 @@ namespace MovieApp.Logic.Http
 
         public async Task<int> UpdateReelEditsAsync(int reelId, string cropDataJson, int? backgroundMusicId, string videoUrl)
         {
-            var payload = new 
+            var payload = new UpdateReelEditsRequestBody 
             { 
-                cropDataJson, 
-                backgroundMusicId, 
-                videoUrl 
+                CropDataJson = cropDataJson, 
+                BackgroundMusicId = backgroundMusicId, 
+                VideoUrl = videoUrl 
             };
             
             await _apiClient.PutAsync($"api/reels/{reelId}", payload);

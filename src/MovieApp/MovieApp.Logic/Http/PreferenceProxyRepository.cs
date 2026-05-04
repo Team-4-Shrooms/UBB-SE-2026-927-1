@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Interfaces.Repositories;
 using MovieApp.DataLayer.Models;
+using MovieApp.WebDTOs.DTOs.RequestDTOs;
 
 namespace MovieApp.Logic.Http
 {
@@ -20,13 +21,13 @@ namespace MovieApp.Logic.Http
 
         public async Task InsertPreferenceAsync(int userId, int movieId, decimal score)
         {
-            var payload = new { userId, movieId, score };
+            var payload = new InsertPreferenceRequestBody { UserId = userId, MovieId = movieId, Score = score };
             await _apiClient.PostAsync("api/preferences", (object)payload);
         }
 
         public async Task UpdatePreferenceAsync(int userId, int movieId, decimal boost)
         {
-            var payload = new { boost };
+            var payload = new UpdatePreferenceRequestBody { Boost = boost };
             await _apiClient.PutAsync($"api/preferences/users/{userId}/movies/{movieId}/boost", payload);
         }
 

@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Interfaces.Repositories;
 using MovieApp.DataLayer.Models;
+using MovieApp.WebDTOs.DTOs.RequestDTOs;
 
 namespace MovieApp.Logic.Http
 {
@@ -46,7 +47,7 @@ namespace MovieApp.Logic.Http
         {
             try
             {
-                var payload = new { newBalance };
+                var payload = new UpdateBalanceRequestBody { NewBalance = newBalance };
                 _apiClient.PutAsync($"api/users/{userId}/balance", payload).GetAwaiter().GetResult();
             }
             catch
@@ -59,7 +60,7 @@ namespace MovieApp.Logic.Http
         {
             try
             {
-                var payload = new { newBalance };
+                var payload = new UpdateBalanceRequestBody { NewBalance = newBalance };
                 await _apiClient.PutAsync($"api/users/{userId}/balance", payload);
             }
             catch

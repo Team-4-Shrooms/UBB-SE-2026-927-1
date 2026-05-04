@@ -125,7 +125,13 @@ namespace MovieApp.Logic.Http
             {
                 var response = await _httpClient.PostAsJsonAsync(AppendUserIdQuery(endpoint), data, JsonOptions);
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions);
+                try
+                {
+                    return await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions);
+                }
+                catch (JsonException e) {
+                    return new Task<TResponse?>(null).Result;
+                }
             }
             catch (HttpRequestException ex)
             {
@@ -168,7 +174,10 @@ namespace MovieApp.Logic.Http
 
         private static JsonSerializerOptions CreateJsonOptions()
         {
-            JsonSerializerOptions options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+            JsonSerializerOptions options = new JsonSerializerOptions(JsonSerializerDefaults.Web)
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
             options.Converters.Add(new JsonStringEnumConverter());
             return options;
         }
