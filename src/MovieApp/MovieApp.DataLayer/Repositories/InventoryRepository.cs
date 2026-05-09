@@ -51,6 +51,15 @@ namespace MovieApp.DataLayer.Repositories
             return Task.CompletedTask;
         }
 
+        public async Task<List<OwnedTicket>> GetAllTicketsForUserAsync(int userId)
+        {
+            return await _context.OwnedTickets
+                .Include(ownedTicket => ownedTicket.Event)
+                    .ThenInclude(movieEvent => movieEvent.Movie)
+                .Where(ot => ot.User.Id == userId)
+                .ToListAsync();
+        }
+
         public async Task AddTransactionAsync(Transaction transaction)
         {
             await _context.Transactions.AddAsync(transaction);

@@ -33,6 +33,13 @@ namespace MovieApp.DataLayer.Interfaces.Repositories
         Task<IList<ScrapeJob>> GetAllJobsAsync();
 
         /// <summary>
+        /// Retrieves a specific scrape job by its ID.
+        /// </summary>
+        /// <param name="jobId">The unique identifier of the scrape job.</param>
+        /// <returns>The scrape job if found; otherwise, null.</returns>
+        Task<ScrapeJob?> GetJobByIdAsync(int jobId);
+
+        /// <summary>
         /// Retrieves log entries for a specific job ordered by timestamp.
         /// </summary>
         /// <param name="jobId">The unique identifier of the scrape job.</param>
