@@ -64,6 +64,16 @@ namespace MovieApp.Logic.Services
 
             await _equipmentRepo.SaveChangesAsync();
         }
+
+        public async Task<List<Equipment>> GetAvailableEquipmentAsync()
+        {
+            return await _equipmentRepo.FetchAvailableEquipmentAsync();
+        }
+
+        public async Task<Equipment?> GetEquipmentByIdAsync(int id)
+        {
+            return await _equipmentRepo.GetByIdAsync(id);
+        }
     }
 }
 

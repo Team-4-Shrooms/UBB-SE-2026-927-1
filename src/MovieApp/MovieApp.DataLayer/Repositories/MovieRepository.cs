@@ -17,6 +17,11 @@ namespace MovieApp.DataLayer.Repositories
             return await _context.Movies.FindAsync(movieId);
         }
 
+        public async Task<List<Movie>> GetAllMoviesAsync()
+        {
+            return await _context.Movies.ToListAsync();
+        }
+
         public async Task<bool> UserOwnsMovieAsync(int userId, int movieId)
         {
             return await _context.OwnedMovies.AnyAsync(om => om.User.Id == userId && om.Movie.Id == movieId);

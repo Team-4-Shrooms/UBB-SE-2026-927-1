@@ -12,6 +12,7 @@ namespace MovieApp.Logic.Features.ReelsUpload
     public class VideoStorageService : IVideoStorageService
     {
         private readonly IVideoStorageRepository memoryRepository;
+        private readonly IReelRepository reelRepository;
         private readonly string blobStorageDirectory;
 
         private const string VideoFileExtension = ".mp4";
@@ -20,9 +21,10 @@ namespace MovieApp.Logic.Features.ReelsUpload
         private const int NullId = 0;
         private const double MaximumReelDurationSeconds = 60.0;
 
-        public VideoStorageService(IVideoStorageRepository memoryRepository)
+        public VideoStorageService(IVideoStorageRepository memoryRepository, IReelRepository reelRepository)
         {
             this.memoryRepository = memoryRepository;
+            this.reelRepository = reelRepository;
 
             blobStorageDirectory = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -70,6 +72,11 @@ namespace MovieApp.Logic.Features.ReelsUpload
             };
 
             return await memoryRepository.InsertReelAsync(newReel);
+        }
+
+        public async Task<IList<Reel>> GetUserReelsAsync(int userId)
+        {
+            return await reelRepository.GetUserReelsAsync(userId);
         }
     }
 }

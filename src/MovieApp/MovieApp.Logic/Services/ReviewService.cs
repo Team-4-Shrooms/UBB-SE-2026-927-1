@@ -49,6 +49,11 @@ namespace MovieApp.Logic.Services
             });
             await _reviewRepo.SaveChangesAsync();
         }
+
+        public async Task<List<MovieReview>> GetReviewsForMovieAsync(int movieId)
+        {
+            return await _reviewRepo.GetReviewsForMovieAsync(movieId);
+        }
     }
 }
 
