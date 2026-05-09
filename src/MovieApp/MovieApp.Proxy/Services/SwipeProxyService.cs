@@ -14,7 +14,7 @@ namespace MovieApp.Proxy.Services
 
         public async Task UpdatePreferenceScoreAsync(int userId, int movieId, bool isLiked)
         {
-            await _apiClient.PostAsync($"api/swipe/{userId}/preference", new { MovieId = movieId, IsLiked = isLiked });
+            await _apiClient.PutAsync($"api/swipe/{userId}/preference", new { MovieId = movieId, IsLiked = isLiked });
         }
     }
 }

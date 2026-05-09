@@ -16,17 +16,17 @@ namespace MovieApp.DataLayer.Repositories
         {
             return await _context.OwnedMovies
                 .Include(ownedMovie => ownedMovie.Movie)
-                .Where(om => om.User.Id == userId)
-                .Select(om => om.Movie)
+                .Where(ownedMovie => ownedMovie.User.Id == userId)
+                .Select(ownedMovie => ownedMovie.Movie)
                 .ToListAsync();
         }
 
         public async Task<List<OwnedMovie>> GetMovieOwnershipsAsync(int userId, int movieId)
         {
             return await _context.OwnedMovies
-                .Include(om => om.User)
-                .Include(om => om.Movie)
-                .Where(om => om.User.Id == userId && om.Movie.Id == movieId)
+                .Include(ownedMovie => ownedMovie.User)
+                .Include(ownedMovie => ownedMovie.Movie)
+                .Where(ownedMovie => ownedMovie.User.Id == userId && ownedMovie.Movie.Id == movieId)
                 .ToListAsync();
         }
 
@@ -41,7 +41,7 @@ namespace MovieApp.DataLayer.Repositories
             return await _context.OwnedTickets
                 .Include(ownedTicket => ownedTicket.Event)
                     .ThenInclude(movieEvent => movieEvent.Movie)
-                .Where(ot => ot.User.Id == userId && ot.Event.Id == eventId)
+                .Where(ownedTicket => ownedTicket.User.Id == userId && ownedTicket.Event.Id == eventId)
                 .ToListAsync();
         }
 
@@ -56,7 +56,7 @@ namespace MovieApp.DataLayer.Repositories
             return await _context.OwnedTickets
                 .Include(ownedTicket => ownedTicket.Event)
                     .ThenInclude(movieEvent => movieEvent.Movie)
-                .Where(ot => ot.User.Id == userId)
+                .Where(ownedTicket => ownedTicket.User.Id == userId)
                 .ToListAsync();
         }
 

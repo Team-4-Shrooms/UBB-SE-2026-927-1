@@ -15,12 +15,12 @@ namespace MovieApp.Proxy.Services
 
         public async Task ToggleLikeAsync(int userId, int reelId)
         {
-            await _apiClient.PostAsync($"api/reels/{reelId}/like?userId={userId}", new { });
+            await _apiClient.PutAsync($"api/reels/{reelId}/like?userId={userId}", new { });
         }
 
         public async Task RecordViewAsync(int userId, int reelId, double watchDurationSec, double watchPercentage)
         {
-            await _apiClient.PostAsync($"api/reels/{reelId}/view", new 
+            await _apiClient.PutAsync($"api/reels/{reelId}/view", new 
             { 
                 UserId = userId, 
                 WatchDurationSec = watchDurationSec, 
