@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Models;
 
@@ -12,5 +13,7 @@ namespace MovieApp.Logic.Features.TrailerScraping
     {
         Task<string> IngestVideoFromUrlAsync(string trailerUrl, int movieId);
         Task<ScrapeJob> RunScrapeJobAsync(Movie movie, int maxResults, Func<ScrapeJobLog, Task>? onLogEntry = null);
+        Task<ScrapeJob?> GetJobStatusAsync(int jobId);
+        Task<IList<ScrapeJob>> GetAllJobsAsync();
     }
 }

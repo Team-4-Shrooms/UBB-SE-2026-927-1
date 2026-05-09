@@ -11,6 +11,8 @@ namespace MovieApp.Logic.Interfaces.Services
     {
         Task ListItemAsync(Equipment item);
         Task PurchaseEquipmentAsync(int equipmentId, int buyerId, decimal price, string address);
+        Task<List<Equipment>> GetAvailableEquipmentAsync();
+        Task<Equipment?> GetEquipmentByIdAsync(int id);
     }
 }
 
