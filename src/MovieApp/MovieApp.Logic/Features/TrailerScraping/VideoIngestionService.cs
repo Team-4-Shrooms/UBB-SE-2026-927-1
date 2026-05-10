@@ -183,5 +183,15 @@ namespace MovieApp.Logic.Features.TrailerScraping
 
             return job;
         }
+
+        public async Task<ScrapeJob?> GetJobStatusAsync(int jobId)
+        {
+            return await this.repository.GetJobByIdAsync(jobId);
+        }
+
+        public async Task<IList<ScrapeJob>> GetAllJobsAsync()
+        {
+            return await this.repository.GetAllJobsAsync();
+        }
     }
 }

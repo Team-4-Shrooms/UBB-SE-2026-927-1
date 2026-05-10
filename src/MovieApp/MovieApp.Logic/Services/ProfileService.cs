@@ -12,11 +12,13 @@ namespace MovieApp.Logic.Services
     {
         private readonly IProfileRepository _profileRepo;
         private readonly IUserRepository _userRepo;
+        private readonly ITransactionRepository _transactionRepo;
 
-        public ProfileService(IProfileRepository profileRepo, IUserRepository userRepo)
+        public ProfileService(IProfileRepository profileRepo, IUserRepository userRepo, ITransactionRepository transactionRepo)
         {
             _profileRepo = profileRepo;
             _userRepo = userRepo;
+            _transactionRepo = transactionRepo;
         }
 
         public async Task<UserProfile> BuildProfileFromInteractionsAsync(int userId)
@@ -40,6 +42,17 @@ namespace MovieApp.Logic.Services
                 AverageWatchTimeSeconds = views == 0 ? 0m : (decimal)seconds / views,
                 LastUpdated = DateTime.UtcNow
             };
+        }
+
+        public async Task<decimal> GetUserBalanceAsync(int userId)
+        {
+            return await _userRepo.GetBalanceAsync(userId);
+        }
+
+        public async Task<List<Transaction>> GetUserTransactionsAsync(int userId, int page, int pageSize)
+        {
+            var transactions = _transactionRepo.GetTransactionsByUserId(userId);
+            return await Task.FromResult(transactions.Skip((page - 1) * pageSize).Take(pageSize).ToList());
         }
     }
 }

@@ -63,6 +63,16 @@ namespace MovieApp.Logic.Services
 
             await _eventRepo.SaveChangesAsync();
         }
+
+        public async Task<MovieEvent?> GetEventByIdAsync(int id)
+        {
+            return await _eventRepo.GetEventByIdAsync(id);
+        }
+
+        public async Task<bool> UserHasTicketAsync(int userId, int eventId)
+        {
+            return await _eventRepo.UserHasTicketAsync(userId, eventId);
+        }
     }
 }
 

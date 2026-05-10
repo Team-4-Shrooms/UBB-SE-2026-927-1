@@ -11,6 +11,9 @@ namespace MovieApp.Logic.Interfaces.Services
     {
         Task PurchaseMovieAsync(int userId, int movieId, decimal price);
         Task<List<Movie>> SearchMoviesAsync(string? partialName);
+        Task<Movie?> GetMovieByIdAsync(int id);
+        Task<List<Movie>> GetAllMoviesAsync();
+        Task<bool> UserOwnsMovieAsync(int userId, int movieId);
     }
 }
 

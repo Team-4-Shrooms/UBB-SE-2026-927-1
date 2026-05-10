@@ -11,6 +11,8 @@ namespace MovieApp.Logic.Interfaces.Services
     {
         Task<List<MovieEvent>> GetAvailableEventsAsync();
         Task PurchaseTicketAsync(int userId, int eventId);
+        Task<MovieEvent?> GetEventByIdAsync(int id);
+        Task<bool> UserHasTicketAsync(int userId, int eventId);
     }
 }
 

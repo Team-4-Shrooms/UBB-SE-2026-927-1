@@ -63,6 +63,14 @@ namespace MovieApp.DataLayer.Repositories
         }
 
         /// <inheritdoc />
+        public async Task<ScrapeJob?> GetJobByIdAsync(int jobId)
+        {
+            return await _context.ScrapeJobs
+                .Include(job => job.Logs)
+                .FirstOrDefaultAsync(job => job.Id == jobId);
+        }
+
+        /// <inheritdoc />
         public async Task<IList<ScrapeJobLog>> GetLogsForJobAsync(int jobId)
         {
             return await _context.ScrapeJobLogs

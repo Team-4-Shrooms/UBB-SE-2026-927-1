@@ -9,6 +9,7 @@ namespace MovieApp.DataLayer.Interfaces.Repositories
     public interface IMovieRepository
     {
         Task<Movie?> GetMovieByIdAsync(int movieId);
+        Task<List<Movie>> GetAllMoviesAsync();
         Task<List<Movie>> SearchMoviesAsync(string query, int limit);
         Task<bool> UserOwnsMovieAsync(int userId, int movieId);
         Task AddOwnedMovieAsync(OwnedMovie ownership);

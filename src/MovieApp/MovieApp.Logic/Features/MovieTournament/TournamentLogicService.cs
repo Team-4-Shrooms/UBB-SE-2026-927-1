@@ -94,6 +94,18 @@ namespace MovieApp.Logic.Features.MovieTournament
 
         public void ResetTournament() => this.activeTournamentState = null;
 
+        public Task<MatchPair?> GetCurrentMatchAsync(int userId) => Task.FromResult(GetCurrentMatch());
+
+        public Task<bool> IsTournamentCompleteAsync(int userId) => Task.FromResult(IsTournamentComplete());
+
+        public Task<Movie> GetFinalWinnerAsync(int userId) => Task.FromResult(GetFinalWinner());
+
+        public Task ResetTournamentAsync(int userId)
+        {
+            ResetTournament();
+            return Task.CompletedTask;
+        }
+
         private void GenerateNextRound()
         {
             List<Movie> roundWinners = new List<Movie>(this.activeTournamentState!.CurrentRoundWinners);

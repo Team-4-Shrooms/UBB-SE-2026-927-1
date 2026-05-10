@@ -64,6 +64,21 @@ namespace MovieApp.Logic.Services
             return await _movieRepository.SearchMoviesAsync(query ?? string.Empty, 10);
         }
 
+        public async Task<Movie?> GetMovieByIdAsync(int id)
+        {
+            return await _movieRepository.GetMovieByIdAsync(id);
+        }
+
+        public async Task<List<Movie>> GetAllMoviesAsync()
+        {
+            return await _movieRepository.GetAllMoviesAsync();
+        }
+
+        public async Task<bool> UserOwnsMovieAsync(int userId, int movieId)
+        {
+            return await _movieRepository.UserOwnsMovieAsync(userId, movieId);
+        }
+
     }
 }
 

@@ -75,6 +75,16 @@ namespace MovieApp.Logic.Services
 
             await _inventoryRepo.SaveChangesAsync();
         }
+
+        public async Task<List<Movie>> GetOwnedMoviesAsync(int userId)
+        {
+            return await _inventoryRepo.GetOwnedMoviesAsync(userId);
+        }
+
+        public async Task<List<OwnedTicket>> GetOwnedTicketsAsync(int userId)
+        {
+            return await _inventoryRepo.GetAllTicketsForUserAsync(userId);
+        }
     }
 }
 

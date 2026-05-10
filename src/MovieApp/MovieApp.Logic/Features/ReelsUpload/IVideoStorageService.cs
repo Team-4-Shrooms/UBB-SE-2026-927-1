@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using MovieApp.DataLayer.Models;
 
 namespace MovieApp.Logic.Features.ReelsUpload
@@ -10,5 +11,6 @@ namespace MovieApp.Logic.Features.ReelsUpload
     {
         Task<Reel> UploadVideoAsync(ReelUploadRequest request);
         Task<bool> ValidateVideoAsync(string localFilePath);
+        Task<IList<Reel>> GetUserReelsAsync(int userId);
     }
 }

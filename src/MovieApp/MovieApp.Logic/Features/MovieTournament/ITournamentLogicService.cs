@@ -16,5 +16,9 @@ namespace MovieApp.Logic.Features.MovieTournament
         MatchPair? GetCurrentMatch();
         bool IsTournamentComplete();
         Movie GetFinalWinner();
+        Task<MatchPair?> GetCurrentMatchAsync(int userId);
+        Task<bool> IsTournamentCompleteAsync(int userId);
+        Task<Movie> GetFinalWinnerAsync(int userId);
+        Task ResetTournamentAsync(int userId);
     }
 }

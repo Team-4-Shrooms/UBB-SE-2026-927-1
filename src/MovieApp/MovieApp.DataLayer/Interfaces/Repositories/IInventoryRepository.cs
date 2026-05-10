@@ -13,6 +13,7 @@ namespace MovieApp.DataLayer.Interfaces.Repositories
         Task RemoveMovieOwnershipsAsync(IEnumerable<OwnedMovie> ownerships);
         Task<List<OwnedTicket>> GetTicketOwnershipsAsync(int userId, int eventId);
         Task RemoveTicketOwnershipsAsync(IEnumerable<OwnedTicket> ownerships);
+        Task<List<OwnedTicket>> GetAllTicketsForUserAsync(int userId);
         Task AddTransactionAsync(Transaction transaction);
         Task<int> SaveChangesAsync();
     }
