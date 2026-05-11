@@ -160,14 +160,19 @@ using (IServiceScope scope = app.Services.CreateScope())
     {
         try
         {
+            // Use a short timeout so a locked __EFMigrationsHistory table (common after a
+            // previous crash) fails fast instead of blocking startup for 30+ seconds.
+            context.Database.SetCommandTimeout(TimeSpan.FromSeconds(5));
             await context.Database.MigrateAsync();
         }
         catch (Exception migEx)
         {
-            // DB may already exist with the correct schema but without an EF migration
-            // history entry (e.g. created by a previous EnsureCreated call or raw SQL).
-            // Log the warning and continue — seeding and BCrypt hashing still run.
-            Console.Error.WriteLine($"[Startup] MigrateAsync warning (non-fatal): {migEx.Message}");
+            Console.Error.WriteLine($"[Startup] MigrateAsync skipped (non-fatal): {migEx.Message}");
+        }
+        finally
+        {
+            // Restore normal timeout for seeding queries.
+            context.Database.SetCommandTimeout(TimeSpan.FromSeconds(30));
         }
     }
 
