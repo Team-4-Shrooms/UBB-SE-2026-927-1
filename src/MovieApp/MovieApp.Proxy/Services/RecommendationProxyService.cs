@@ -5,19 +5,21 @@ using MovieApp.Logic.Features.ReelsFeed;
 
 namespace MovieApp.Proxy.Services
 {
+    /// <summary>
+    /// Proxy implementation of IRecommendationService.
+    /// Delegates to the real RecommendationService backed by RecommendationProxyRepository,
+    /// so the personalized/cold-start ranking logic is preserved while data goes over HTTP.
+    /// </summary>
     public class RecommendationProxyService : IRecommendationService
     {
-        private readonly ApiClient _apiClient;
+        private readonly RecommendationService _inner;
 
         public RecommendationProxyService(ApiClient apiClient)
         {
-            _apiClient = apiClient;
+            _inner = new RecommendationService(new RecommendationProxyRepository(apiClient));
         }
 
-        public async Task<IList<Reel>> GetRecommendedReelsAsync(int userId, int count)
-        {
-            var result = await _apiClient.GetAsync<List<Reel>>($"api/recommendations/{userId}?count={count}");
-            return result ?? new List<Reel>();
-        }
+        public Task<IList<Reel>> GetRecommendedReelsAsync(int userId, int count)
+            => _inner.GetRecommendedReelsAsync(userId, count);
     }
 }
