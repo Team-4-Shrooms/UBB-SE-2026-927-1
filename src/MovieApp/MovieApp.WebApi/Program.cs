@@ -158,19 +158,36 @@ using (IServiceScope scope = app.Services.CreateScope())
     AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     if (context.Database.IsSqlServer())
     {
-        await context.Database.MigrateAsync();
+        try
+        {
+            await context.Database.MigrateAsync();
+        }
+        catch (Exception migEx)
+        {
+            // DB may already exist with the correct schema but without an EF migration
+            // history entry (e.g. created by a previous EnsureCreated call or raw SQL).
+            // Log the warning and continue — seeding and BCrypt hashing still run.
+            Console.Error.WriteLine($"[Startup] MigrateAsync warning (non-fatal): {migEx.Message}");
+        }
     }
 
-    DataSeeder seeder = new DataSeeder(context);
-    await seeder.SeedAsync();
-
-    // Replace placeholder hashes with real BCrypt hashes on first run.
-    foreach (var user in context.Users.Where(u => u.PasswordHash.StartsWith("placeholder_")))
+    try
     {
-        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(config["Auth:SeedPassword"] ?? "password123");
-    }
+        DataSeeder seeder = new DataSeeder(context);
+        await seeder.SeedAsync();
 
-    await context.SaveChangesAsync();
+        // Replace placeholder hashes with real BCrypt hashes on first run.
+        foreach (var user in context.Users.Where(u => u.PasswordHash.StartsWith("placeholder_")))
+        {
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(config["Auth:SeedPassword"] ?? "password123");
+        }
+
+        await context.SaveChangesAsync();
+    }
+    catch (Exception seedEx)
+    {
+        Console.Error.WriteLine($"[Startup] Seeding warning (non-fatal): {seedEx.Message}");
+    }
 }
 
 // Configure the HTTP request pipeline.
