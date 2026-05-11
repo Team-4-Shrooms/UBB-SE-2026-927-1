@@ -10,6 +10,7 @@
   <Project Path="MovieApp.Tests/MovieApp.Tests.csproj">
     <Platform Solution="*|x64" Project="x64" />
   </Project>
+  <Project Path="MovieApp.Web/MovieApp.Web.csproj" />
   <Project Path="MovieApp.WebApi/MovieApp.WebApi.csproj">
     <Platform Solution="*|x64" Project="x64" />
   </Project>
