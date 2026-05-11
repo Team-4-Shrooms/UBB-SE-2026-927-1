@@ -7,6 +7,7 @@ using MovieApp.Logic.Features.ReelsUpload;
 using MovieApp.Logic.Features.TrailerScraping;
 using MovieApp.Logic.Interfaces.Services;
 using MovieApp.Proxy;
+using MovieApp.Proxy.Services;
 using MovieApp.Web.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
