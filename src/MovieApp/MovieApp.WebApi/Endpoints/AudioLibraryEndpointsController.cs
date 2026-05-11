@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MovieApp.WebDTOs.DTOs.RequestDTOs;
 using MovieApp.WebApi.Mappings;
@@ -6,6 +7,7 @@ using MovieApp.WebDTOs.DTOs;
 
 namespace MovieApp.WebApi.Endpoints;
 
+[Authorize]
 [ApiController]
 [Route("api/audio-library")]
 public sealed class AudioLibraryEndpointsController : ControllerBase
