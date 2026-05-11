@@ -18,6 +18,12 @@ namespace MovieApp.DataLayer.Repositories
             return await _context.Users.FindAsync(id);
         }
 
+        public async Task<User?> GetUserByUsernameAsync(string username)
+        {
+            return await _context.Users
+                .FirstOrDefaultAsync(user => user.Username == username);
+        }
+
         public async Task<int> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync();

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MovieApp.WebDTOs.DTOs.RequestDTOs;
 using MovieApp.WebApi.Mappings;
@@ -8,6 +9,7 @@ using MovieApp.WebApi.DTOs;
 
 namespace MovieApp.WebApi.Endpoints;
 
+[Authorize]
 [ApiController]
 [Route("api/video-storage")]
 public sealed class VideoStorageEndpointsController : ControllerBase

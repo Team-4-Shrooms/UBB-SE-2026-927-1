@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieApp.WebDTOs.DTOs.RequestDTOs;
@@ -8,6 +9,7 @@ using MovieApp.DataLayer.Repositories;
 
 namespace MovieApp.WebApi.Endpoints;
 
+[Authorize]
 [ApiController]
 [Route("api/interactions")]
 public sealed class InteractionEndpointsController : ControllerBase

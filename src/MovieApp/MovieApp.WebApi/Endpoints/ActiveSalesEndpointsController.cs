@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MovieApp.DataLayer.Repositories;
 using MovieApp.WebApi.Mappings;
 
 namespace MovieApp.WebApi.Endpoints;
 
+[Authorize]
 [ApiController]
 [Route("api/active-sales")]
 public sealed class ActiveSalesEndpointsController : ControllerBase
