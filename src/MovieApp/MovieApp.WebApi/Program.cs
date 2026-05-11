@@ -46,25 +46,61 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IMovieAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
 
-// Repositories
-builder.Services.AddScoped<IActiveSalesRepository, ActiveSalesRepository>();
-builder.Services.AddScoped<IAudioLibraryRepository, AudioLibraryRepository>();
-builder.Services.AddScoped<IEquipmentRepository, EquipmentRepository>();
-builder.Services.AddScoped<IEventRepository, EventRepository>();
-builder.Services.AddScoped<IInteractionRepository, InteractionRepository>();
-builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
-builder.Services.AddScoped<IMovieRepository, MovieRepository>();
-builder.Services.AddScoped<IMovieTournamentRepository, MovieTournamentRepository>();
-builder.Services.AddScoped<IPersonalityMatchRepository, PersonalityMatchRepository>();
-builder.Services.AddScoped<IPreferenceRepository, PreferenceRepository>();
-builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
-builder.Services.AddScoped<IRecommendationRepository, RecommendationRepository>();
-builder.Services.AddScoped<IReelRepository, ReelRepository>();
-builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
-builder.Services.AddScoped<IScrapeRepository, ScrapeJobRepository>();
-builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IVideoStorageRepository, VideoStorageRepository>();
+// Repositories — concrete types registered first so controllers can inject them directly;
+// interface registrations delegate to the same scoped instance.
+builder.Services.AddScoped<ActiveSalesRepository>();
+builder.Services.AddScoped<IActiveSalesRepository>(sp => sp.GetRequiredService<ActiveSalesRepository>());
+
+builder.Services.AddScoped<AudioLibraryRepository>();
+builder.Services.AddScoped<IAudioLibraryRepository>(sp => sp.GetRequiredService<AudioLibraryRepository>());
+
+builder.Services.AddScoped<EquipmentRepository>();
+builder.Services.AddScoped<IEquipmentRepository>(sp => sp.GetRequiredService<EquipmentRepository>());
+
+builder.Services.AddScoped<EventRepository>();
+builder.Services.AddScoped<IEventRepository>(sp => sp.GetRequiredService<EventRepository>());
+
+builder.Services.AddScoped<InteractionRepository>();
+builder.Services.AddScoped<IInteractionRepository>(sp => sp.GetRequiredService<InteractionRepository>());
+
+builder.Services.AddScoped<InventoryRepository>();
+builder.Services.AddScoped<IInventoryRepository>(sp => sp.GetRequiredService<InventoryRepository>());
+
+builder.Services.AddScoped<MovieRepository>();
+builder.Services.AddScoped<IMovieRepository>(sp => sp.GetRequiredService<MovieRepository>());
+
+builder.Services.AddScoped<MovieTournamentRepository>();
+builder.Services.AddScoped<IMovieTournamentRepository>(sp => sp.GetRequiredService<MovieTournamentRepository>());
+
+builder.Services.AddScoped<PersonalityMatchRepository>();
+builder.Services.AddScoped<IPersonalityMatchRepository>(sp => sp.GetRequiredService<PersonalityMatchRepository>());
+
+builder.Services.AddScoped<PreferenceRepository>();
+builder.Services.AddScoped<IPreferenceRepository>(sp => sp.GetRequiredService<PreferenceRepository>());
+
+builder.Services.AddScoped<ProfileRepository>();
+builder.Services.AddScoped<IProfileRepository>(sp => sp.GetRequiredService<ProfileRepository>());
+
+builder.Services.AddScoped<RecommendationRepository>();
+builder.Services.AddScoped<IRecommendationRepository>(sp => sp.GetRequiredService<RecommendationRepository>());
+
+builder.Services.AddScoped<ReelRepository>();
+builder.Services.AddScoped<IReelRepository>(sp => sp.GetRequiredService<ReelRepository>());
+
+builder.Services.AddScoped<ReviewRepository>();
+builder.Services.AddScoped<IReviewRepository>(sp => sp.GetRequiredService<ReviewRepository>());
+
+builder.Services.AddScoped<ScrapeJobRepository>();
+builder.Services.AddScoped<IScrapeRepository>(sp => sp.GetRequiredService<ScrapeJobRepository>());
+
+builder.Services.AddScoped<TransactionRepository>();
+builder.Services.AddScoped<ITransactionRepository>(sp => sp.GetRequiredService<TransactionRepository>());
+
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<IUserRepository>(sp => sp.GetRequiredService<UserRepository>());
+
+builder.Services.AddScoped<VideoStorageRepository>();
+builder.Services.AddScoped<IVideoStorageRepository>(sp => sp.GetRequiredService<VideoStorageRepository>());
 
 // Core services
 builder.Services.AddScoped<IMovieService, MovieService>();
