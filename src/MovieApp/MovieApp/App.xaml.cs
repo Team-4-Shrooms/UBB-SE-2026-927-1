@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Net.Http;
 using CommunityToolkit.Mvvm.DependencyInjection;
@@ -7,6 +8,7 @@ using MovieApp.Logic.Interfaces.Services;
 using MovieApp.Proxy;
 using MovieApp.Proxy.Services;
 using MovieApp.Auth;
+using MovieApp.WebApi.Data;
 using MovieApp.Features.Marketplace.ViewModels;
 using MovieApp.Features.Wallet.ViewModels;
 
@@ -28,6 +30,10 @@ namespace MovieApp
         private void ConfigureServices()
         {
             var services = new ServiceCollection();
+
+            // Direct DB context — still used by some pages pending full proxy migration
+            var connectionString = "Server=localhost\\SQLEXPRESS;Database=MovieApp;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;";
+            services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 
             // Auth — login to WebApi and get JWT token
             var authProvider = new WinUiAuthTokenProvider();
