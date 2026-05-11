@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -48,6 +49,15 @@ namespace MovieApp.Tests.Integration
 
                 services.AddScoped<IMovieAppDbContext>(serviceProvider =>
                     serviceProvider.GetRequiredService<AppDbContext>());
+
+                // Replace JWT authentication with a no-op test handler so [Authorize]
+                // endpoints are accessible without a real token during integration tests.
+                services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = "Test";
+                    options.DefaultChallengeScheme = "Test";
+                    options.DefaultScheme = "Test";
+                }).AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", _ => { });
             });
         }
 

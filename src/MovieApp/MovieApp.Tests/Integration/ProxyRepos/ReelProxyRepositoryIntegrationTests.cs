@@ -1,5 +1,5 @@
 using MovieApp.DataLayer.Models;
-using MovieApp.Logic.Http;
+using MovieApp.Proxy;
 
 namespace MovieApp.Tests.Integration.ProxyRepos;
 
