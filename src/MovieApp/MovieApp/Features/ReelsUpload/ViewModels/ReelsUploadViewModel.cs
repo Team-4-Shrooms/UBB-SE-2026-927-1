@@ -2,9 +2,8 @@ using System;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Data.SqlClient;
 using MovieApp.DataLayer.Models;
-using MovieApp.DataLayer.Interfaces.Repositories;
+using MovieApp.Logic.Interfaces.Services;
 using MovieApp.Logic.Features.ReelsUpload;
 using System.Runtime.InteropServices;
 
@@ -17,17 +16,16 @@ namespace MovieApp.Features.ReelsUpload.ViewModels
     {
         //private readonly IAppWindowContext appWindowContext;
         private readonly IVideoStorageService videoStorageService;
-        private readonly IMovieRepository movieRepository;
+        private readonly IMovieService movieService;
 
         private const string UntitledName = "Untitled Reel";
 
         public ReelsUploadViewModel(
             IVideoStorageService videoStorageService,
-            IMovieRepository movieRepository)
+            IMovieService movieService)
         {
-            //this.appWindowContext = appWindowContext;
             this.videoStorageService = videoStorageService;
-            this.movieRepository = movieRepository;
+            this.movieService = movieService;
             SuggestedMovies = new ObservableCollection<Movie>();
         }
 
@@ -150,9 +148,7 @@ namespace MovieApp.Features.ReelsUpload.ViewModels
 
             try
             {
-                const int DefaultSearchLimit = 10;
-
-                System.Collections.Generic.List<Movie> searchResults = await movieRepository.SearchMoviesAsync(partialMovieName, DefaultSearchLimit);
+                System.Collections.Generic.List<Movie> searchResults = await movieService.SearchMoviesAsync(partialMovieName);
 
                 SuggestedMovies.Clear();
                 foreach (Movie movie in searchResults)

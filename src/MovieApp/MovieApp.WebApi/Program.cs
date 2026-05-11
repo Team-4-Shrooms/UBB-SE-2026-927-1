@@ -1,6 +1,9 @@
 using System.Reflection;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MovieApp.WebApi.Auth;
 using MovieApp.DataLayer;
 using MovieApp.DataLayer.Interfaces;
 using MovieApp.DataLayer.Interfaces.Repositories;
