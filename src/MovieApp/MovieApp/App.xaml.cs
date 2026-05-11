@@ -50,6 +50,10 @@ namespace MovieApp
             services.AddTransient<IMovieRepository, MovieRepository>();
             services.AddTransient<IActiveSalesRepository, ActiveSalesRepository>();
             services.AddTransient<IReviewRepository, ReviewRepository>();
+            services.AddTransient<IEquipmentRepository, EquipmentRepository>();
+            services.AddTransient<ITransactionRepository, TransactionRepository>();
+            services.AddTransient<IProfileRepository, ProfileRepository>();
+            services.AddTransient<IMovieTournamentRepository, MovieTournamentRepository>();
 
             // Auth — login to WebApi and get JWT token.
             // Task.Run avoids deadlocking the WinUI UI thread's sync context.
