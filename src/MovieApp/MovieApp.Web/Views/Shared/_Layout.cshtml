@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MovieApp</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/MovieApp.Web.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">MovieApp</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav flex-wrap">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Catalog" asp-action="Index">Movie Catalog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Marketplace" asp-action="Index">Marketplace</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Events" asp-action="Index">Events</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Inventory" asp-action="Index">Inventory</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Wallet" asp-action="Index">Wallet</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Swipe" asp-action="Index">Movie Swipe</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Tournament" asp-action="Index">Tournament</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="PersonalityMatch" asp-action="Index">Personality Match</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="ReelsFeed" asp-action="Index">Reels Feed</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="ReelsUpload" asp-action="Index">Reels Upload</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="ReelsEditing" asp-action="Index">Reels Editing</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="TrailerScraping" asp-action="Index">Trailer Scraping</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted mt-4">
+        <div class="container py-2">
+            &copy; 2026 - MovieApp
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
