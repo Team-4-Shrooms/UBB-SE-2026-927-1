@@ -7,6 +7,7 @@ namespace MovieApp.Features.TrailerScraping.ViewModels
     using CommunityToolkit.Mvvm.Input;
     using MovieApp.DataLayer.Models;
     using MovieApp.Logic.Features.TrailerScraping;
+    using MovieApp.Logic.Interfaces.Services;
 
     /// <summary>
     /// ViewModel for the Trailer Scraping admin dashboard.
@@ -23,7 +24,7 @@ namespace MovieApp.Features.TrailerScraping.ViewModels
         private const string StatusScraping = "Scraping...";
 
         private readonly IVideoIngestionService ingestionService;
-        private readonly IScrapeRepository repository;
+        private readonly IMovieService movieService;
 
         [ObservableProperty]
         private int totalMovies;
@@ -65,39 +66,39 @@ namespace MovieApp.Features.TrailerScraping.ViewModels
         /// Initializes a new instance of the <see cref="TrailerScrapingViewModel"/> class.
         /// </summary>
         /// <param name="ingestionService">The video ingestion service.</param>
-        /// <param name="repository">The scrape job repository.</param>
+        /// <param name="movieService">The movie service used for search and listing.</param>
         public TrailerScrapingViewModel(
             IVideoIngestionService ingestionService,
-            IScrapeRepository repository)
+            IMovieService movieService)
         {
             this.ingestionService = ingestionService;
-            this.repository = repository;
+            this.movieService = movieService;
         }
 
         /// <summary>
         /// Gets the collection of movies suggested by the search query.
         /// </summary>
-        public ObservableCollection<Movie> SuggestedMovies { get; } = new ();
+        public ObservableCollection<Movie> SuggestedMovies { get; } = new();
 
         /// <summary>
         /// Gets the available options for the maximum number of search results.
         /// </summary>
-        public List<int> MaxResultsOptions { get; } = new () { 5, 10, 15, 25, 50 };
+        public List<int> MaxResultsOptions { get; } = new() { 5, 10, 15, 25, 50 };
 
         /// <summary>
         /// Gets the collection of scrape job logs.
         /// </summary>
-        public ObservableCollection<ScrapeJobLog> LogEntries { get; } = new ();
+        public ObservableCollection<ScrapeJobLog> LogEntries { get; } = new();
 
         /// <summary>
         /// Gets the collection of all movies for the data table.
         /// </summary>
-        public ObservableCollection<Movie> MovieTableItems { get; } = new ();
+        public ObservableCollection<Movie> MovieTableItems { get; } = new();
 
         /// <summary>
         /// Gets the collection of all reels for the data table.
         /// </summary>
-        public ObservableCollection<Reel> ReelTableItems { get; } = new ();
+        public ObservableCollection<Reel> ReelTableItems { get; } = new();
 
         /// <summary>
         /// Called when the user picks a movie from the dropdown.
@@ -114,18 +115,14 @@ namespace MovieApp.Features.TrailerScraping.ViewModels
         /// <summary>
         /// Called by the Page when it loads to populate initial data.
         /// </summary>
-        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task InitializeAsync()
         {
             await this.RefreshAsync();
         }
 
         /// <summary>
-        /// Called when the user types in the AutoSuggestBox.
-        /// Queries the Movie table for case-insensitive matches.
+        /// Queries movies via IMovieService for case-insensitive matches.
         /// </summary>
-        /// <param name="query">The search query text.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
         [RelayCommand]
         private async Task SearchMoviesAsync(string query)
         {
@@ -141,7 +138,7 @@ namespace MovieApp.Features.TrailerScraping.ViewModels
 
             try
             {
-                IList<Movie> matches = await this.repository.SearchMoviesByNameAsync(query);
+                var matches = await this.movieService.SearchMoviesAsync(query);
                 this.SuggestedMovies.Clear();
 
                 foreach (Movie movieMatch in matches)
@@ -176,7 +173,6 @@ namespace MovieApp.Features.TrailerScraping.ViewModels
                     this.MaxResults,
                     onLogEntry: async logEntry =>
                     {
-                        // Dispatch to UI thread
 #if !IS_TEST_PROJECT
                         Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread()?.TryEnqueue(() =>
                         {
@@ -208,41 +204,45 @@ namespace MovieApp.Features.TrailerScraping.ViewModels
         {
             try
             {
-                MovieApp.DataLayer.Models.DashboardStatsModel stats = await this.repository.GetDashboardStatsAsync();
-                this.TotalMovies = stats.TotalMovies;
-                this.TotalReels = stats.TotalReels;
-                this.TotalJobs = stats.TotalJobs;
-                this.RunningJobs = stats.RunningJobs;
-                this.CompletedJobs = stats.CompletedJobs;
-                this.FailedJobs = stats.FailedJobs;
+                // Compute job stats from the ingestion service
+                IList<ScrapeJob> jobs = await this.ingestionService.GetAllJobsAsync();
+                this.TotalJobs = jobs.Count;
+                this.RunningJobs = 0;
+                this.CompletedJobs = 0;
+                this.FailedJobs = 0;
 
-                IList<ScrapeJobLog> logs = await this.repository.GetAllLogsAsync();
-                this.LogEntries.Clear();
-                foreach (ScrapeJobLog log in logs)
+                foreach (ScrapeJob job in jobs)
                 {
-                    this.LogEntries.Add(log);
+                    if (job.Status == "running")
+                    {
+                        this.RunningJobs++;
+                    }
+                    else if (job.Status == "completed")
+                    {
+                        this.CompletedJobs++;
+                    }
+                    else if (job.Status == "failed")
+                    {
+                        this.FailedJobs++;
+                    }
                 }
 
-                // Table viewers
-                IList<Movie> movies = await this.repository.GetAllMoviesAsync();
+                // Movie list from movie service
+                var movies = await this.movieService.GetAllMoviesAsync();
+                this.TotalMovies = movies.Count;
                 this.MovieTableItems.Clear();
-
                 foreach (Movie movie in movies)
                 {
                     this.MovieTableItems.Add(movie);
                 }
 
-                IList<Reel> reels = await this.repository.GetAllReelsAsync();
+                // Reels table not available via proxy; stubbed empty
+                this.TotalReels = 0;
                 this.ReelTableItems.Clear();
-
-                foreach (Reel reel in reels)
-                {
-                    this.ReelTableItems.Add(reel);
-                }
             }
             catch
             {
-                // Database may not be available during development
+                // API may not be available
             }
         }
     }
