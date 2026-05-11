@@ -1,4 +1,4 @@
-using MovieApp.Logic.Http;
+using MovieApp.Proxy;
 
 namespace MovieApp.Tests.Integration.ProxyRepos;
 
@@ -8,7 +8,7 @@ internal sealed class ProxyRepoIntegrationTestContext : IDisposable
     {
         Factory = new MovieAppWebApplicationFactory();
         HttpClient = Factory.CreateClient();
-        ApiClient = new ApiClient(HttpClient);
+        ApiClient = new ApiClient(HttpClient, new NullAuthTokenProvider());
     }
 
     public MovieAppWebApplicationFactory Factory { get; }

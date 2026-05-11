@@ -3,8 +3,15 @@ using MovieApp.Logic.Features.MovieSwipe;
 
 namespace MovieApp.Proxy.Services
 {
+    /// <summary>
+    /// Proxy implementation of ISwipeService.
+    /// Replicates SwipeService logic (check-then-insert-or-update) via preference endpoints.
+    /// </summary>
     public class SwipeProxyService : ISwipeService
     {
+        private const double LikeDelta = 1.0;
+        private const double SkipDelta = -0.5;
+
         private readonly ApiClient _apiClient;
 
         public SwipeProxyService(ApiClient apiClient)
@@ -14,7 +21,23 @@ namespace MovieApp.Proxy.Services
 
         public async Task UpdatePreferenceScoreAsync(int userId, int movieId, bool isLiked)
         {
-            await _apiClient.PutAsync($"api/swipe/{userId}/preference", new { MovieId = movieId, IsLiked = isLiked });
+            decimal delta = (decimal)(isLiked ? LikeDelta : SkipDelta);
+
+            bool exists = await _apiClient.GetAsync<bool>(
+                $"api/preferences/users/{userId}/movies/{movieId}/exists");
+
+            if (exists)
+            {
+                await _apiClient.PutAsync(
+                    $"api/preferences/users/{userId}/movies/{movieId}/boost",
+                    new { Boost = delta });
+            }
+            else
+            {
+                await _apiClient.PostAsync(
+                    "api/preferences",
+                    new { UserId = userId, MovieId = movieId, Score = delta });
+            }
         }
     }
 }

@@ -5,42 +5,33 @@ using MovieApp.Logic.Features.PersonalityMatch;
 
 namespace MovieApp.Proxy.Services
 {
+    /// <summary>
+    /// Proxy implementation of IPersonalityMatchingService.
+    /// Delegates to the real PersonalityMatchingService backed by PersonalityMatchProxyRepository,
+    /// so all cosine-similarity business logic is preserved while data fetching goes over HTTP.
+    /// </summary>
     public class PersonalityMatchingProxyService : IPersonalityMatchingService
     {
-        private readonly ApiClient _apiClient;
+        private readonly PersonalityMatchingService _inner;
 
         public PersonalityMatchingProxyService(ApiClient apiClient)
         {
-            _apiClient = apiClient;
+            _inner = new PersonalityMatchingService(new PersonalityMatchProxyRepository(apiClient));
         }
 
-        public async Task<List<MatchResult>> GetTopMatchesAsync(int userId, int count)
-        {
-            var result = await _apiClient.GetAsync<List<MatchResult>>($"api/personalitymatching/{userId}/matches?count={count}");
-            return result ?? new List<MatchResult>();
-        }
+        public Task<List<MatchResult>> GetTopMatchesAsync(int userId, int count)
+            => _inner.GetTopMatchesAsync(userId, count);
 
-        public async Task<List<MatchResult>> GetRandomUsersAsync(int userId, int count)
-        {
-            var result = await _apiClient.GetAsync<List<MatchResult>>($"api/personalitymatching/{userId}/random?count={count}");
-            return result ?? new List<MatchResult>();
-        }
+        public Task<List<MatchResult>> GetRandomUsersAsync(int userId, int count)
+            => _inner.GetRandomUsersAsync(userId, count);
 
-        public async Task<UserProfile?> GetUserProfileAsync(int userId)
-        {
-            return await _apiClient.GetAsync<UserProfile>($"api/personalitymatching/{userId}/profile");
-        }
+        public Task<UserProfile?> GetUserProfileAsync(int userId)
+            => _inner.GetUserProfileAsync(userId);
 
-        public async Task<List<MoviePreferenceDisplay>> GetTopMoviePreferencesAsync(int userId, int topMoviePreferencesCount)
-        {
-            var result = await _apiClient.GetAsync<List<MoviePreferenceDisplay>>($"api/personalitymatching/{userId}/preferences?count={topMoviePreferencesCount}");
-            return result ?? new List<MoviePreferenceDisplay>();
-        }
+        public Task<List<MoviePreferenceDisplay>> GetTopMoviePreferencesAsync(int userId, int topMoviePreferencesCount)
+            => _inner.GetTopMoviePreferencesAsync(userId, topMoviePreferencesCount);
 
-        public async Task<string> GetUsernameAsync(int userId)
-        {
-            var result = await _apiClient.GetAsync<string>($"api/personalitymatching/{userId}/name");
-            return result ?? string.Empty;
-        }
+        public Task<string> GetUsernameAsync(int userId)
+            => _inner.GetUsernameAsync(userId);
     }
 }

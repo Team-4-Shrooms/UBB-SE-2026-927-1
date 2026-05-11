@@ -2,12 +2,19 @@ using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace MovieApp.Proxy
 {
     public class ApiClient
     {
+        private static readonly JsonSerializerOptions DeserializeOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
+        {
+            Converters = { new JsonStringEnumConverter() },
+        };
+
         private readonly HttpClient _httpClient;
         private readonly IAuthTokenProvider _tokenProvider;
 
@@ -33,7 +40,7 @@ namespace MovieApp.Proxy
             AttachToken();
             var response = await _httpClient.GetAsync(uri);
             response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<T>();
+            return await response.Content.ReadFromJsonAsync<T>(DeserializeOptions);
         }
 
         public async Task PostAsync<TValue>(string uri, TValue value)
@@ -48,7 +55,7 @@ namespace MovieApp.Proxy
             AttachToken();
             var response = await _httpClient.PostAsJsonAsync(uri, value);
             response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<TResponse>();
+            return await response.Content.ReadFromJsonAsync<TResponse>(DeserializeOptions);
         }
 
         public async Task PutAsync<TValue>(string uri, TValue value)
@@ -63,7 +70,7 @@ namespace MovieApp.Proxy
             AttachToken();
             var response = await _httpClient.PutAsJsonAsync(uri, value);
             response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<TResponse>();
+            return await response.Content.ReadFromJsonAsync<TResponse>(DeserializeOptions);
         }
 
         public async Task DeleteAsync(string uri)

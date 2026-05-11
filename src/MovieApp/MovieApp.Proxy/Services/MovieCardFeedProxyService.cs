@@ -16,7 +16,8 @@ namespace MovieApp.Proxy.Services
 
         public async Task<List<Movie>> FetchMovieFeedAsync(int userId, int count)
         {
-            var result = await _apiClient.GetAsync<List<Movie>>($"api/moviecardfeed/{userId}?count={count}");
+            var result = await _apiClient.GetAsync<List<Movie>>(
+                $"api/preferences/users/{userId}/feed?count={count}");
             return result ?? new List<Movie>();
         }
     }

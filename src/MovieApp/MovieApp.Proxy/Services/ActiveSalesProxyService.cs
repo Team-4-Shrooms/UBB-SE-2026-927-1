@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MovieApp.DataLayer.Models;
 using MovieApp.Logic.Interfaces.Services;
 
 namespace MovieApp.Proxy.Services
@@ -15,8 +16,22 @@ namespace MovieApp.Proxy.Services
 
         public async Task<Dictionary<int, decimal>> GetBestDiscountPercentByMovieIdAsync()
         {
-            var result = await _apiClient.GetAsync<Dictionary<int, decimal>>("api/sales/discounts");
-            return result ?? new Dictionary<int, decimal>();
+            // The API only exposes GET /api/active-sales/current which returns all current sales.
+            // Compute the best (highest) discount percentage per movie locally — mirrors ActiveSalesService logic.
+            var sales = await _apiClient.GetAsync<List<ActiveSale>>("api/active-sales/current")
+                        ?? new List<ActiveSale>();
+
+            var bestByMovieId = new Dictionary<int, decimal>();
+            foreach (ActiveSale sale in sales)
+            {
+                if (sale.Movie == null) continue;
+                int movieId = sale.Movie.Id;
+                decimal percentage = sale.DiscountPercentage;
+
+                if (!bestByMovieId.TryGetValue(movieId, out decimal existing) || percentage > existing)
+                    bestByMovieId[movieId] = percentage;
+            }
+            return bestByMovieId;
         }
     }
 }

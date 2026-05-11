@@ -1,56 +1,52 @@
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Models;
 using MovieApp.Logic.Features.MovieTournament;
 
 namespace MovieApp.Proxy.Services
 {
+    /// <summary>
+    /// Proxy implementation of ITournamentLogicService.
+    /// Delegates to the real TournamentLogicService backed by MovieTournamentProxyRepository.
+    /// Tournament bracket state is held in memory locally (same as the real service);
+    /// only pool/boost data fetching goes over HTTP.
+    /// </summary>
     public class TournamentLogicProxyService : ITournamentLogicService
     {
-        private readonly ApiClient _apiClient;
+        private readonly TournamentLogicService _inner;
 
         public TournamentLogicProxyService(ApiClient apiClient)
         {
-            _apiClient = apiClient;
+            _inner = new TournamentLogicService(new MovieTournamentProxyRepository(apiClient));
         }
 
-        public TournamentState CurrentState => throw new NotSupportedException("Use async methods.");
-        public bool IsTournamentActive => throw new NotSupportedException("Use async methods.");
-        public void ResetTournament() => throw new NotSupportedException("Use async methods.");
-        public MatchPair? GetCurrentMatch() => throw new NotSupportedException("Use async methods.");
-        public bool IsTournamentComplete() => throw new NotSupportedException("Use async methods.");
-        public Movie GetFinalWinner() => throw new NotSupportedException("Use async methods.");
+        public TournamentState CurrentState => _inner.CurrentState;
 
-        public async Task StartTournamentAsync(int userId, int poolSize)
-        {
-            await _apiClient.PostAsync($"api/tournament/{userId}/start?poolSize={poolSize}", new { });
-        }
+        public bool IsTournamentActive => _inner.IsTournamentActive;
 
-        public async Task AdvanceWinnerAsync(int userId, int winnerId)
-        {
-            await _apiClient.PostAsync($"api/tournament/{userId}/advance?winnerId={winnerId}", new { });
-        }
+        public Task StartTournamentAsync(int userId, int poolSize)
+            => _inner.StartTournamentAsync(userId, poolSize);
 
-        public async Task<MatchPair?> GetCurrentMatchAsync(int userId)
-        {
-            return await _apiClient.GetAsync<MatchPair>($"api/tournament/{userId}/current-match");
-        }
+        public Task AdvanceWinnerAsync(int userId, int winnerId)
+            => _inner.AdvanceWinnerAsync(userId, winnerId);
 
-        public async Task<bool> IsTournamentCompleteAsync(int userId)
-        {
-            return await _apiClient.GetAsync<bool>($"api/tournament/{userId}/is-complete");
-        }
+        public void ResetTournament() => _inner.ResetTournament();
 
-        public async Task<Movie> GetFinalWinnerAsync(int userId)
-        {
-            var result = await _apiClient.GetAsync<Movie>($"api/tournament/{userId}/final-winner");
-            return result ?? new Movie();
-        }
+        public MatchPair? GetCurrentMatch() => _inner.GetCurrentMatch();
 
-        public async Task ResetTournamentAsync(int userId)
-        {
-            await _apiClient.PostAsync($"api/tournament/{userId}/reset", new { });
-        }
+        public bool IsTournamentComplete() => _inner.IsTournamentComplete();
+
+        public Movie GetFinalWinner() => _inner.GetFinalWinner();
+
+        public Task<MatchPair?> GetCurrentMatchAsync(int userId)
+            => _inner.GetCurrentMatchAsync(userId);
+
+        public Task<bool> IsTournamentCompleteAsync(int userId)
+            => _inner.IsTournamentCompleteAsync(userId);
+
+        public Task<Movie> GetFinalWinnerAsync(int userId)
+            => _inner.GetFinalWinnerAsync(userId);
+
+        public Task ResetTournamentAsync(int userId)
+            => _inner.ResetTournamentAsync(userId);
     }
 }

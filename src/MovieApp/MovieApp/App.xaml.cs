@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Net.Http;
 using CommunityToolkit.Mvvm.DependencyInjection;
+using MovieApp.DataLayer.Interfaces;
+using MovieApp.DataLayer.Interfaces.Repositories;
+using MovieApp.DataLayer.Repositories;
 using MovieApp.Logic.Interfaces.Services;
 using MovieApp.Proxy;
 using MovieApp.Proxy.Services;
@@ -35,9 +38,27 @@ namespace MovieApp
             var connectionString = "Server=localhost\\SQLEXPRESS;Database=MovieApp;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;";
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 
-            // Auth — login to WebApi and get JWT token
+            // IMovieAppDbContext alias — needed by repositories that use the interface rather than the concrete type
+            services.AddScoped<IMovieAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
+
+            // Repositories used directly by pages that have not yet been migrated to proxy services
+            services.AddTransient<IReelRepository, ReelRepository>();
+            services.AddTransient<IAudioLibraryRepository, AudioLibraryRepository>();
+            services.AddTransient<IInventoryRepository, InventoryRepository>();
+            services.AddTransient<IEventRepository, EventRepository>();
+            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<IMovieRepository, MovieRepository>();
+            services.AddTransient<IActiveSalesRepository, ActiveSalesRepository>();
+            services.AddTransient<IReviewRepository, ReviewRepository>();
+            services.AddTransient<IEquipmentRepository, EquipmentRepository>();
+            services.AddTransient<ITransactionRepository, TransactionRepository>();
+            services.AddTransient<IProfileRepository, ProfileRepository>();
+            services.AddTransient<IMovieTournamentRepository, MovieTournamentRepository>();
+
+            // Auth — login to WebApi and get JWT token.
+            // Task.Run avoids deadlocking the WinUI UI thread's sync context.
             var authProvider = new WinUiAuthTokenProvider();
-            authProvider.InitializeAsync().GetAwaiter().GetResult();
+            Task.Run(() => authProvider.InitializeAsync()).GetAwaiter().GetResult();
             services.AddSingleton<IAuthTokenProvider>(authProvider);
 
             // HTTP client + ApiClient
