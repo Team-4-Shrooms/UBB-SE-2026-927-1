@@ -31,7 +31,7 @@ namespace MovieApp.Features.Marketplace.Views
                     Content = "Your equipment has been listed successfully.",
                     PrimaryButtonText = "OK",
                     DefaultButton = ContentDialogButton.Primary,
-                    XamlRoot = XamlRoot
+                    XamlRoot = App.MainWindow.Content.XamlRoot
                 };
                 await dialog.ShowAsync();
 
@@ -44,7 +44,7 @@ namespace MovieApp.Features.Marketplace.Views
                     Title = "Error",
                     Content = exception.Message,
                     PrimaryButtonText = "OK",
-                    XamlRoot = XamlRoot
+                    XamlRoot = App.MainWindow.Content.XamlRoot
                 };
                 await dialog.ShowAsync();
             }

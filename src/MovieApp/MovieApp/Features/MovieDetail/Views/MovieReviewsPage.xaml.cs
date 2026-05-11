@@ -84,7 +84,7 @@ namespace MovieApp.Features.MovieDetail.Views
                     PrimaryButtonText = "Submit",
                     CloseButtonText = "Cancel",
                     DefaultButton = ContentDialogButton.Primary,
-                    XamlRoot = XamlRoot
+                    XamlRoot = App.MainWindow.Content.XamlRoot
                 };
 
                 var result = await dialog.ShowAsync();
@@ -97,7 +97,7 @@ namespace MovieApp.Features.MovieDetail.Views
                         Title = "Invalid rating",
                         Content = error,
                         PrimaryButtonText = "OK",
-                        XamlRoot = XamlRoot
+                        XamlRoot = App.MainWindow.Content.XamlRoot
                     };
                     await err.ShowAsync();
                     continue;

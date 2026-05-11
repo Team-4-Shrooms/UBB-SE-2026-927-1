@@ -185,7 +185,7 @@ namespace MovieApp.Features.MovieDetail.Views
                 PrimaryButtonText = "Buy",
                 CloseButtonText = "Cancel",
                 DefaultButton = ContentDialogButton.Primary,
-                XamlRoot = XamlRoot
+                XamlRoot = App.MainWindow.Content.XamlRoot
             };
 
             if (await confirm.ShowAsync() != ContentDialogResult.Primary) return;
@@ -236,7 +236,7 @@ namespace MovieApp.Features.MovieDetail.Views
                     Content = $"You now own \"{_movie.Title}\". It has been added to your inventory.",
                     PrimaryButtonText = "OK",
                     DefaultButton = ContentDialogButton.Primary,
-                    XamlRoot = XamlRoot
+                    XamlRoot = App.MainWindow.Content.XamlRoot
                 };
                 await dialog.ShowAsync();
                 
@@ -249,7 +249,7 @@ namespace MovieApp.Features.MovieDetail.Views
                     Title = "Error",
                     Content = exception.Message,
                     PrimaryButtonText = "OK",
-                    XamlRoot = XamlRoot
+                    XamlRoot = App.MainWindow.Content.XamlRoot
                 };
                 await error.ShowAsync();
             }

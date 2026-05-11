@@ -155,7 +155,7 @@ namespace MovieApp.Features.Marketplace.Views
                     Content = $"\"{_selectedItem.Title}\" has been purchased and added to your inventory.",
                     PrimaryButtonText = "OK",
                     DefaultButton = ContentDialogButton.Primary,
-                    XamlRoot = XamlRoot
+                    XamlRoot = App.MainWindow.Content.XamlRoot
                 };
                 await dialog.ShowAsync();
  
