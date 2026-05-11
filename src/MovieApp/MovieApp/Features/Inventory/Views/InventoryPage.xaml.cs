@@ -39,7 +39,7 @@ namespace MovieApp.Features.Inventory.Views
                     Title = "Error loading inventory",
                     Content = ex.Message,
                     CloseButtonText = "OK",
-                    XamlRoot = XamlRoot
+                    XamlRoot = App.MainWindow.Content.XamlRoot
                 };
                 await err.ShowAsync();
             }
@@ -91,7 +91,7 @@ namespace MovieApp.Features.Inventory.Views
                     Content = $"Are you sure you want to remove '{movie.Title}' from your library? This will allow you to purchase it again.",
                     PrimaryButtonText = "Remove",
                     CloseButtonText = "Cancel",
-                    XamlRoot = XamlRoot
+                    XamlRoot = App.MainWindow.Content.XamlRoot
                 };
 
                 if (await removeDialog.ShowAsync() == ContentDialogResult.Primary)
@@ -133,7 +133,7 @@ namespace MovieApp.Features.Inventory.Views
                             Title = "Error",
                             Content = ex.Message,
                             CloseButtonText = "OK",
-                            XamlRoot = XamlRoot
+                            XamlRoot = App.MainWindow.Content.XamlRoot
                         };
                         await err.ShowAsync();
                     }
@@ -151,7 +151,7 @@ namespace MovieApp.Features.Inventory.Views
                     Content = $"Remove your ticket for '{ot.Event.Title}'? This will allow you to buy it again.",
                     PrimaryButtonText = "Remove",
                     CloseButtonText = "Cancel",
-                    XamlRoot = XamlRoot
+                    XamlRoot = App.MainWindow.Content.XamlRoot
                 };
 
                 if (await dlg.ShowAsync() == ContentDialogResult.Primary)
@@ -193,7 +193,7 @@ namespace MovieApp.Features.Inventory.Views
                             Title = "Error",
                             Content = ex.Message,
                             CloseButtonText = "OK",
-                            XamlRoot = XamlRoot
+                            XamlRoot = App.MainWindow.Content.XamlRoot
                         };
                         await err.ShowAsync();
                     }
@@ -210,7 +210,7 @@ namespace MovieApp.Features.Inventory.Views
                     Content = $"Remove '{eq.Title}' from your inventory? This will make it available in the marketplace again.",
                     PrimaryButtonText = "Remove",
                     CloseButtonText = "Cancel",
-                    XamlRoot = XamlRoot
+                    XamlRoot = App.MainWindow.Content.XamlRoot
                 };
 
                 if (await dlg.ShowAsync() == ContentDialogResult.Primary)

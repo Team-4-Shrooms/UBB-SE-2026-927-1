@@ -50,7 +50,7 @@ namespace MovieApp.Features.Events.Views
                     Title = "Error loading events",
                     Content = "Could not load events. Please ensure the backend server is running.",
                     CloseButtonText = "OK",
-                    XamlRoot = XamlRoot
+                    XamlRoot = App.MainWindow.Content.XamlRoot
                 };
                 await errorDialog.ShowAsync();
             }

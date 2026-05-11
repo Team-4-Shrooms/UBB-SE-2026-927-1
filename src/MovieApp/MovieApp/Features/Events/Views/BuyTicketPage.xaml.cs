@@ -57,7 +57,7 @@ namespace MovieApp.Features.Events.Views
                     Title = "Error loading event",
                     Content = "Could not load event details. Please ensure the backend server is running.",
                     CloseButtonText = "OK",
-                    XamlRoot = XamlRoot
+                    XamlRoot = App.MainWindow.Content.XamlRoot
                 };
                 await errorDialog.ShowAsync();
                 if (Frame.CanGoBack) Frame.GoBack();
@@ -140,7 +140,7 @@ namespace MovieApp.Features.Events.Views
                     Content = "Please sign in to continue.",
                     PrimaryButtonText = "Sign in",
                     CloseButtonText = "Cancel",
-                    XamlRoot = XamlRoot
+                    XamlRoot = App.MainWindow.Content.XamlRoot
                 };
 
                 if (await dialog.ShowAsync() != ContentDialogResult.Primary)
@@ -198,7 +198,7 @@ namespace MovieApp.Features.Events.Views
                     Title = "Purchase successful",
                     Content = $"Ticket for '{_event.Title}' purchased and added to your library.",
                     CloseButtonText = "OK",
-                    XamlRoot = XamlRoot
+                    XamlRoot = App.MainWindow.Content.XamlRoot
                 };
                 await dialog.ShowAsync();
  
@@ -211,7 +211,7 @@ namespace MovieApp.Features.Events.Views
                     Title = "Cannot complete purchase",
                     Content = exception.Message,
                     CloseButtonText = "OK",
-                    XamlRoot = XamlRoot
+                    XamlRoot = App.MainWindow.Content.XamlRoot
                 };
                 await error.ShowAsync();
             }

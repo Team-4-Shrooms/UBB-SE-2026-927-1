@@ -9,5 +9,7 @@ namespace MovieApp.Tests.Integration.ProxyRepos
     internal sealed class NullAuthTokenProvider : IAuthTokenProvider
     {
         public string? GetToken() => null;
+
+        public Task RefreshAsync() => Task.CompletedTask;
     }
 }

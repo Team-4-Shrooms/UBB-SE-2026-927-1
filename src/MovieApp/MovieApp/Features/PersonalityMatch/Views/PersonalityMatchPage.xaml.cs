@@ -178,7 +178,7 @@ namespace MovieApp.Features.PersonalityMatch.Views
                 Title = AddAccountDialogTitle,
                 Content = NoAccountsAvailableMessage,
                 CloseButtonText = NoAccountsAvailableCloseButtonText,
-                XamlRoot = this.XamlRoot,
+                XamlRoot = App.MainWindow.Content.XamlRoot,
             };
             await noAccountsDialog.ShowAsync();
         }
@@ -218,7 +218,7 @@ namespace MovieApp.Features.PersonalityMatch.Views
                 Content = accountPickerListView,
                 PrimaryButtonText = AddAccountDialogPrimaryButtonText,
                 CloseButtonText = AddAccountDialogCancelButtonText,
-                XamlRoot = this.XamlRoot,
+                XamlRoot = App.MainWindow.Content.XamlRoot,
             };
         }
     }

@@ -13,7 +13,7 @@ namespace MovieApp.Auth
     public sealed class WinUiAuthTokenProvider : IAuthTokenProvider
     {
         private const string LoginEndpoint = "api/auth/login";
-        private const string DefaultUsername = "User1";
+        private const string DefaultUsername = "admin";
         private const string DefaultPassword = "password123";
         private const string BaseUrl = "http://localhost:4544/";
         private static readonly TimeSpan LoginTimeout = TimeSpan.FromSeconds(5);
@@ -51,6 +51,9 @@ namespace MovieApp.Auth
 
         /// <inheritdoc/>
         public string? GetToken() => this.token;
+
+        /// <inheritdoc/>
+        public Task RefreshAsync() => this.InitializeAsync();
 
         private sealed record LoginResponse(string Token, int UserId, DateTime ExpiresAt);
     }

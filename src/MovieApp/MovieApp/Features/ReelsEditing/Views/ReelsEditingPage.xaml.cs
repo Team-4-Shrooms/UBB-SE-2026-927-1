@@ -541,7 +541,7 @@ namespace MovieApp.Features.ReelsEditing.Views
                 CloseButtonText = DialogButtonCancel,
                 PrimaryButtonText = DialogButtonConfirm,
                 DefaultButton = ContentDialogButton.Primary,
-                XamlRoot = this.XamlRoot,
+                XamlRoot = App.MainWindow.Content.XamlRoot,
             };
 
             ListView listView = new ListView

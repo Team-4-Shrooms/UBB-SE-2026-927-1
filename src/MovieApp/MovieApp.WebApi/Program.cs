@@ -46,25 +46,61 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IMovieAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
 
-// Repositories
-builder.Services.AddScoped<IActiveSalesRepository, ActiveSalesRepository>();
-builder.Services.AddScoped<IAudioLibraryRepository, AudioLibraryRepository>();
-builder.Services.AddScoped<IEquipmentRepository, EquipmentRepository>();
-builder.Services.AddScoped<IEventRepository, EventRepository>();
-builder.Services.AddScoped<IInteractionRepository, InteractionRepository>();
-builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
-builder.Services.AddScoped<IMovieRepository, MovieRepository>();
-builder.Services.AddScoped<IMovieTournamentRepository, MovieTournamentRepository>();
-builder.Services.AddScoped<IPersonalityMatchRepository, PersonalityMatchRepository>();
-builder.Services.AddScoped<IPreferenceRepository, PreferenceRepository>();
-builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
-builder.Services.AddScoped<IRecommendationRepository, RecommendationRepository>();
-builder.Services.AddScoped<IReelRepository, ReelRepository>();
-builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
-builder.Services.AddScoped<IScrapeRepository, ScrapeJobRepository>();
-builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IVideoStorageRepository, VideoStorageRepository>();
+// Repositories — concrete types registered first so controllers can inject them directly;
+// interface registrations delegate to the same scoped instance.
+builder.Services.AddScoped<ActiveSalesRepository>();
+builder.Services.AddScoped<IActiveSalesRepository>(sp => sp.GetRequiredService<ActiveSalesRepository>());
+
+builder.Services.AddScoped<AudioLibraryRepository>();
+builder.Services.AddScoped<IAudioLibraryRepository>(sp => sp.GetRequiredService<AudioLibraryRepository>());
+
+builder.Services.AddScoped<EquipmentRepository>();
+builder.Services.AddScoped<IEquipmentRepository>(sp => sp.GetRequiredService<EquipmentRepository>());
+
+builder.Services.AddScoped<EventRepository>();
+builder.Services.AddScoped<IEventRepository>(sp => sp.GetRequiredService<EventRepository>());
+
+builder.Services.AddScoped<InteractionRepository>();
+builder.Services.AddScoped<IInteractionRepository>(sp => sp.GetRequiredService<InteractionRepository>());
+
+builder.Services.AddScoped<InventoryRepository>();
+builder.Services.AddScoped<IInventoryRepository>(sp => sp.GetRequiredService<InventoryRepository>());
+
+builder.Services.AddScoped<MovieRepository>();
+builder.Services.AddScoped<IMovieRepository>(sp => sp.GetRequiredService<MovieRepository>());
+
+builder.Services.AddScoped<MovieTournamentRepository>();
+builder.Services.AddScoped<IMovieTournamentRepository>(sp => sp.GetRequiredService<MovieTournamentRepository>());
+
+builder.Services.AddScoped<PersonalityMatchRepository>();
+builder.Services.AddScoped<IPersonalityMatchRepository>(sp => sp.GetRequiredService<PersonalityMatchRepository>());
+
+builder.Services.AddScoped<PreferenceRepository>();
+builder.Services.AddScoped<IPreferenceRepository>(sp => sp.GetRequiredService<PreferenceRepository>());
+
+builder.Services.AddScoped<ProfileRepository>();
+builder.Services.AddScoped<IProfileRepository>(sp => sp.GetRequiredService<ProfileRepository>());
+
+builder.Services.AddScoped<RecommendationRepository>();
+builder.Services.AddScoped<IRecommendationRepository>(sp => sp.GetRequiredService<RecommendationRepository>());
+
+builder.Services.AddScoped<ReelRepository>();
+builder.Services.AddScoped<IReelRepository>(sp => sp.GetRequiredService<ReelRepository>());
+
+builder.Services.AddScoped<ReviewRepository>();
+builder.Services.AddScoped<IReviewRepository>(sp => sp.GetRequiredService<ReviewRepository>());
+
+builder.Services.AddScoped<ScrapeJobRepository>();
+builder.Services.AddScoped<IScrapeRepository>(sp => sp.GetRequiredService<ScrapeJobRepository>());
+
+builder.Services.AddScoped<TransactionRepository>();
+builder.Services.AddScoped<ITransactionRepository>(sp => sp.GetRequiredService<TransactionRepository>());
+
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<IUserRepository>(sp => sp.GetRequiredService<UserRepository>());
+
+builder.Services.AddScoped<VideoStorageRepository>();
+builder.Services.AddScoped<IVideoStorageRepository>(sp => sp.GetRequiredService<VideoStorageRepository>());
 
 // Core services
 builder.Services.AddScoped<IMovieService, MovieService>();
@@ -122,19 +158,41 @@ using (IServiceScope scope = app.Services.CreateScope())
     AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     if (context.Database.IsSqlServer())
     {
-        await context.Database.MigrateAsync();
+        try
+        {
+            // Use a short timeout so a locked __EFMigrationsHistory table (common after a
+            // previous crash) fails fast instead of blocking startup for 30+ seconds.
+            context.Database.SetCommandTimeout(TimeSpan.FromSeconds(5));
+            await context.Database.MigrateAsync();
+        }
+        catch (Exception migEx)
+        {
+            Console.Error.WriteLine($"[Startup] MigrateAsync skipped (non-fatal): {migEx.Message}");
+        }
+        finally
+        {
+            // Restore normal timeout for seeding queries.
+            context.Database.SetCommandTimeout(TimeSpan.FromSeconds(30));
+        }
     }
 
-    DataSeeder seeder = new DataSeeder(context);
-    await seeder.SeedAsync();
-
-    // Replace placeholder hashes with real BCrypt hashes on first run.
-    foreach (var user in context.Users.Where(u => u.PasswordHash.StartsWith("placeholder_")))
+    try
     {
-        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(config["Auth:SeedPassword"] ?? "password123");
-    }
+        DataSeeder seeder = new DataSeeder(context);
+        await seeder.SeedAsync();
 
-    await context.SaveChangesAsync();
+        // Replace placeholder hashes with real BCrypt hashes on first run.
+        foreach (var user in context.Users.Where(u => u.PasswordHash.StartsWith("placeholder_")))
+        {
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(config["Auth:SeedPassword"] ?? "password123");
+        }
+
+        await context.SaveChangesAsync();
+    }
+    catch (Exception seedEx)
+    {
+        Console.Error.WriteLine($"[Startup] Seeding warning (non-fatal): {seedEx.Message}");
+    }
 }
 
 // Configure the HTTP request pipeline.

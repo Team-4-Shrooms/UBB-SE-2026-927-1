@@ -36,10 +36,16 @@ namespace MovieApp
 
             // Direct DB context — still used by some pages pending full proxy migration
             var connectionString = "Server=localhost\\SQLEXPRESS;Database=MovieApp;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;";
-            services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+            // Transient lifetime prevents concurrent-operation errors: WinUI has no DI scope
+            // boundary, so Scoped behaves like Singleton and two async repo calls on the same
+            // context instance throw InvalidOperationException.
+            services.AddDbContext<AppDbContext>(
+                options => options.UseSqlServer(connectionString),
+                ServiceLifetime.Transient,
+                ServiceLifetime.Transient);
 
             // IMovieAppDbContext alias — needed by repositories that use the interface rather than the concrete type
-            services.AddScoped<IMovieAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
+            services.AddTransient<IMovieAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
 
             // Repositories used directly by pages that have not yet been migrated to proxy services
             services.AddTransient<IReelRepository, ReelRepository>();

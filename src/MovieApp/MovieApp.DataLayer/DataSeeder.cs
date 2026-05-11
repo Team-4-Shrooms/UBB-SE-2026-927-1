@@ -30,6 +30,7 @@ namespace MovieApp.DataLayer
         /// </summary>
         public async Task SeedAsync()
         {
+            await SeedAdminUserAsync();
             await SeedUsersAsync();
             await SeedMoviesAsync();
             await SeedMusicTracksAsync();
@@ -43,9 +44,30 @@ namespace MovieApp.DataLayer
             await SeedEquipmentAsync();
         }
 
+        /// <summary>
+        /// Ensures the built-in admin account exists.
+        /// Runs on every startup — safe on existing databases.
+        /// The placeholder hash is replaced with a real BCrypt hash by Program.cs on first run.
+        /// </summary>
+        private async Task SeedAdminUserAsync()
+        {
+            bool adminExists = await _context.Users.AnyAsync(u => u.Username == "admin");
+            if (!adminExists)
+            {
+                _context.Users.Add(new User
+                {
+                    Username = "admin",
+                    Email = "admin@movieapp.com",
+                    PasswordHash = "placeholder_admin",
+                    Balance = 0m,
+                });
+                await _context.SaveChangesAsync();
+            }
+        }
+
         private async Task SeedUsersAsync()
         {
-            if (await _context.Users.AnyAsync())
+            if (await _context.Users.AnyAsync(u => u.Username != "admin"))
             {
                 return;
             }
