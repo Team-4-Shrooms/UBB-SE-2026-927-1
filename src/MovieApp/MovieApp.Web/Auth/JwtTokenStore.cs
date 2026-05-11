@@ -18,6 +18,10 @@ namespace MovieApp.Web.Auth
         public string? GetToken() => this.token;
 
         /// <inheritdoc/>
+        /// MVC token refresh is handled by JwtAutoLoginService — nothing to do here.
+        public Task RefreshAsync() => Task.CompletedTask;
+
+        /// <inheritdoc/>
         public int UserId => this.userId;
 
         /// <summary>

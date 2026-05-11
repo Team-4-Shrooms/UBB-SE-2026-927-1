@@ -52,6 +52,9 @@ namespace MovieApp.Auth
         /// <inheritdoc/>
         public string? GetToken() => this.token;
 
+        /// <inheritdoc/>
+        public Task RefreshAsync() => this.InitializeAsync();
+
         private sealed record LoginResponse(string Token, int UserId, DateTime ExpiresAt);
     }
 }
