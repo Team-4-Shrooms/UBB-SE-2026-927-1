@@ -1,13 +1,19 @@
 using System.Reflection;
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MovieApp.DataLayer;
 using MovieApp.DataLayer.Interfaces;
+using MovieApp.DataLayer.Interfaces.Repositories;
 using MovieApp.DataLayer.Repositories;
+using MovieApp.Logic.Features.MovieSwipe;
+using MovieApp.Logic.Features.MovieTournament;
+using MovieApp.Logic.Features.PersonalityMatch;
+using MovieApp.Logic.Features.ReelsEditing;
+using MovieApp.Logic.Features.ReelsFeed;
+using MovieApp.Logic.Features.ReelsUpload;
+using MovieApp.Logic.Features.TrailerScraping;
 using MovieApp.Logic.Interfaces.Services;
-using MovieApp.WebApi.Auth;
+using MovieApp.Logic.Services;
 using MovieApp.WebApi.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,24 +42,54 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IMovieAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
-builder.Services.AddScoped<ActiveSalesRepository>();
-builder.Services.AddScoped<AudioLibraryRepository>();
-builder.Services.AddScoped<InteractionRepository>();
-builder.Services.AddScoped<EventRepository>();
-builder.Services.AddScoped<EquipmentRepository>();
-builder.Services.AddScoped<MovieRepository>();
-builder.Services.AddScoped<InventoryRepository>();
-builder.Services.AddScoped<MovieTournamentRepository>();
-builder.Services.AddScoped<ProfileRepository>();
-builder.Services.AddScoped<PreferenceRepository>();
-builder.Services.AddScoped<PersonalityMatchRepository>();
-builder.Services.AddScoped<RecommendationRepository>();
-builder.Services.AddScoped<ReelRepository>();
-builder.Services.AddScoped<ReviewRepository>();
-builder.Services.AddScoped<VideoStorageRepository>();
-builder.Services.AddScoped<UserRepository>();
-builder.Services.AddScoped<TransactionRepository>();
-builder.Services.AddScoped<ScrapeJobRepository>();
+
+// Repositories
+builder.Services.AddScoped<IActiveSalesRepository, ActiveSalesRepository>();
+builder.Services.AddScoped<IAudioLibraryRepository, AudioLibraryRepository>();
+builder.Services.AddScoped<IEquipmentRepository, EquipmentRepository>();
+builder.Services.AddScoped<IEventRepository, EventRepository>();
+builder.Services.AddScoped<IInteractionRepository, InteractionRepository>();
+builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
+builder.Services.AddScoped<IMovieRepository, MovieRepository>();
+builder.Services.AddScoped<IMovieTournamentRepository, MovieTournamentRepository>();
+builder.Services.AddScoped<IPersonalityMatchRepository, PersonalityMatchRepository>();
+builder.Services.AddScoped<IPreferenceRepository, PreferenceRepository>();
+builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
+builder.Services.AddScoped<IRecommendationRepository, RecommendationRepository>();
+builder.Services.AddScoped<IReelRepository, ReelRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<IScrapeRepository, ScrapeJobRepository>();
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IVideoStorageRepository, VideoStorageRepository>();
+
+// Core services
+builder.Services.AddScoped<IMovieService, MovieService>();
+builder.Services.AddScoped<IEquipmentService, EquipmentService>();
+builder.Services.AddScoped<IEventService, EventService>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IActiveSalesService, ActiveSalesService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IPersonalityMatchService, PersonalityMatchService>();
+
+// Feature services
+builder.Services.AddScoped<IMovieCardFeedService, MovieCardFeedService>();
+builder.Services.AddScoped<ISwipeService, SwipeService>();
+builder.Services.AddScoped<IPersonalityMatchingService, PersonalityMatchingService>();
+builder.Services.AddScoped<IReelInteractionService, ReelInteractionService>();
+builder.Services.AddScoped<IRecommendationService, RecommendationService>();
+builder.Services.AddScoped<IVideoProcessingService, VideoProcessingService>();
+builder.Services.AddScoped<IVideoStorageService, VideoStorageService>();
+builder.Services.AddScoped<IVideoIngestionService, VideoIngestionService>();
+builder.Services.AddSingleton<ITournamentLogicService, TournamentLogicService>();
+
+// Infrastructure
+builder.Services.AddSingleton<IVideoDownloadService, VideoDownloadService>();
+builder.Services.AddTransient<IYouTubeScraperService>(_ =>
+    new YouTubeScraperService(config["YouTube:ApiKey"] ?? string.Empty));
+builder.Services.AddTransient<IWebScraperService>(sp =>
+    (IWebScraperService)sp.GetRequiredService<IYouTubeScraperService>());
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

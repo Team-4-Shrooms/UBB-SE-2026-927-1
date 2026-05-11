@@ -2,7 +2,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using System;
-using MovieApp.Logic.Http;
 using MovieApp.DataLayer.Interfaces.Repositories;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using MovieApp.WebApi.Data;
