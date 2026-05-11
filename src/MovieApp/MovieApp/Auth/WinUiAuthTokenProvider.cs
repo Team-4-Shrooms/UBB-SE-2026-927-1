@@ -3,6 +3,7 @@ namespace MovieApp.Auth
     using System;
     using System.Net.Http;
     using System.Net.Http.Json;
+    using System.Threading;
     using System.Threading.Tasks;
     using MovieApp.Proxy;
 
@@ -15,25 +16,30 @@ namespace MovieApp.Auth
         private const string DefaultUsername = "admin";
         private const string DefaultPassword = "password123";
         private const string BaseUrl = "http://localhost:4544/";
+        private static readonly TimeSpan LoginTimeout = TimeSpan.FromSeconds(5);
 
         private string? token;
 
         /// <summary>
         /// Logs in to the WebApi and stores the JWT token.
-        /// Call once before building the DI container.
+        /// Must be called via Task.Run to avoid deadlocking the UI thread.
         /// </summary>
         public async Task InitializeAsync()
         {
             try
             {
                 using HttpClient client = new HttpClient { BaseAddress = new Uri(BaseUrl) };
+                using CancellationTokenSource cts = new CancellationTokenSource(LoginTimeout);
+
                 HttpResponseMessage response = await client.PostAsJsonAsync(
                     LoginEndpoint,
-                    new { Username = DefaultUsername, Password = DefaultPassword });
+                    new { Username = DefaultUsername, Password = DefaultPassword },
+                    cts.Token);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    LoginResponse? result = await response.Content.ReadFromJsonAsync<LoginResponse>();
+                    LoginResponse? result = await response.Content.ReadFromJsonAsync<LoginResponse>(
+                        cancellationToken: cts.Token);
                     this.token = result?.Token;
                 }
             }

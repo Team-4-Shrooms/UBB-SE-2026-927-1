@@ -35,9 +35,10 @@ namespace MovieApp
             var connectionString = "Server=localhost\\SQLEXPRESS;Database=MovieApp;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;";
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 
-            // Auth — login to WebApi and get JWT token
+            // Auth — login to WebApi and get JWT token.
+            // Task.Run avoids deadlocking the WinUI UI thread's sync context.
             var authProvider = new WinUiAuthTokenProvider();
-            authProvider.InitializeAsync().GetAwaiter().GetResult();
+            Task.Run(() => authProvider.InitializeAsync()).GetAwaiter().GetResult();
             services.AddSingleton<IAuthTokenProvider>(authProvider);
 
             // HTTP client + ApiClient
