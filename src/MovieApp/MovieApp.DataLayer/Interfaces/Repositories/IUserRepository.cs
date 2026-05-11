@@ -8,6 +8,13 @@ namespace MovieApp.DataLayer.Interfaces.Repositories
     public interface IUserRepository
     {
         Task<User?> GetUserByIdAsync(int id);
+
+        /// <summary>
+        /// Retrieves a user by their username.
+        /// </summary>
+        /// <param name="username">The username to look up.</param>
+        /// <returns>The matching user, or null if not found.</returns>
+        Task<User?> GetUserByUsernameAsync(string username);
         Task<int> SaveChangesAsync();
 
         /// <summary>

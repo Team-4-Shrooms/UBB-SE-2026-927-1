@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MovieApp.DataLayer.Interfaces;
 using MovieApp.WebDTOs.DTOs.RequestDTOs;
@@ -7,6 +8,7 @@ using MovieApp.DataLayer.Repositories;
 
 namespace MovieApp.WebApi.Endpoints;
 
+[Authorize]
 [ApiController]
 [Route("api/scrape-jobs")]
 public sealed class ScrapeJobEndpointsController : ControllerBase

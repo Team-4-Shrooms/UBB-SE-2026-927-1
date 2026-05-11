@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MovieApp.WebDTOs.DTOs.RequestDTOs;
 using MovieApp.WebApi.DTOs;
@@ -8,6 +9,7 @@ using MovieApp.DataLayer.Repositories;
 
 namespace MovieApp.WebApi.Endpoints;
 
+[Authorize]
 [ApiController]
 [Route("api/profiles")]
 public sealed class ProfileEndpointsController : ControllerBase

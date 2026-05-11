@@ -1,13 +1,36 @@
+using System.Reflection;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MovieApp.DataLayer;
 using MovieApp.DataLayer.Interfaces;
 using MovieApp.DataLayer.Repositories;
+using MovieApp.Logic.Interfaces.Services;
+using MovieApp.WebApi.Auth;
 using MovieApp.WebApi.Data;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
+var config = builder.Configuration;
 
 // Add services to the container.
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(config["Jwt:SecretKey"]!)),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+        };
+    });
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, WebApiCurrentUserService>();
+builder.Services.AddScoped<JwtTokenService>();
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -65,6 +88,14 @@ using (IServiceScope scope = app.Services.CreateScope())
 
     DataSeeder seeder = new DataSeeder(context);
     await seeder.SeedAsync();
+
+    // Replace placeholder hashes with real BCrypt hashes on first run.
+    foreach (var user in context.Users.Where(u => u.PasswordHash.StartsWith("placeholder_")))
+    {
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(config["Auth:SeedPassword"] ?? "password123");
+    }
+
+    await context.SaveChangesAsync();
 }
 
 // Configure the HTTP request pipeline.
@@ -83,6 +114,7 @@ if (!app.Environment.IsEnvironment("Testing"))
     app.UseHttpsRedirection();
 }
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
