@@ -165,3 +165,15 @@ public sealed class AddOwnedTicketRequestBody
     public int UserId { get; set; }
     public int EventId { get; set; }
 }
+
+public sealed class RemoveMovieRequestBody
+{
+    public int UserId { get; set; }
+    public int MovieId { get; set; }
+}
+
+public sealed class RemoveTicketRequestBody
+{
+    public int UserId { get; set; }
+    public int EventId { get; set; }
+}

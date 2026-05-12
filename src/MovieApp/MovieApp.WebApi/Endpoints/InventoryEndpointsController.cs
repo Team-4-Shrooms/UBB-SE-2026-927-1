@@ -5,6 +5,7 @@ using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Interfaces;
 using MovieApp.DataLayer.Models;
 using MovieApp.DataLayer.Repositories;
+using MovieApp.Logic.Interfaces.Services;
 
 namespace MovieApp.WebApi.Endpoints;
 
@@ -16,12 +17,14 @@ public sealed class InventoryEndpointsController : ControllerBase
     private readonly InventoryRepository _repository;
     private readonly MovieRepository _movieRepository;
     private readonly IMovieAppDbContext _context;
+    private readonly IInventoryService _inventoryService;
 
-    public InventoryEndpointsController(InventoryRepository repository, MovieRepository movieRepository, IMovieAppDbContext context)
+    public InventoryEndpointsController(InventoryRepository repository, MovieRepository movieRepository, IMovieAppDbContext context, IInventoryService inventoryService)
     {
         _repository = repository;
         _movieRepository = movieRepository;
         _context = context;
+        _inventoryService = inventoryService;
     }
 
     [HttpGet("users/{userId:int}/movies")]
@@ -72,6 +75,35 @@ public sealed class InventoryEndpointsController : ControllerBase
             ?? throw new InvalidOperationException($"Movie {body.MovieId} not found.");
         await _movieRepository.AddOwnedMovieAsync(new OwnedMovie { User = user, Movie = movie });
         await _movieRepository.SaveChangesAsync();
+        return Ok();
+    }
+
+    [HttpGet("users/{userId:int}/tickets")]
+    public async Task<IActionResult> GetOwnedTickets(int userId)
+    {
+        var tickets = await _inventoryService.GetOwnedTicketsAsync(userId);
+        return Ok(tickets.Select(t => new
+        {
+            t.Id,
+            t.PurchaseDate,
+            EventId = t.Event?.Id ?? 0,
+            EventTitle = t.Event?.Title ?? string.Empty,
+            EventDate = t.Event?.Date,
+            EventLocation = t.Event?.Location ?? string.Empty,
+        }));
+    }
+
+    [HttpPost("remove-movie")]
+    public async Task<IActionResult> RemoveOwnedMovie([FromBody] RemoveMovieRequestBody body)
+    {
+        await _inventoryService.RemoveOwnedMovieAsync(body.UserId, body.MovieId);
+        return Ok();
+    }
+
+    [HttpPost("remove-ticket")]
+    public async Task<IActionResult> RemoveOwnedTicket([FromBody] RemoveTicketRequestBody body)
+    {
+        await _inventoryService.RemoveOwnedTicketAsync(body.UserId, body.EventId);
         return Ok();
     }
 }

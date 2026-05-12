@@ -6,6 +6,7 @@ using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Interfaces;
 using MovieApp.DataLayer.Models;
 using MovieApp.DataLayer.Repositories;
+using MovieApp.Logic.Interfaces.Services;
 
 namespace MovieApp.WebApi.Endpoints;
 
@@ -16,18 +17,20 @@ public sealed class ProfileEndpointsController : ControllerBase
 {
     private readonly ProfileRepository _repository;
     private readonly IMovieAppDbContext _context;
+    private readonly IProfileService _profileService;
 
-    public ProfileEndpointsController(ProfileRepository repository, IMovieAppDbContext context)
+    public ProfileEndpointsController(ProfileRepository repository, IMovieAppDbContext context, IProfileService profileService)
     {
         _repository = repository;
         _context = context;
+        _profileService = profileService;
     }
 
     [HttpGet("users/{userId:int}")]
     public async Task<IActionResult> GetProfileAsync(int userId)
     {
-        UserProfileDto? profile = (await _repository.GetProfileAsync(userId))?.ToDto(userId);
-        return Ok(profile);
+        var profile = await _profileService.BuildProfileFromInteractionsAsync(userId);
+        return Ok(profile.ToDto(userId));
     }
 
     [HttpPost]

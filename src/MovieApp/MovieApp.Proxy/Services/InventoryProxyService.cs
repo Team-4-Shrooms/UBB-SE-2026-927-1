@@ -16,23 +16,23 @@ namespace MovieApp.Proxy.Services
 
         public async Task RemoveOwnedMovieAsync(int userId, int movieId)
         {
-            await _apiClient.DeleteAsync($"api/inventory/movies/{movieId}?userId={userId}");
+            await _apiClient.PostAsync($"api/inventory/remove-movie", new { userId, movieId });
         }
 
         public async Task RemoveOwnedTicketAsync(int userId, int eventId)
         {
-            await _apiClient.DeleteAsync($"api/inventory/tickets/{eventId}?userId={userId}");
+            await _apiClient.PostAsync($"api/inventory/remove-ticket", new { userId, eventId });
         }
 
         public async Task<List<Movie>> GetOwnedMoviesAsync(int userId)
         {
-            var result = await _apiClient.GetAsync<List<Movie>>($"api/inventory/movies?userId={userId}");
+            var result = await _apiClient.GetAsync<List<Movie>>($"api/inventory/users/{userId}/movies");
             return result ?? new List<Movie>();
         }
 
         public async Task<List<OwnedTicket>> GetOwnedTicketsAsync(int userId)
         {
-            var result = await _apiClient.GetAsync<List<OwnedTicket>>($"api/inventory/tickets?userId={userId}");
+            var result = await _apiClient.GetAsync<List<OwnedTicket>>($"api/inventory/users/{userId}/tickets");
             return result ?? new List<OwnedTicket>();
         }
     }
