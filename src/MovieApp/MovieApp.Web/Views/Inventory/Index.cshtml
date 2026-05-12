@@ -1,9 +1,127 @@
+@using MovieApp.DataLayer.Models
 @{
     ViewData["Title"] = "Inventory";
+    var movies = (List<Movie>?)ViewBag.Movies ?? new List<Movie>();
+    var tickets = (List<OwnedTicket>?)ViewBag.Tickets ?? new List<OwnedTicket>();
 }
 
-<div class="text-center py-5">
-    <h1 class="display-5">Inventory</h1>
-    <p class="lead text-muted">This feature is coming soon.</p>
-    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary mt-3">Back to Home</a>
+<h1 class="mb-4">My Inventory</h1>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<ul class="nav nav-tabs mb-3" id="inventoryTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="movies-tab" data-bs-toggle="tab" data-bs-target="#movies" type="button" role="tab" aria-controls="movies" aria-selected="true">
+            My Movies <span class="badge bg-secondary">@movies.Count</span>
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tickets-tab" data-bs-toggle="tab" data-bs-target="#tickets" type="button" role="tab" aria-controls="tickets" aria-selected="false">
+            My Tickets <span class="badge bg-secondary">@tickets.Count</span>
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="inventoryTabContent">
+    <div class="tab-pane fade show active" id="movies" role="tabpanel" aria-labelledby="movies-tab">
+        @if (movies.Count == 0)
+        {
+            <div class="text-center py-5 text-muted">
+                <p class="lead">You don't own any movies yet.</p>
+                <a asp-controller="Catalog" asp-action="Index" class="btn btn-outline-primary">Browse Catalog</a>
+            </div>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                @foreach (var movie in movies)
+                {
+                    <div class="col">
+                        <div class="card h-100">
+                            @if (!string.IsNullOrEmpty(movie.PosterUrl))
+                            {
+                                <img src="@movie.PosterUrl" class="card-img-top" alt="@movie.Title" style="height: 280px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center text-white" style="height: 280px;">
+                                    <span>No Poster</span>
+                                </div>
+                            }
+                            <div class="card-body">
+                                <h5 class="card-title">@movie.Title</h5>
+                                <p class="card-text text-muted">@movie.ReleaseYear &middot; @movie.PrimaryGenre</p>
+                            </div>
+                            <div class="card-footer">
+                                <form asp-action="RemoveMovie" method="post">
+                                    <input type="hidden" name="movieId" value="@movie.Id" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm w-100" onclick="return confirm('Remove this movie from your inventory?')">
+                                        Remove
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="tab-pane fade" id="tickets" role="tabpanel" aria-labelledby="tickets-tab">
+        @if (tickets.Count == 0)
+        {
+            <div class="text-center py-5 text-muted">
+                <p class="lead">You don't have any tickets yet.</p>
+                <a asp-controller="Events" asp-action="Index" class="btn btn-outline-primary">Browse Events</a>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Ticket ID</th>
+                            <th>Event</th>
+                            <th>Date</th>
+                            <th>Purchased</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var ticket in tickets)
+                        {
+                            <tr>
+                                <td>@ticket.Id</td>
+                                <td>@(ticket.Event?.Title ?? "—")</td>
+                                <td>@(ticket.Event?.Date.ToString("MMM dd, yyyy") ?? "—")</td>
+                                <td>@ticket.PurchaseDate.ToString("MMM dd, yyyy")</td>
+                                <td>
+                                    <form asp-action="RemoveTicket" method="post">
+                                        <input type="hidden" name="eventId" value="@(ticket.Event?.Id ?? 0)" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Remove this ticket?')">
+                                            Remove
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
 </div>
