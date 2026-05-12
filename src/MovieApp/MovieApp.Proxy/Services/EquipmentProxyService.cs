@@ -16,12 +16,22 @@ namespace MovieApp.Proxy.Services
 
         public async Task ListItemAsync(Equipment item)
         {
-            await _apiClient.PostAsync("api/equipment", item);
+            var body = new
+            {
+                Title = item.Title,
+                Category = item.Category,
+                Description = item.Description,
+                Condition = item.Condition,
+                Price = item.Price,
+                ImageUrl = item.ImageUrl,
+                SellerId = item.Seller.Id
+            };
+            await _apiClient.PostAsync("api/equipment", body);
         }
 
         public async Task PurchaseEquipmentAsync(int equipmentId, int buyerId, decimal price, string address)
         {
-            await _apiClient.PostAsync($"api/equipment/{equipmentId}/purchase?buyerId={buyerId}&price={price}&address={address}", new { });
+            await _apiClient.PostAsync($"api/equipment/{equipmentId}/purchase", new { buyerId, price, address });
         }
 
         public async Task<List<Equipment>> GetAvailableEquipmentAsync()

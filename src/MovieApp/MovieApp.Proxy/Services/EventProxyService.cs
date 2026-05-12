@@ -16,13 +16,13 @@ namespace MovieApp.Proxy.Services
 
         public async Task<List<MovieEvent>> GetAvailableEventsAsync()
         {
-            var result = await _apiClient.GetAsync<List<MovieEvent>>("api/events/available");
+            var result = await _apiClient.GetAsync<List<MovieEvent>>("api/events");
             return result ?? new List<MovieEvent>();
         }
 
         public async Task PurchaseTicketAsync(int userId, int eventId)
         {
-            await _apiClient.PostAsync($"api/events/{eventId}/purchase?userId={userId}", new { });
+            await _apiClient.PostAsync($"api/events/{eventId}/purchase-ticket", new { userId });
         }
 
         public async Task<MovieEvent?> GetEventByIdAsync(int id)
@@ -32,7 +32,7 @@ namespace MovieApp.Proxy.Services
 
         public async Task<bool> UserHasTicketAsync(int userId, int eventId)
         {
-            return await _apiClient.GetAsync<bool>($"api/events/{eventId}/hasticket?userId={userId}");
+            return await _apiClient.GetAsync<bool>($"api/events/{eventId}/tickets/{userId}");
         }
     }
 }
