@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using MovieApp.DataLayer.Models;
+using MovieApp.DataLayer.Interfaces.Repositories;
 
 namespace MovieApp.Logic.Features.MovieTournament
 {
@@ -14,13 +16,13 @@ namespace MovieApp.Logic.Features.MovieTournament
         private const int MinimumPoolSize = 4;
         private const double FinalWinnerScoreBoost = 2.0;
 
-        private readonly IMovieTournamentRepository tournamentRepository;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly Random randomNumberGenerator;
         private TournamentState? activeTournamentState;
 
-        public TournamentLogicService(IMovieTournamentRepository tournamentRepository)
+        public TournamentLogicService(IServiceScopeFactory scopeFactory)
         {
-            this.tournamentRepository = tournamentRepository;
+            _scopeFactory = scopeFactory;
             this.randomNumberGenerator = new Random();
         }
 
@@ -35,7 +37,13 @@ namespace MovieApp.Logic.Features.MovieTournament
             if (poolSize < MinimumPoolSize)
                 throw new ArgumentException($"Pool size must be at least {MinimumPoolSize}.");
 
-            List<Movie> movies = await this.tournamentRepository.GetTournamentPoolAsync(userId, poolSize);
+            List<Movie> movies;
+
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var tournamentRepository = scope.ServiceProvider.GetRequiredService<IMovieTournamentRepository>();
+                movies = await tournamentRepository.GetTournamentPoolAsync(userId, poolSize);
+            }
 
             if (movies.Count < poolSize)
                 throw new InvalidOperationException($"Not enough movies. Requested {poolSize}, but found {movies.Count}.");
@@ -74,7 +82,12 @@ namespace MovieApp.Logic.Features.MovieTournament
             if (this.IsTournamentComplete())
             {
                 Movie finalWinner = this.GetFinalWinner();
-                await this.tournamentRepository.BoostMovieScoreAsync(userId, finalWinner.Id, (decimal)FinalWinnerScoreBoost);
+
+                using (var scope = _scopeFactory.CreateScope())
+                {
+                    var tournamentRepository = scope.ServiceProvider.GetRequiredService<IMovieTournamentRepository>();
+                    await tournamentRepository.BoostMovieScoreAsync(userId, finalWinner.Id, (decimal)FinalWinnerScoreBoost);
+                }
             }
         }
 
