@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
@@ -12,6 +12,8 @@
     <WinUISDKReferences>false</WinUISDKReferences>
     <EnableMsixTooling>true</EnableMsixTooling>
     <Nullable>enable</Nullable>
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Features\Events - Copy\**" />
@@ -122,7 +124,6 @@
     <Folder Include="Features\ReelsUpload\Services\" />
     <Folder Include="Features\ReelsUpload\ViewModels\" />
     <Folder Include="Features\TrailerScraping\Services\" />
-    <Folder Include="Features\TrailerScraping\ViewModels\" />
     <Folder Include="Features\Wallet\Services\" />
     <Folder Include="Features\Wallet\ViewModels\" />
   </ItemGroup>
