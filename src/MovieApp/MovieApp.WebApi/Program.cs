@@ -121,7 +121,7 @@ builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<IVideoProcessingService, VideoProcessingService>();
 builder.Services.AddScoped<IVideoStorageService, VideoStorageService>();
 builder.Services.AddScoped<IVideoIngestionService, VideoIngestionService>();
-builder.Services.AddScoped<ITournamentLogicService, TournamentLogicService>();
+builder.Services.AddSingleton<ITournamentLogicService, TournamentLogicService>();
 
 // Infrastructure
 builder.Services.AddSingleton<IVideoDownloadService, VideoDownloadService>();
