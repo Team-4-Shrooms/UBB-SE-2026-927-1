@@ -15,17 +15,28 @@ public class ReelsUploadController : Controller
 {
     private readonly IVideoStorageService _storageService;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IMovieService _movieService; // 1. Added the private field
 
-    public ReelsUploadController(IVideoStorageService storageService, ICurrentUserService currentUserService)
+    // 2. Updated constructor to inject IMovieService
+    public ReelsUploadController(
+        IVideoStorageService storageService, 
+        ICurrentUserService currentUserService,
+        IMovieService movieService)
     {
         _storageService = storageService;
         _currentUserService = currentUserService;
+        _movieService = movieService;
     }
 
     [HttpGet]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         ViewData["Title"] = "Upload Reel";
+        
+        // 3. Fetch movies and pass them to the View via ViewBag
+        var movies = await _movieService.GetAllMoviesAsync();
+        ViewBag.AvailableMovies = movies;
+
         return View(new ReelUploadForm());
     }
 
@@ -60,9 +71,9 @@ public class ReelsUploadController : Controller
             {
                 LocalFilePath = tempPath,
                 Title = form.Title ?? string.Empty,
-                Caption = form.Description ?? string.Empty, // Mapping form Description to request Caption
+                Caption = form.Description ?? string.Empty,
                 UploaderUserId = userId,
-                MovieId = null
+                MovieId = form.MovieId // Use the ID selected by the user
             };
 
             // 4. Pass to the storage service
@@ -75,11 +86,14 @@ public class ReelsUploadController : Controller
         catch (Exception ex)
         {
             ModelState.AddModelError(string.Empty, $"Upload failed: {ex.Message}");
+            
+            // Re-populate movies in case of error so the dropdown isn't empty
+            ViewBag.AvailableMovies = await _movieService.GetAllMoviesAsync();
             return View("Index", form);
         }
         finally
         {
-            // 6. ALWAYS delete the temp file, even if the service throws an exception
+            // 6. ALWAYS delete the temp file
             if (System.IO.File.Exists(tempPath))
             {
                 System.IO.File.Delete(tempPath);

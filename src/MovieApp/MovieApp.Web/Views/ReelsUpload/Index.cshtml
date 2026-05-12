@@ -1,33 +1,48 @@
 @model MovieApp.Web.ViewModels.ReelUpload.ReelUploadForm
 
 @{
-    ViewData["Title"] = "Upload Reel";
+	ViewData["Title"] = "Upload Reel";
 }
 
 <div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <h2 class="mb-4 text-center">@ViewData["Title"]</h2>
+	<div class="row justify-content-center">
+		<div class="col-md-8">
+			<h2 class="mb-4 text-center">@ViewData["Title"] [cite: 26]</h2>
 
-            @if (!ViewData.ModelState.IsValid)
-            {
-                <div class="alert alert-danger shadow-sm">
-                    <div asp-validation-summary="All" class="mb-0"></div>
-                </div>
-            }
+			@if (!ViewData.ModelState.IsValid)
+			{
+				<div class="alert alert-danger shadow-sm">
+					<div asp-validation-summary="All" class="mb-0"></div> [cite: 27]
+				</div>
+			}
 
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white fw-bold">
-                    Reel Details
-                </div>
-                <div class="card-body p-4">
-                    <form asp-action="Upload" asp-controller="ReelsUpload" enctype="multipart/form-data" method="post">
-                        
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Video File (.mp4)</label>
-                            <input type="file" name="videoFile" class="form-control form-control-lg" accept=".mp4,video/mp4" required />
-                            <div class="form-text">Must be a valid MP4 file (Max 60 seconds / 100MB).</div>
-                        </div>
+			<div class="card shadow-sm">
+				<div class="card-header bg-primary text-white fw-bold">
+					Reel Details [cite: 28]
+				</div>
+				<div class="card-body p-4">
+					<form asp-action="Upload" asp-controller="ReelsUpload" enctype="multipart/form-data" method="post">
+
+						<div class="mb-4">
+							<label class="form-label fw-bold">Video File (.mp4)</label> [cite: 29]
+							<input type="file" name="videoFile" class="form-control form-control-lg" accept=".mp4,video/mp4" required />
+							<div class="form-text">Must be a valid MP4 file (Max 60 seconds / 100MB). [cite: 30]</div>
+						</div>
+
+						<div class="mb-3">
+							<label asp-for="MovieId" class="form-label fw-bold">Link to Movie</label>
+							<select asp-for="MovieId" class="form-select" required>
+								<option value="">-- Select a Movie --</option>
+								@if (ViewBag.AvailableMovies != null)
+								{
+									foreach (var movie in (IEnumerable<MovieApp.DataLayer.Models.Movie>)ViewBag.AvailableMovies)
+									{
+										<option value="@movie.Id">@movie.Title (@movie.ReleaseYear)</option>
+									}
+								}
+							</select>
+							<div class="form-text">Every reel must be associated with a movie.</div>
+						</div>
 
 						<div class="mb-3">
 							<label asp-for="MusicTrackId" class="form-label fw-bold">Background Music (Optional)</label>
@@ -39,22 +54,22 @@
 							</select>
 						</div>
 
-                        <div class="mb-3">
-                            <label asp-for="Title" class="form-label fw-bold">Reel Title</label>
-                            <input asp-for="Title" class="form-control" placeholder="e.g., Awesome Scene" required />
-                        </div>
+						<div class="mb-3">
+							<label asp-for="Title" class="form-label fw-bold">Reel Title</label> [cite: 31]
+							<input asp-for="Title" class="form-control" placeholder="e.g., Awesome Scene" required />
+						</div>
 
-                        <div class="mb-4">
-                            <label asp-for="Description" class="form-label fw-bold">Caption</label>
-                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Write a compelling caption..."></textarea>
-                        </div>
+						<div class="mb-4">
+							<label asp-for="Description" class="form-label fw-bold">Caption</label> [cite: 32]
+							<textarea asp-for="Description" class="form-control" rows="3" placeholder="Write a compelling caption..."></textarea>
+						</div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">Upload Reel</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+						<div class="d-grid gap-2">
+							<button type="submit" class="btn btn-primary btn-lg">Upload Reel</button> [cite: 33]
+						</div>
+					</form>
+				</div> [cite: 34]
+			</div>
+		</div>
+	</div>
 </div>

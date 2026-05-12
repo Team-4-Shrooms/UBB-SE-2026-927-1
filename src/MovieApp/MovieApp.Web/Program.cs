@@ -19,7 +19,7 @@ builder.Services.AddControllersWithViews();
 // HTTP client for auto-login and for ApiClient
 builder.Services.AddHttpClient();
 builder.Services.AddHttpClient<ApiClient>(c =>
-    c.BaseAddress = new Uri(config["WebApi:BaseUrl"]!));
+    c.BaseAddress = new Uri("https://localhost:7143/"));
 
 // JWT token store — single instance satisfying both IAuthTokenProvider and ICurrentUserService
 builder.Services.AddSingleton<JwtTokenStore>();
@@ -52,6 +52,12 @@ builder.Services.AddSingleton<ITournamentLogicService, TournamentLogicProxyServi
 builder.Services.AddMemoryCache();
 builder.Services.AddSession();
 
+builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Home/Index";
+    });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -66,6 +72,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseSession();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

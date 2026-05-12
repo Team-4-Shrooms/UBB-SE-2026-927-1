@@ -41,7 +41,10 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, WebApiCurrentUserService>();
 builder.Services.AddScoped<JwtTokenService>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+});
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IMovieAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
@@ -149,7 +152,7 @@ builder.Services.AddSwaggerGen(options =>
     }
 });
 
-builder.WebHost.UseUrls("http://localhost:4544");
+//builder.WebHost.UseUrls("http://localhost:4544");
 
 var app = builder.Build();
 

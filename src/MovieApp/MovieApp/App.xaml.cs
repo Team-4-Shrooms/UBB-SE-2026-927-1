@@ -68,7 +68,7 @@ namespace MovieApp
             services.AddSingleton<IAuthTokenProvider>(authProvider);
 
             // HTTP client + ApiClient
-            var httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:4544/") };
+            var httpClient = new HttpClient { BaseAddress = new Uri("https://localhost:7143/") };
             services.AddSingleton(httpClient);
             services.AddSingleton<ApiClient>();
 
