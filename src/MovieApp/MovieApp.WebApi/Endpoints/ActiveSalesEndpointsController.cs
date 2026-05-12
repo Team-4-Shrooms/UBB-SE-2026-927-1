@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MovieApp.DataLayer.Repositories;
-using MovieApp.WebApi.Mappings;
+using MovieApp.Logic.Interfaces.Services;
 
 namespace MovieApp.WebApi.Endpoints;
 
@@ -10,18 +9,17 @@ namespace MovieApp.WebApi.Endpoints;
 [Route("api/active-sales")]
 public sealed class ActiveSalesEndpointsController : ControllerBase
 {
-    private readonly ActiveSalesRepository _repository;
+    private readonly IActiveSalesService _activeSalesService;
 
-    public ActiveSalesEndpointsController(ActiveSalesRepository repository)
+    public ActiveSalesEndpointsController(IActiveSalesService activeSalesService)
     {
-        _repository = repository;
+        _activeSalesService = activeSalesService;
     }
 
     [HttpGet("current")]
     public async Task<IActionResult> GetCurrentSales()
     {
-        var currentSales = (await _repository.GetCurrentSalesAsync())
-            .Select(sale => sale.ToDto());
+        var currentSales = await _activeSalesService.GetBestDiscountPercentByMovieIdAsync();
         return Ok(currentSales);
     }
 }
