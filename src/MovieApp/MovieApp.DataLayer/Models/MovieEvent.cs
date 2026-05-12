@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MovieApp.DataLayer.Models
 {
@@ -11,6 +11,7 @@ namespace MovieApp.DataLayer.Models
         public string Location { get; set; } = string.Empty;
         public decimal TicketPrice { get; set; }
         public string PosterUrl { get; set; } = string.Empty;
+        public int Capacity { get; set; } = 100;
 
         public Movie Movie { get; set; }
 

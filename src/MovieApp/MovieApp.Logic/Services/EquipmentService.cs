@@ -23,6 +23,12 @@ namespace MovieApp.Logic.Services
         {
             if (item is null) throw new ArgumentNullException(nameof(item));
 
+            // Fetch the actual user from DB to avoid identity insert errors
+            var sellerId = item.Seller?.Id ?? throw new InvalidOperationException("Seller ID is required.");
+            var seller = await _userRepo.GetUserByIdAsync(sellerId) 
+                         ?? throw new InvalidOperationException($"User with ID {sellerId} not found.");
+            
+            item.Seller = seller;
             item.Status = EquipmentStatus.Available;
 
             await _equipmentRepo.AddAsync(item);

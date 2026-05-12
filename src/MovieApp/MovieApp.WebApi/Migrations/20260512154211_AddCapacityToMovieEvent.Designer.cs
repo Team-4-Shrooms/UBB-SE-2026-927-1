@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MovieApp.WebApi.Data;
 
@@ -11,9 +12,11 @@ using MovieApp.WebApi.Data;
 namespace MovieApp.WebApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260512154211_AddCapacityToMovieEvent")]
+    partial class AddCapacityToMovieEvent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -208,8 +211,7 @@ namespace MovieApp.WebApi.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("StarRating")
-                        .HasPrecision(3, 1)
-                        .HasColumnType("decimal(3,1)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -621,8 +623,7 @@ namespace MovieApp.WebApi.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("WatchPercentage")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 

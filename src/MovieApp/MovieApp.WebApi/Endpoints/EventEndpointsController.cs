@@ -5,6 +5,7 @@ using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Interfaces;
 using MovieApp.DataLayer.Models;
 using MovieApp.DataLayer.Repositories;
+using MovieApp.Logic.Interfaces.Services;
 
 namespace MovieApp.WebApi.Endpoints;
 
@@ -13,51 +14,48 @@ namespace MovieApp.WebApi.Endpoints;
 [Route("api/events")]
 public sealed class EventEndpointsController : ControllerBase
 {
-    private readonly EventRepository _repository;
-    private readonly IMovieAppDbContext _context;
+    private readonly IEventService _eventService;
 
-    public EventEndpointsController(EventRepository repository, IMovieAppDbContext context)
+    public EventEndpointsController(IEventService eventService)
     {
-        _repository = repository;
-        _context = context;
+        _eventService = eventService;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAllEvents()
     {
-        var events = await _repository.GetAllEventsAsync();
+        var events = await _eventService.GetAvailableEventsAsync();
         return Ok(events.Select(movieEvent => movieEvent.ToDto()));
     }
 
-    [HttpGet("{eventId:int}")]
-    public async Task<IActionResult> GetEventById(int eventId)
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetEventById(int id)
     {
-        var movieEvent = await _repository.GetEventByIdAsync(eventId);
+        var movieEvent = await _eventService.GetEventByIdAsync(id);
         return Ok(movieEvent?.ToDto());
     }
 
-    [HttpGet("movie/{movieId:int}")]
-    public async Task<IActionResult> GetEventsForMovie(int movieId)
+    [HttpGet("{id:int}/tickets/{userId:int}")]
+    public async Task<IActionResult> UserHasTicket(int id, int userId)
     {
-        var events = await _repository.GetEventsByMovieIdAsync(movieId);
-        return Ok(events.Select(movieEvent => movieEvent.ToDto()));
+        return Ok(await _eventService.UserHasTicketAsync(userId, id));
     }
 
-    [HttpGet("{eventId:int}/tickets/{userId:int}")]
-    public async Task<IActionResult> UserHasTicket(int eventId, int userId)
+    [HttpPost("{id:int}/purchase-ticket")]
+    public async Task<IActionResult> PurchaseTicketAsync(int id, [FromBody] PurchaseTicketRequestBody body)
     {
-        return Ok(await _repository.UserHasTicketAsync(userId, eventId));
-    }
-
-    [HttpPost("tickets")]
-    public async Task<IActionResult> AddOwnedTicket([FromBody] AddOwnedTicketRequestBody body)
-    {
-        var user = await _context.Users.FindAsync(body.UserId)
-            ?? throw new InvalidOperationException($"User {body.UserId} not found.");
-        var movieEvent = await _context.MovieEvents.FindAsync(body.EventId)
-            ?? throw new InvalidOperationException($"Event {body.EventId} not found.");
-        await _repository.AddOwnedTicketAsync(new OwnedTicket { User = user, Event = movieEvent });
-        await _repository.SaveChangesAsync();
-        return Ok();
+        try
+        {
+            await _eventService.PurchaseTicketAsync(body.UserId, id);
+            return Ok();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "An unexpected error occurred: " + ex.Message);
+        }
     }
 }

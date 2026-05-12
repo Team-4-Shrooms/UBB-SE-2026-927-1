@@ -1,0 +1,108 @@
+@model MovieApp.Web.Models.SellEquipmentForm
+
+@{
+    ViewData["Title"] = "Sell Equipment";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5">
+                <div class="text-center mb-5">
+                    <h1 class="display-5 fw-bold mb-2">Sell Your Equipment</h1>
+                    <p class="text-muted">Fill out the details below to list your item in the marketplace.</p>
+                </div>
+
+                <form asp-action="Sell" method="post" class="needs-validation">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
+
+                    <div class="row g-4">
+                        <div class="col-md-12">
+                            <label asp-for="Name" class="form-label fw-semibold">Item Name</label>
+                            <input asp-for="Name" class="form-control form-control-lg rounded-3 shadow-sm border-0 bg-light" placeholder="e.g. Pro Video Camera X1" />
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Category" class="form-label fw-semibold">Category</label>
+                            <select asp-for="Category" class="form-select form-select-lg rounded-3 shadow-sm border-0 bg-light">
+                                <option value="">Select Category</option>
+                                <option value="Cameras">Cameras</option>
+                                <option value="Audio">Audio</option>
+                                <option value="Lighting">Lighting</option>
+                                <option value="Accessories">Accessories</option>
+                            </select>
+                            <span asp-validation-for="Category" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Condition" class="form-label fw-semibold">Condition</label>
+                            <select asp-for="Condition" class="form-select form-select-lg rounded-3 shadow-sm border-0 bg-light">
+                                <option value="">Select Condition</option>
+                                <option value="New">New</option>
+                                <option value="Like New">Like New</option>
+                                <option value="Good">Good</option>
+                                <option value="Fair">Fair</option>
+                            </select>
+                            <span asp-validation-for="Condition" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label asp-for="Description" class="form-label fw-semibold">Description</label>
+                            <textarea asp-for="Description" class="form-control form-control-lg rounded-3 shadow-sm border-0 bg-light" rows="4" placeholder="Tell buyers about your item..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Price" class="form-label fw-semibold">Price ($)</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text border-0 bg-light shadow-sm">$</span>
+                                <input asp-for="Price" type="number" step="0.01" class="form-control rounded-3 shadow-sm border-0 bg-light" placeholder="0.00" />
+                            </div>
+                            <span asp-validation-for="Price" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="ImageUrl" class="form-label fw-semibold">Image URL</label>
+                            <input asp-for="ImageUrl" class="form-control form-control-lg rounded-3 shadow-sm border-0 bg-light" placeholder="https://example.com/image.jpg" />
+                            <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-5">
+                        <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill py-3 shadow-sm sell-submit-btn">
+                            List Item Now
+                        </button>
+                        <a asp-action="Index" class="btn btn-link w-100 mt-2 text-muted text-decoration-none">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control:focus, .form-select:focus {
+        background-color: #fff !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15) !important;
+        border: 1px solid #0d6efd !important;
+    }
+    .sell-submit-btn {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        border: none;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+    .sell-submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(37, 117, 252, 0.3) !important;
+    }
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+</style>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

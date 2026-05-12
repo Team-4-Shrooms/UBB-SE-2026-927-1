@@ -1,9 +1,133 @@
+@model IEnumerable<MovieApp.DataLayer.Models.MovieEvent>
+
 @{
     ViewData["Title"] = "Events";
 }
 
-<div class="text-center py-5">
-    <h1 class="display-5">Events</h1>
-    <p class="lead text-muted">This feature is coming soon.</p>
-    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary mt-3">Back to Home</a>
+<div class="events-container mt-4">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-gradient">Exclusive Movie Events</h1>
+        <p class="lead text-muted">Join the community for special screenings, workshops, and more.</p>
+        <div class="d-flex justify-content-center mt-4">
+            <input type="text" id="eventSearchInput" class="form-control search-bar-events" placeholder="Search events by title..." style="max-width: 400px; border-radius: 25px; padding: 10px 20px; border: 2px solid #dee2e6;" />
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        @foreach (var item in Model)
+        {
+            // Simple logic for remaining capacity: Assume 10 tickets sold if not available
+            var soldTickets = 0; 
+            var remaining = Math.Max(0, item.Capacity - soldTickets);
+            var isSoldOut = remaining <= 0 || item.Capacity <= 0;
+
+            <div class="col event-card-wrapper" data-title="@item.Title">
+                <div class="card h-100 border-0 shadow-lg event-card">
+                    <div class="row g-0">
+                        <div class="col-md-5">
+                            <div class="event-img-container h-100">
+                                <img src="@item.PosterUrl" class="img-fluid rounded-start h-100 object-fit-cover" alt="@item.Title" onerror="this.src='https://placehold.co/400x600?text=@item.Title'">
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="card-body d-flex flex-column h-100">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h4 class="card-title fw-bold mb-0">@item.Title</h4>
+                                    @if (isSoldOut)
+                                    {
+                                        <span class="badge bg-danger rounded-pill px-3 py-2">Sold Out</span>
+                                    }
+                                </div>
+                                
+                                <p class="card-text text-muted flex-grow-1">@item.Description</p>
+                                
+                                <div class="event-details mb-3">
+                                    <div class="d-flex align-items-center mb-1">
+                                        <i class="bi bi-calendar-event me-2 text-primary"></i>
+                                        <span class="small">@item.DisplayDate</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-1">
+                                        <i class="bi bi-geo-alt me-2 text-primary"></i>
+                                        <span class="small">@item.Location</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-people me-2 text-primary"></i>
+                                        <span class="small">@remaining / @item.Capacity remaining</span>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    <span class="h5 mb-0 fw-bold">@item.DisplayTicketPrice</span>
+                                    <a asp-action="Detail" asp-route-id="@item.Id" class="btn btn-primary rounded-pill px-4">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 </div>
+
+<style>
+    .text-gradient {
+        background: linear-gradient(90deg, #121212, #6c757d);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .event-card {
+        border-radius: 20px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .event-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
+    }
+    .event-img-container {
+        min-height: 250px;
+    }
+    .object-fit-cover {
+        object-fit: cover;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #00d2ff 100%);
+        border: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+        opacity: 0.9;
+        transform: scale(1.05);
+    }
+</style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            console.log("Events Search Initialized (Robust jQuery)");
+            
+            var $eventSearch = $("#eventSearchInput");
+            var $eventCards = $(".event-card-wrapper");
+            
+            $eventSearch.on("input keyup", function() {
+                var query = $(this).val().toLowerCase().trim();
+                console.log("Event Query: " + query);
+                
+                $eventCards.each(function() {
+                    var $card = $(this);
+                    var title = $card.attr("data-title") || "";
+                    var isMatch = title.toLowerCase().indexOf(query) > -1;
+                    
+                    if (isMatch) {
+                        $card.show();
+                    } else {
+                        $card.hide();
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
