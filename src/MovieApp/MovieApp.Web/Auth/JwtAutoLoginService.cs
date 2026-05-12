@@ -41,34 +41,44 @@ namespace MovieApp.Web.Auth
                 return;
             }
 
-            try
-            {
-                HttpClient client = this.httpClientFactory.CreateClient();
-                HttpResponseMessage response = await client.PostAsJsonAsync(
-                    $"{baseUrl.TrimEnd('/')}/api/auth/login",
-                    new { Username = username, Password = password },
-                    cancellationToken);
+            int retryCount = 3;
+            int delaySeconds = 2;
 
-                if (!response.IsSuccessStatusCode)
+            for (int i = 0; i < retryCount; i++)
+            {
+                try
                 {
-                    this.logger.LogError("Auto-login failed with status {Status}.", response.StatusCode);
-                    return;
+                    HttpClient client = this.httpClientFactory.CreateClient();
+                    HttpResponseMessage response = await client.PostAsJsonAsync(
+                        $"{baseUrl.TrimEnd('/')}/api/auth/login",
+                        new { Username = username, Password = password },
+                        cancellationToken);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        LoginResponse? result = await response.Content.ReadFromJsonAsync<LoginResponse>(cancellationToken: cancellationToken);
+                        if (result != null)
+                        {
+                            this.tokenStore.SetToken(result.Token, result.UserId);
+                            this.logger.LogInformation("Auto-login succeeded for user {UserId} (attempt {Attempt}).", result.UserId, i + 1);
+                            return;
+                        }
+                    }
+
+                    this.logger.LogWarning("Auto-login attempt {Attempt} failed with status {Status}.", i + 1, response.StatusCode);
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogWarning("Auto-login attempt {Attempt} failed: {Message}", i + 1, ex.Message);
                 }
 
-                LoginResponse? result = await response.Content.ReadFromJsonAsync<LoginResponse>(cancellationToken: cancellationToken);
-                if (result is null)
+                if (i < retryCount - 1)
                 {
-                    this.logger.LogError("Auto-login returned an empty response.");
-                    return;
+                    await Task.Delay(TimeSpan.FromSeconds(delaySeconds), cancellationToken);
                 }
+            }
 
-                this.tokenStore.SetToken(result.Token, result.UserId);
-                this.logger.LogInformation("Auto-login succeeded for user {UserId}.", result.UserId);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Auto-login threw an exception — app will start without a token.");
-            }
+            this.logger.LogError("Auto-login failed after {Count} attempts. App will start without a token.", retryCount);
         }
 
         /// <inheritdoc/>

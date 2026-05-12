@@ -48,6 +48,7 @@ public static class WebApiDtoMappingExtensions
             Date = movieEvent.Date,
             Location = movieEvent.Location ?? string.Empty,
             PosterUrl = movieEvent.PosterUrl ?? string.Empty,
+            Capacity = movieEvent.Capacity,
         };
     }
 
@@ -86,6 +87,7 @@ public static class WebApiDtoMappingExtensions
             Condition = dto.Condition ?? string.Empty,
             Price = dto.Price,
             ImageUrl = dto.ImageUrl ?? string.Empty,
+            Seller = new User { Id = dto.SellerId }
         };
     }
 
@@ -141,6 +143,7 @@ public static class WebApiDtoMappingExtensions
             Location = movieEvent.Location ?? string.Empty,
             TicketPrice = movieEvent.TicketPrice,
             PosterUrl = movieEvent.PosterUrl ?? string.Empty,
+            Capacity = movieEvent.Capacity,
             Movie = movieEvent.Movie?.ToReferenceDto(),
             DisplayDate = movieEvent.DisplayDate,
             DisplayTicketPrice = movieEvent.DisplayTicketPrice,

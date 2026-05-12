@@ -41,6 +41,7 @@ public sealed class MovieEventDto
     public string Location { get; set; } = string.Empty;
     public decimal TicketPrice { get; set; }
     public string PosterUrl { get; set; } = string.Empty;
+    public int Capacity { get; set; }
     public MovieReferenceDto? Movie { get; set; }
     public string DisplayDate { get; set; } = string.Empty;
     public string DisplayTicketPrice { get; set; } = string.Empty;
