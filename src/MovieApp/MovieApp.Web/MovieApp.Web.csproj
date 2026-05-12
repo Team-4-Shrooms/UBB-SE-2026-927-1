@@ -1,6 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
+    <Compile Remove="Views\Events\Index1.cshtml.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Views\Events\Index1.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MovieApp.Logic\MovieApp.Logic.csproj" />
     <ProjectReference Include="..\MovieApp.Proxy\MovieApp.Proxy.csproj" />
   </ItemGroup>

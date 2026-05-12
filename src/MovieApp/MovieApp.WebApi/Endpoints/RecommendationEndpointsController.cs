@@ -4,6 +4,7 @@ using MovieApp.WebDTOs.DTOs.RequestDTOs;
 using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Repositories;
 using MovieApp.Logic.Features.ReelsFeed;
+using MovieApp.DataLayer.Interfaces.Repositories;
 
 namespace MovieApp.WebApi.Endpoints;
 
@@ -12,12 +13,13 @@ namespace MovieApp.WebApi.Endpoints;
 [Route("api/recommendations")]
 public sealed class RecommendationEndpointsController : ControllerBase
 {
-    private readonly RecommendationRepository _repository;
-    private readonly RecommendationService _service;
+    private readonly IRecommendationRepository _repository;
+    private readonly IRecommendationService _service;
 
-    public RecommendationEndpointsController(RecommendationRepository repository)
+    public RecommendationEndpointsController(IRecommendationRepository repository, IRecommendationService service)
     {
         _repository = repository;
+        _service = service;
     }
 
     [HttpGet("users/{userId:int}/has-preferences")]
@@ -33,7 +35,7 @@ public sealed class RecommendationEndpointsController : ControllerBase
         return Ok(reels.Select(reel => reel.ToDto()));
     }
 
-    [HttpGet("api/recommendations/users/{userId:int}/recommended-reels/count={n:int}")]
+    [HttpGet("users/{userId:int}/recommended-reels/count={n:int}")]
     public async Task<IActionResult> GetRecommendedReelsAsync(int userId, int n)
     {
         var reels = await _service.GetRecommendedReelsAsync(userId, n);

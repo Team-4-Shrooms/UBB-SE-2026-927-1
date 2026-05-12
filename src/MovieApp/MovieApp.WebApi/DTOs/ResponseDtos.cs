@@ -144,6 +144,11 @@ public sealed class ReelDto
     public UserReferenceDto? CreatorUser { get; set; }
 }
 
+public class VideoProcessingResponse
+{
+    public string OutputPath { get; set; } = string.Empty;
+}
+
 public sealed class TransactionDto
 {
     public int Id { get; set; }
