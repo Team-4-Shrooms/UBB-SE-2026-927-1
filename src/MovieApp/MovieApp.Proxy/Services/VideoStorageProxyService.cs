@@ -5,6 +5,13 @@ using MovieApp.Logic.Features.ReelsUpload;
 
 namespace MovieApp.Proxy.Services
 {
+    /// <summary>
+    /// Proxy implementation of IVideoIngestionService.
+    /// Read-only operations (GetAllJobsAsync, GetJobStatusAsync) call the scrape-job WebApi.
+    /// RunScrapeJobAsync and IngestVideoFromUrlAsync create scrape-job / reel records on the server;
+    /// the actual YouTube download is done server-side by the real VideoIngestionService.
+    /// </summary>
+    
     public class VideoStorageProxyService : IVideoStorageService
     {
         private readonly ApiClient _apiClient;

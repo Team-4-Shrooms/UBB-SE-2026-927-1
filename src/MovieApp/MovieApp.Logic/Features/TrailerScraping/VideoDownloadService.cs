@@ -67,7 +67,6 @@ namespace MovieApp.Logic.Features.TrailerScraping
                 return Task.CompletedTask;
             }
 
-            // Explicitly resolve absolute paths to guarantee yt-dlp can find ffmpeg
             string currentDir = AppDomain.CurrentDomain.BaseDirectory;
             string localYtDlp = Path.Combine(currentDir, YtDlpExecutableName);
             string localFfmpeg = Path.Combine(currentDir, FfmpegExecutableName);
@@ -86,7 +85,6 @@ namespace MovieApp.Logic.Features.TrailerScraping
         {
             await this.EnsureDependenciesAsync();
 
-            // 1. Generate a totally unique ID so we don't have to parse console text!
             string uniqueFileName = Guid.NewGuid().ToString("N");
             string outputTemplate = Path.Combine(this.downloadFolder, $"{uniqueFileName}.%(ext)s");
             string expectedFinalFile = Path.Combine(this.downloadFolder, $"{uniqueFileName}.mp4");
@@ -106,8 +104,6 @@ namespace MovieApp.Logic.Features.TrailerScraping
                     FileName = this.ytDlpPath,
                     Arguments = processArguments,
                     UseShellExecute = false,
-                    // 2. THE FIX: We turn OFF all pipe redirection. 
-                    // C# will no longer deadlock waiting for ffmpeg to close its inherited streams!
                     RedirectStandardOutput = false,
                     RedirectStandardError = false,
                     RedirectStandardInput = false,
@@ -124,7 +120,6 @@ namespace MovieApp.Logic.Features.TrailerScraping
                 using CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(ProcessTimeoutMinutes));
                 try
                 {
-                    // This will now perfectly complete the second yt-dlp finishes.
                     await downloadProcess.WaitForExitAsync(cancellationTokenSource.Token);
                 }
                 catch (OperationCanceledException)
@@ -140,7 +135,6 @@ namespace MovieApp.Logic.Features.TrailerScraping
                     return null;
                 }
 
-                // 3. We instantly know where the file is because we assigned the GUID
                 if (File.Exists(expectedFinalFile))
                 {
                     this.LastError = null;
