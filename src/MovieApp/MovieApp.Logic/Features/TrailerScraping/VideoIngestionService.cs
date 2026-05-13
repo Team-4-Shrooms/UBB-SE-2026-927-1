@@ -104,9 +104,13 @@ namespace MovieApp.Logic.Features.TrailerScraping
                 var backgroundScraper = scope.ServiceProvider.GetRequiredService<IYouTubeScraperService>();
                 var backgroundDownloader = scope.ServiceProvider.GetRequiredService<IVideoDownloadService>();
 
+                var dbContext = scope.ServiceProvider.GetRequiredService<MovieApp.DataLayer.Interfaces.IMovieAppDbContext>();
                 var backgroundJob = await backgroundRepo.GetJobByIdAsync(job.Id);
 
                 if (backgroundJob == null) return;
+
+                var trackedMovie = await dbContext.Movies.FindAsync(movie.Id);
+                var trackedUser = await dbContext.Users.FindAsync(DefaultCreatorUserId);
 
                 async Task LogAsync(string level, string message)
                 {
@@ -123,11 +127,9 @@ namespace MovieApp.Logic.Features.TrailerScraping
 
                 try
                 {
-                    // 3. USE BACKGROUNDJOB EVERYWHERE INSTEAD OF 'job'
                     backgroundJob.Status = JobStatusRunning;
                     await backgroundRepo.UpdateJobAsync(backgroundJob);
 
-                    // We can safely read primitive properties (strings/ints) from the old 'movie' object
                     await LogAsync(LogLevelInfo, string.Format(LogFormatScrapingMovie, movie.Title, movie.Id));
                     await LogAsync(LogLevelInfo, string.Format(LogFormatYouTubeQuery, searchQuery, maxResults));
 
@@ -160,9 +162,8 @@ namespace MovieApp.Logic.Features.TrailerScraping
 
                             Reel reel = new Reel
                             {
-                                // 4. THE FIX: Do NOT use 'Movie = movie'. Create a safe stub reference!
-                                Movie = new Movie { Id = movie.Id },
-                                CreatorUser = new User { Id = DefaultCreatorUserId },
+                                Movie = trackedMovie,
+                                CreatorUser = trackedUser,
                                 VideoUrl = localMp4Path,
                                 ThumbnailUrl = video.ThumbnailUrl,
                                 Title = video.Title,
