@@ -144,6 +144,14 @@ namespace MovieApp.WebApi.Data
             modelBuilder.Entity<UserReelInteraction>()
                 .Property(interaction => interaction.WatchDurationSeconds)
                 .HasPrecision(18, 2);
+
+            modelBuilder.Entity<UserReelInteraction>()
+                .Property(interaction => interaction.WatchPercentage)
+                .HasPrecision(5, 2);
+
+            modelBuilder.Entity<MovieReview>()
+                .Property(review => review.StarRating)
+                .HasPrecision(3, 1);
         }
     }
 }

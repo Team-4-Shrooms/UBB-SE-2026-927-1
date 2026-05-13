@@ -1,0 +1,48 @@
+@model IEnumerable<MovieApp.DataLayer.Models.Movie>
+
+@{
+    var onSaleMovies = Model.Where(m => m.HasActiveSale).ToList();
+}
+
+@if (onSaleMovies.Any())
+{
+    <div class="alert alert-warning text-center mb-4 box-shadow rounded-3">
+        <h4 class="alert-heading fw-bold text-danger"> FLASH SALE </h4>
+        <p class="mb-2">Hurry! These exclusive deals end in: <strong id="flash-sale-timer" class="fs-5">00:00:00</strong></p>
+        
+        <div class="d-flex justify-content-center flex-wrap gap-2 mt-2">
+            @foreach (var movie in onSaleMovies.Take(4))
+            {
+                <span class="badge bg-danger fs-6 py-2 px-3">
+                    @movie.Title — Now $@movie.DiscountedPriceText <del class="text-white-50 ms-1">$@movie.OriginalPriceText</del>
+                </span>
+            }
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            var countDownDate = new Date().getTime() + (2 * 60 * 60 * 1000);
+
+            var x = setInterval(function() {
+                var now = new Date().getTime();
+                var distance = countDownDate - now;
+
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                hours = hours < 10 ? "0" + hours : hours;
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                $("#flash-sale-timer").text(hours + ":" + minutes + ":" + seconds);
+
+                if (distance < 0) {
+                    clearInterval(x);
+                    $("#flash-sale-timer").text("EXPIRED");
+                }
+            }, 1000);
+        });
+    </script>
+}

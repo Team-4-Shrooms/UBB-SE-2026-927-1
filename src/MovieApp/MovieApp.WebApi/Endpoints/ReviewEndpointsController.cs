@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MovieApp.WebDTOs.DTOs.RequestDTOs;
+using MovieApp.DataLayer.Interfaces.Repositories;
+using MovieApp.Logic.Interfaces.Services;
 using MovieApp.WebApi.Mappings;
-using MovieApp.DataLayer.Interfaces;
-using MovieApp.DataLayer.Models;
-using MovieApp.DataLayer.Repositories;
+using MovieApp.WebDTOs.DTOs.RequestDTOs;
 
 namespace MovieApp.WebApi.Endpoints;
 
@@ -13,45 +12,32 @@ namespace MovieApp.WebApi.Endpoints;
 [Route("api/reviews")]
 public sealed class ReviewEndpointsController : ControllerBase
 {
-    private readonly ReviewRepository _repository;
-    private readonly IMovieAppDbContext _context;
+    private readonly IReviewService _reviewService;
+    private readonly IReviewRepository _repository;
 
-    public ReviewEndpointsController(ReviewRepository repository, IMovieAppDbContext context)
+    public ReviewEndpointsController(IReviewService reviewService, IReviewRepository repository)
     {
+        _reviewService = reviewService;
         _repository = repository;
-        _context = context;
     }
 
     [HttpGet("movie/{movieId:int}")]
     public async Task<IActionResult> GetReviewsForMovie(int movieId)
     {
-        var reviews = await _repository.GetReviewsForMovieAsync(movieId);
+        var reviews = await _reviewService.GetReviewsForMovieAsync(movieId);
         return Ok(reviews.Select(review => review.ToDto(movieId)));
     }
 
     [HttpGet("movie/{movieId:int}/ratings")]
     public async Task<IActionResult> GetRawRatingsForMovie(int movieId)
     {
-        return Ok(await _repository.GetRawRatingsForMovieAsync(movieId));
+        return Ok(await _reviewService.GetStarRatingBucketsAsync(movieId));
     }
 
     [HttpPost]
     public async Task<IActionResult> AddReview([FromBody] AddReviewRequestBody body)
     {
-        var user = await _context.Users.FindAsync(body.UserId)
-            ?? throw new InvalidOperationException($"User {body.UserId} not found.");
-        var movie = await _context.Movies.FindAsync(body.MovieId)
-            ?? throw new InvalidOperationException($"Movie {body.MovieId} not found.");
-        var review = new MovieReview
-        {
-            StarRating = body.StarRating,
-            Comment = body.Comment,
-            CreatedAt = DateTime.UtcNow,
-            User = user,
-            Movie = movie,
-        };
-        await _repository.AddReviewAsync(review);
-        await _repository.SaveChangesAsync();
+        await _reviewService.PostReviewAsync(body.MovieId, body.UserId, body.StarRating, body.Comment);
         return Ok();
     }
 
