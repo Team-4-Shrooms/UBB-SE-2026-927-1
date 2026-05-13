@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\MovieApp.Logic\MovieApp.Logic.csproj" />
     <ProjectReference Include="..\MovieApp.Proxy\MovieApp.Proxy.csproj" />
+    <ProjectReference Include="..\MovieApp.WebApi\MovieApp.WebApi.csproj" />
   </ItemGroup>
 
   <ItemGroup>

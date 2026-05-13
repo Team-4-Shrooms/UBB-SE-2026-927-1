@@ -52,6 +52,12 @@ builder.Services.AddSingleton<ITournamentLogicService, TournamentLogicProxyServi
 builder.Services.AddMemoryCache();
 builder.Services.AddSession();
 
+builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Home/Index";
+    });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -66,6 +72,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseSession();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

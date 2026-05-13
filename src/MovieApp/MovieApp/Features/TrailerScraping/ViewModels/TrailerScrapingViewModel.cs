@@ -1,14 +1,14 @@
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using MovieApp.DataLayer.Models;
+using MovieApp.Logic.Features.TrailerScraping;
+using MovieApp.Logic.Interfaces.Services;
+
 namespace MovieApp.Features.TrailerScraping.ViewModels
 {
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Threading.Tasks;
-    using CommunityToolkit.Mvvm.ComponentModel;
-    using CommunityToolkit.Mvvm.Input;
-    using MovieApp.DataLayer.Models;
-    using MovieApp.Logic.Features.TrailerScraping;
-    using MovieApp.Logic.Interfaces.Services;
-
     /// <summary>
     /// ViewModel for the Trailer Scraping admin dashboard.
     /// Handles movie autocomplete, scrape execution, and log display.
