@@ -14,7 +14,6 @@ namespace MovieApp.Logic.Features.ReelsFeed
     {
         private const int RecentlyLikedDaysWindow = 7;
         private readonly IRecommendationRepository recommendationRepository;
-        private readonly IRecommendationService _recommendationService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RecommendationService"/> class.
@@ -69,6 +68,31 @@ namespace MovieApp.Logic.Features.ReelsFeed
                 .ThenByDescending(reel => reel.CreatedAt)
                 .Take(count)
                 .ToList();
+        }
+
+        public async Task<bool> UserHasPreferencesAsync(int userId)
+        {
+            return await this.recommendationRepository.UserHasPreferencesAsync(userId);
+        }
+
+        public async Task<IList<Reel>> GetAllReelsAsync()
+        {
+            return await this.recommendationRepository.GetAllReelsAsync();
+        }
+
+        public async Task<IDictionary<int, decimal>> GetUserPreferenceScoresAsync(int userId)
+        {
+            return await this.recommendationRepository.GetUserPreferenceScoresAsync(userId);
+        }
+
+        public async Task<IDictionary<int, int>> GetAllLikeCountsAsync()
+        {
+            return await this.recommendationRepository.GetAllLikeCountsAsync();
+        }
+
+        public async Task<IList<UserReelInteraction>> GetLikesWithinDaysAsync(int days)
+        {
+            return await this.recommendationRepository.GetLikesWithinDaysAsync(days);
         }
     }
 }

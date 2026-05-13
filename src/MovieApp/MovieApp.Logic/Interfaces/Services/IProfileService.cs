@@ -10,8 +10,8 @@ namespace MovieApp.Logic.Interfaces.Services
     public interface IProfileService
     {
         Task<UserProfile> BuildProfileFromInteractionsAsync(int userId);
+        Task AddProfileAsync(UserProfile profile);
         Task<decimal> GetUserBalanceAsync(int userId);
         Task<List<Transaction>> GetUserTransactionsAsync(int userId, int page, int pageSize);
     }
 }
-

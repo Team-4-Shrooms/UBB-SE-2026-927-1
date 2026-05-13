@@ -30,5 +30,11 @@ namespace MovieApp.Proxy.Services
             var result = await _apiClient.GetAsync<List<Reel>>($"api/reels/user/{userId}");
             return result ?? new List<Reel>();
         }
+
+        public async Task<Reel> InsertReelAsync(Reel reel)
+        {
+            var result = await _apiClient.PostAsync<Reel, Reel>("api/video-storage/insert", reel);
+            return result ?? new Reel();
+        }
     }
 }

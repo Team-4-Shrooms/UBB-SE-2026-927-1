@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MovieApp.WebDTOs.DTOs.RequestDTOs;
 using MovieApp.WebApi.Mappings;
-using MovieApp.DataLayer.Repositories;
+using MovieApp.Logic.Interfaces.Services;
 
 namespace MovieApp.WebApi.Endpoints;
 
@@ -11,30 +11,30 @@ namespace MovieApp.WebApi.Endpoints;
 [Route("api/movie-tournament")]
 public sealed class MovieTournamentEndpointsController : ControllerBase
 {
-    private readonly MovieTournamentRepository _repository;
+    private readonly IMovieTournamentService _tournamentService;
 
-    public MovieTournamentEndpointsController(MovieTournamentRepository repository)
+    public MovieTournamentEndpointsController(IMovieTournamentService tournamentService)
     {
-        _repository = repository;
+        _tournamentService = tournamentService;
     }
 
     [HttpGet("users/{userId:int}/pool-size")]
     public async Task<IActionResult> GetTournamentPoolSizeAsync(int userId)
     {
-        return Ok(await _repository.GetTournamentPoolSizeAsync(userId));
+        return Ok(await _tournamentService.GetTournamentPoolSizeAsync(userId));
     }
 
     [HttpGet("users/{userId:int}/pool")]
     public async Task<IActionResult> GetTournamentPoolAsync(int userId, [FromQuery] int poolSize)
     {
-        var pool = await _repository.GetTournamentPoolAsync(userId, poolSize);
+        var pool = await _tournamentService.GetTournamentPoolAsync(userId, poolSize);
         return Ok(pool.Select(movie => movie.ToDto()));
     }
 
     [HttpPost("users/{userId:int}/movies/{movieId:int}/boost")]
     public async Task<IActionResult> BoostMovieScoreAsync(int userId, int movieId, [FromBody] BoostMovieScoreRequestBody request)
     {
-        await _repository.BoostMovieScoreAsync(userId, movieId, request.ScoreBoost);
+        await _tournamentService.BoostMovieScoreAsync(userId, movieId, request.ScoreBoost);
         return Ok();
     }
 }

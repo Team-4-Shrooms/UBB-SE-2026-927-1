@@ -186,3 +186,22 @@ public sealed class RemoveTicketRequestBody
     public int UserId { get; set; }
     public int EventId { get; set; }
 }
+
+public sealed class UpdatePreferenceScoreRequestBody
+{
+    public int UserId { get; set; }
+    public int MovieId { get; set; }
+    public bool IsLiked { get; set; }
+}
+
+public sealed class RunScrapeRequestBody
+{
+    public int MovieId { get; set; }
+    public int MaxResults { get; set; }
+}
+
+public sealed class IngestUrlRequestBody
+{
+    public string TrailerUrl { get; set; } = string.Empty;
+    public int MovieId { get; set; }
+}

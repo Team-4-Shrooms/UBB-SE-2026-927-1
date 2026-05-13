@@ -3,9 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using MovieApp.WebDTOs.DTOs.RequestDTOs;
 using MovieApp.WebApi.DTOs;
 using MovieApp.WebApi.Mappings;
-using MovieApp.DataLayer.Interfaces;
-using MovieApp.DataLayer.Models;
-using MovieApp.DataLayer.Repositories;
 using MovieApp.Logic.Interfaces.Services;
 
 namespace MovieApp.WebApi.Endpoints;
@@ -15,15 +12,13 @@ namespace MovieApp.WebApi.Endpoints;
 [Route("api/profiles")]
 public sealed class ProfileEndpointsController : ControllerBase
 {
-    private readonly ProfileRepository _repository;
-    private readonly IMovieAppDbContext _context;
     private readonly IProfileService _profileService;
+    private readonly IUserService _userService;
 
-    public ProfileEndpointsController(ProfileRepository repository, IMovieAppDbContext context, IProfileService profileService)
+    public ProfileEndpointsController(IProfileService profileService, IUserService userService)
     {
-        _repository = repository;
-        _context = context;
         _profileService = profileService;
+        _userService = userService;
     }
 
     [HttpGet("users/{userId:int}")]
@@ -36,12 +31,12 @@ public sealed class ProfileEndpointsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddProfileAsync([FromBody] UpsertProfileRequestBody body)
     {
-        var user = await _context.Users.FindAsync(body.UserId)
+        var user = await _userService.GetUserByIdAsync(body.UserId)
             ?? throw new InvalidOperationException($"User {body.UserId} not found.");
+
         var profile = body.ToModel();
         profile.User = user;
-        await _repository.AddProfileAsync(profile);
-        await _repository.SaveChangesAsync();
+        await _profileService.AddProfileAsync(profile);
         return Ok();
     }
 }

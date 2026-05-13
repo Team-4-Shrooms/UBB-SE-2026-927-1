@@ -78,5 +78,10 @@ namespace MovieApp.Logic.Features.ReelsUpload
         {
             return await reelRepository.GetUserReelsAsync(userId);
         }
+
+        public async Task<Reel> InsertReelAsync(Reel reel)
+        {
+            return await memoryRepository.InsertReelAsync(reel);
+        }
     }
 }

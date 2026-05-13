@@ -41,34 +41,7 @@ namespace MovieApp.Proxy.Services
 
         public async Task PurchaseMovieAsync(int userId, int movieId, decimal price)
         {
-            // Validate ownership
-            bool alreadyOwned = await UserOwnsMovieAsync(userId, movieId);
-            if (alreadyOwned)
-                throw new InvalidOperationException("Movie already owned.");
-
-            // Check balance
-            decimal balance = await _apiClient.GetAsync<decimal>($"api/users/{userId}/balance");
-            if (balance < price)
-                throw new InvalidOperationException("Insufficient balance.");
-
-            // Deduct balance
-            await _apiClient.PutAsync($"api/users/{userId}/balance",
-                new { NewBalance = balance - price });
-
-            // Record ownership
-            await _apiClient.PostAsync("api/inventory/ownedmovies",
-                new { UserId = userId, MovieId = movieId });
-
-            // Log transaction
-            await _apiClient.PostAsync("api/transactions", new
-            {
-                Amount = -price,
-                Type = "MoviePurchase",
-                Status = "Completed",
-                Timestamp = DateTime.UtcNow,
-                BuyerId = userId,
-                MovieId = movieId,
-            });
+            await _apiClient.PostAsync($"api/movies/{movieId}/purchase", new { UserId = userId, FinalPrice = price });
         }
     }
 }

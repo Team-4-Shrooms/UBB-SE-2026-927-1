@@ -15,5 +15,10 @@ namespace MovieApp.Logic.Features.ReelsFeed
         /// <param name="count">The maximum number of reels to return.</param>
         /// <returns>A list of recommended reels ordered from most to least relevant.</returns>
         Task<IList<Reel>> GetRecommendedReelsAsync(int userId, int count);
+        Task<bool> UserHasPreferencesAsync(int userId);
+        Task<IList<Reel>> GetAllReelsAsync();
+        Task<IDictionary<int, decimal>> GetUserPreferenceScoresAsync(int userId);
+        Task<IDictionary<int, int>> GetAllLikeCountsAsync();
+        Task<IList<UserReelInteraction>> GetLikesWithinDaysAsync(int days);
     }
 }
