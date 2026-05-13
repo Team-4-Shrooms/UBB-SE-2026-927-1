@@ -28,7 +28,7 @@ public sealed class CatalogController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index(string? search, string? genre, decimal? minRating)
+    public async Task<IActionResult> Index(string? search, string? genre, decimal? minRating, string? sort)
     {
         var movies = string.IsNullOrWhiteSpace(search)
             ? await _movieService.GetAllMoviesAsync()
@@ -68,6 +68,15 @@ public sealed class CatalogController : Controller
             filteredMovies = filteredMovies.Where(m => m.Rating >= minRating.Value);
         }
 
+        filteredMovies = sort switch
+        {
+            "price_asc"    => filteredMovies.OrderBy(m => m.GetEffectivePrice()),
+            "price_desc"   => filteredMovies.OrderByDescending(m => m.GetEffectivePrice()),
+            "rating_desc"  => filteredMovies.OrderByDescending(m => m.Rating),
+            "rating_asc"   => filteredMovies.OrderBy(m => m.Rating),
+            _              => filteredMovies.OrderBy(m => m.Title),
+        };
+
         var viewModel = new CatalogIndexViewModel
         {
             Movies = filteredMovies.ToList(),
@@ -77,6 +86,7 @@ public sealed class CatalogController : Controller
                 Search = search,
                 Genre = genre,
                 MinRating = minRating,
+                Sort = sort,
             },
         };
 
@@ -107,15 +117,44 @@ public sealed class CatalogController : Controller
         var reviews = await _reviewService.GetReviewsForMovieAsync(id);
         var buckets = await _reviewService.GetStarRatingBucketsAsync(id);
 
+        var userId = _currentUserService.UserId;
+        var userOwnsMovie = userId > 0 && await _movieService.UserOwnsMovieAsync(userId, id);
+
         var viewModel = new CatalogDetailViewModel
         {
             Movie = movie,
             Reviews = reviews.OrderByDescending(r => r.CreatedAt).ToList(),
             StarRatingBuckets = buckets,
             Form = new AddReviewForm { MovieId = id },
+            UserOwnsMovie = userOwnsMovie,
+            IsLoggedIn = userId > 0,
         };
 
         return View(viewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> PurchaseMovie(int movieId, decimal price)
+    {
+        var userId = _currentUserService.UserId;
+        if (userId <= 0)
+        {
+            TempData["PurchaseError"] = "You must be logged in to purchase a movie.";
+            return RedirectToAction(nameof(Detail), new { id = movieId });
+        }
+
+        try
+        {
+            await _movieService.PurchaseMovieAsync(userId, movieId, price);
+            TempData["PurchaseSuccess"] = "Purchase successful! The movie has been added to your inventory.";
+        }
+        catch (Exception ex)
+        {
+            TempData["PurchaseError"] = ex.Message;
+        }
+
+        return RedirectToAction(nameof(Detail), new { id = movieId });
     }
 
     [HttpPost]

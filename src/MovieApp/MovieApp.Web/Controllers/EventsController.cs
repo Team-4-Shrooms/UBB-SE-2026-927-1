@@ -17,13 +17,18 @@ namespace MovieApp.Web.Controllers
             _currentUserService = currentUserService;
         }
 
-        public async Task<IActionResult> Index(string? search)
+        public async Task<IActionResult> Index(string? search, int? movieId)
         {
-            var events = await _eventService.GetAvailableEventsAsync();
+            var events = movieId.HasValue
+                ? await _eventService.GetEventsByMovieIdAsync(movieId.Value)
+                : await _eventService.GetAvailableEventsAsync();
+
             if (!string.IsNullOrEmpty(search))
             {
                 events = events.Where(e => e.Title.Contains(search, System.StringComparison.OrdinalIgnoreCase)).ToList();
             }
+
+            ViewBag.MovieId = movieId;
             return View(events);
         }
 
