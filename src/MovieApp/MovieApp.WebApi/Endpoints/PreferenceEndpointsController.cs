@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MovieApp.WebDTOs.DTOs.RequestDTOs;
-using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Repositories;
+using MovieApp.Logic.Features.MovieSwipe;
+using MovieApp.WebApi.Mappings;
+using MovieApp.WebDTOs.DTOs.RequestDTOs;
+using System.Threading.Tasks;
 
 namespace MovieApp.WebApi.Endpoints;
 
@@ -12,10 +14,12 @@ namespace MovieApp.WebApi.Endpoints;
 public sealed class PreferenceEndpointsController : ControllerBase
 {
     private readonly PreferenceRepository _repository;
+    private readonly IMovieCardFeedService _movieCardFeedService;
 
-    public PreferenceEndpointsController(PreferenceRepository repository)
+    public PreferenceEndpointsController(PreferenceRepository repository, IMovieCardFeedService movieCardFeedService)
     {
         _repository = repository;
+        _movieCardFeedService = movieCardFeedService;
     }
 
     [HttpGet("users/{userId:int}/movies/{movieId:int}/exists")]
@@ -41,7 +45,7 @@ public sealed class PreferenceEndpointsController : ControllerBase
     [HttpGet("users/{userId:int}/feed")]
     public async Task<IActionResult> GetMovieFeedAsync(int userId, [FromQuery] int count)
     {
-        var feed = await _repository.GetMovieFeedAsync(userId, count);
+        var feed = await _movieCardFeedService.FetchMovieFeedAsync(userId, count);
         return Ok(feed.Select(movie => movie.ToDto()));
     }
 }
