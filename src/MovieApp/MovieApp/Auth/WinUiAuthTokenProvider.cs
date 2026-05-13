@@ -15,7 +15,7 @@ namespace MovieApp.Auth
         private const string LoginEndpoint = "api/auth/login";
         private const string DefaultUsername = "admin";
         private const string DefaultPassword = "password123";
-        private const string BaseUrl = "https://localhost:7143/";
+        private const string BaseUrl = "http://localhost:4544/";
         private static readonly TimeSpan LoginTimeout = TimeSpan.FromSeconds(5);
 
         private string? token;
