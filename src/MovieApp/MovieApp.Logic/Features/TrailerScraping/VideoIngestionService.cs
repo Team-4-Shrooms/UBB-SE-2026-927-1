@@ -43,12 +43,12 @@ namespace MovieApp.Logic.Features.TrailerScraping
         private const string LogFormatJobFailed = "Job failed: {0}";
 
         private readonly IYouTubeScraperService scraper;
-        private readonly IScrapeRepository repository;
+        private readonly IScrapeJobRepository repository;
         private readonly IVideoDownloadService downloader;
 
         public VideoIngestionService(
             IYouTubeScraperService scraper,
-            IScrapeRepository repository,
+            IScrapeJobRepository repository,
             IVideoDownloadService downloader)
         {
             this.scraper = scraper;

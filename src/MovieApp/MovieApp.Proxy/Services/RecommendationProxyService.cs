@@ -12,17 +12,41 @@ namespace MovieApp.Proxy.Services
     /// </summary>
     public class RecommendationProxyService : IRecommendationService
     {
-        private readonly RecommendationService _inner;
+        private readonly ApiClient _apiClient;
 
         public RecommendationProxyService(ApiClient apiClient)
         {
-            _inner = new RecommendationService(new RecommendationProxyRepository(apiClient));
+            _apiClient = apiClient;
         }
 
-        public Task<IList<Reel>> GetRecommendedReelsAsync(int userId, int count)
-            => _inner.GetRecommendedReelsAsync(userId, count);
+        public async Task<IList<Reel>> GetRecommendedReelsAsync(int userId, int count)
+        {
+            return await _apiClient.GetAsync<IList<Reel>>($"api/recommendations/users/{userId}/recommended-reels/count={count}");
+        }
 
-        //public Task<IList<Reel>> GetPersonalizedReelsAsync(int userid, int count)
-        //    => _inner.GetPersonalizedReelsAsync(userid, count);
+        public async Task<bool> UserHasPreferencesAsync(int userId)
+        {
+            return await _apiClient.GetAsync<bool>($"api/recommendations/users/{userId}/has-preferences");
+        }
+
+        public async Task<IList<Reel>> GetAllReelsAsync()
+        {
+            return await _apiClient.GetAsync<IList<Reel>>("api/recommendations/reels");
+        }
+
+        public async Task<IDictionary<int, decimal>> GetUserPreferenceScoresAsync(int userId)
+        {
+            return await _apiClient.GetAsync<IDictionary<int, decimal>>($"api/recommendations/users/{userId}/preference-scores");
+        }
+
+        public async Task<IDictionary<int, int>> GetAllLikeCountsAsync()
+        {
+            return await _apiClient.GetAsync<IDictionary<int, int>>("api/recommendations/like-counts");
+        }
+
+        public async Task<IList<UserReelInteraction>> GetLikesWithinDaysAsync(int days)
+        {
+            return await _apiClient.GetAsync<IList<UserReelInteraction>>($"api/recommendations/likes/within/{days}");
+        }
     }
 }

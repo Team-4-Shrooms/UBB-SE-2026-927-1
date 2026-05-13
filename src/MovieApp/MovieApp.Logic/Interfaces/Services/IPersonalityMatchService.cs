@@ -12,6 +12,8 @@ namespace MovieApp.Logic.Interfaces.Services
         Task<Dictionary<int, List<UserMoviePreference>>> GetAllPreferencesGroupedAsync(int excludedUserId);
         Task<string> GetUsernameAsync(int userId);
         Task<List<MoviePreferenceDisplay>> GetTopMoviePreferencesAsync(int userId, int topMoviePreferencesCount);
+        Task<List<UserMoviePreference>> GetCurrentUserPreferencesAsync(int userId);
+        Task<List<int>> GetRandomUserIdsAsync(int excludedUserId, int userIdsCount);
     }
 }
 

@@ -30,5 +30,10 @@ namespace MovieApp.Proxy.Services
             var result = await _apiClient.GetAsync<List<Transaction>>($"api/transactions/users/{userId}?page={page}&pageSize={pageSize}");
             return result ?? new List<Transaction>();
         }
+
+        public async Task AddProfileAsync(UserProfile profile)
+        {
+            await _apiClient.PostAsync("api/profiles", new { UserId = profile.User.Id, TotalLikes = profile.TotalLikes, TotalWatchTimeSeconds = profile.TotalWatchTimeSeconds, AverageWatchTimeSeconds = profile.AverageWatchTimeSeconds, TotalClipsViewed = profile.TotalClipsViewed, LikeToViewRatio = profile.LikeToViewRatio, LastUpdated = profile.LastUpdated });
+        }
     }
 }

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MovieApp.DataLayer.Repositories;
+using MovieApp.Logic.Interfaces.Services;
 using MovieApp.Logic.Features.TrailerScraping;
 using MovieApp.Logic.Interfaces;
 using MovieApp.WebDTOs.DTOs.RequestDTOs;
@@ -13,23 +13,23 @@ namespace MovieApp.WebApi.Endpoints
     public class VideoIngestionEndpointsController : ControllerBase
     {
         private readonly IVideoIngestionService _ingestionService;
-        private readonly MovieRepository _movieRepository;
+        private readonly IMovieService _movieService;
 
         public VideoIngestionEndpointsController(
             IVideoIngestionService ingestionService,
-            MovieRepository movieRepository)
+            IMovieService movieService)
         {
             _ingestionService = ingestionService;
-            _movieRepository = movieRepository;
+            _movieService = movieService;
         }
 
         [HttpPost("run-scrape")]
         public async Task<IActionResult> RunScrape([FromBody] RunScrapeRequestBody body)
         {
-            var movie = await _movieRepository.GetMovieByIdAsync(body.MovieId);
+            var movie = await _movieService.GetMovieByIdAsync(body.MovieId);
             if (movie == null) return NotFound();
             var scrapeJob = await _ingestionService.RunScrapeJobAsync(movie, body.MaxResults);
-                        return Accepted(new { JobId = scrapeJob.Id });
+            return Accepted(scrapeJob);
         }
 
         [HttpGet("jobs")]

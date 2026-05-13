@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MovieApp.WebDTOs.DTOs.RequestDTOs;
 using MovieApp.WebApi.Mappings;
-using MovieApp.DataLayer.Repositories;
+using MovieApp.Logic.Interfaces.Services;
 
 namespace MovieApp.WebApi.Endpoints;
 
@@ -11,30 +11,30 @@ namespace MovieApp.WebApi.Endpoints;
 [Route("api/users")]
 public sealed class UserEndpointsController : ControllerBase
 {
-    private readonly UserRepository _repository;
+    private readonly IUserService _userService;
 
-    public UserEndpointsController(UserRepository repository)
+    public UserEndpointsController(IUserService userService)
     {
-        _repository = repository;
+        _userService = userService;
     }
 
     [HttpGet("{userId:int}")]
     public async Task<IActionResult> GetUserById(int userId)
     {
-        var user = await _repository.GetUserByIdAsync(userId);
+        var user = await _userService.GetUserByIdAsync(userId);
         return Ok(user?.ToDto());
     }
 
     [HttpGet("{userId:int}/balance")]
     public async Task<IActionResult> GetBalance(int userId)
     {
-        return Ok(await _repository.GetBalanceAsync(userId));
+        return Ok(await _userService.GetBalanceAsync(userId));
     }
 
     [HttpPut("{userId:int}/balance")]
     public async Task<IActionResult> UpdateBalance(int userId, [FromBody] UpdateBalanceRequestBody request)
     {
-        await _repository.UpdateBalanceAsync(userId, request.NewBalance);
+        await _userService.UpdateBalanceAsync(userId, request.NewBalance);
         return Ok();
     }
 }

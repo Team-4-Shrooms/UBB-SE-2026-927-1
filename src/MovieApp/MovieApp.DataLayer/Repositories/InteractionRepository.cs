@@ -152,5 +152,15 @@ namespace MovieApp.DataLayer.Repositories
 
             return reel?.Movie.Id;
         }
+
+        /// <inheritdoc />
+        public async Task<IList<UserReelInteraction>> GetInteractionsForUserAsync(int userId)
+        {
+            return await _context.UserReelInteractions
+                .Include(i => i.User)
+                .Include(i => i.Reel)
+                .Where(i => i.User.Id == userId)
+                .ToListAsync();
+        }
     }
 }
