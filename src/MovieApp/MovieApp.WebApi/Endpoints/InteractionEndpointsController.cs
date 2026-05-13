@@ -8,6 +8,7 @@ using MovieApp.DataLayer.Models;
 using MovieApp.DataLayer.Repositories;
 using MovieApp.Logic.Features.ReelsFeed;
 using MovieApp.DataLayer.Interfaces.Repositories;
+using System.Diagnostics;
 
 namespace MovieApp.WebApi.Endpoints;
 
@@ -57,6 +58,7 @@ public sealed class InteractionEndpointsController : ControllerBase
     [HttpPut("users/{userId:int}/reels/{reelId:int}/like")]
     public async Task<IActionResult> ToggleLikeAsync(int userId, int reelId)
     {
+        Debug.WriteLine($"liked in controller");
         await _service.ToggleLikeAsync(userId, reelId);
         return Ok();
     }
@@ -71,8 +73,12 @@ public sealed class InteractionEndpointsController : ControllerBase
     [HttpGet("users/{userId:int}/reels/{reelId:int}")]
     public async Task<IActionResult> GetInteractionAsync(int userId, int reelId)
     {
-        UserReelInteraction? interaction = await _service.GetInteractionAsync(userId, reelId);
-        return Ok(interaction?.ToDto());
+        var interaction = await _service.GetInteractionAsync(userId, reelId);
+        if (interaction == null)
+        {
+            return Ok(null);
+        }
+        return Ok(interaction);
     }
 
     [HttpGet("reels/{reelId:int}/likes")]

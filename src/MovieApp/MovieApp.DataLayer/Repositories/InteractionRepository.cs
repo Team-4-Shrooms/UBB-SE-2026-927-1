@@ -3,6 +3,7 @@ using MovieApp.DataLayer.Interfaces.Repositories;
 using MovieApp.DataLayer.Models;
 using System.Threading.Tasks;
 using System;
+using System.Diagnostics;
 
 namespace MovieApp.DataLayer.Repositories
 {
@@ -62,6 +63,7 @@ namespace MovieApp.DataLayer.Repositories
         /// <inheritdoc />
         public async Task ToggleLikeAsync(int userId, int reelId)
         {
+            Debug.WriteLine($"liked in repo");
             UserReelInteraction? existingInteraction = await GetInteractionAsync(userId, reelId);
 
             if (existingInteraction is null)

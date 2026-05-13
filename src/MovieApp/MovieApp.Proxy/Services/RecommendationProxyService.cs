@@ -21,5 +21,8 @@ namespace MovieApp.Proxy.Services
 
         public Task<IList<Reel>> GetRecommendedReelsAsync(int userId, int count)
             => _inner.GetRecommendedReelsAsync(userId, count);
+
+        //public Task<IList<Reel>> GetPersonalizedReelsAsync(int userid, int count)
+        //    => _inner.GetPersonalizedReelsAsync(userid, count);
     }
 }

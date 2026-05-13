@@ -42,6 +42,10 @@ namespace MovieApp.Logic.Features.ReelsEditing
         private const string FfmpegCropArgumentsFormat = "-hide_banner -loglevel error -i \"{0}\" -vf \"{1}\" -c:v libx264 -preset veryfast -crf 20 -c:a copy -movflags +faststart -y \"{2}\"";
         private const string DurationFilterFormat = ",atrim=duration={0}";
         private const string VolumeFilterFormat = ",volume={0}";
+
+        //private const string AudioFilterComplexFormat = "[1:a]aresample=async=1:first_pts=0{0}{1},apad[aout]";
+
+        //private const string AudioFilterComplexFormat = "[1:a]aresample=async=1:first_pts=0{0}{1}[aout]";
         private const string AudioFilterComplexFormat = "[1:a]aresample=async=1:first_pts=0[aout]";
         private const string FfmpegMusicArgumentsFormat = "-hide_banner -loglevel error -i \"{0}\" -stream_loop -1 -i \"{2}\" -filter_complex \"{3}\" -map 0:v:0 -map \"[aout]\" -c:v copy -c:a aac -b:a 192k -movflags +faststart -shortest -y \"{4}\"";
         private const string FfprobeDurationArgumentsFormat = "-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"{0}\"";

@@ -18,7 +18,14 @@ namespace MovieApp.Proxy
 
         public async Task<IList<Reel>> GetAllReelsAsync()
         {
+            //[HttpGet("users/{userId:int}/recommended-reels/count={n:int}")]
             var result = await _apiClient.GetAsync<List<Reel>>("api/recommendations/reels");
+            return result ?? new List<Reel>();
+        }
+
+        public async Task<IList<Reel>> GetPersonalizedReelsAsync(int userId, int count)
+        {
+            var result = await _apiClient.GetAsync<List<Reel>>($"api/recommendations/users/{userId}/recommended-reels/count={count}");
             return result ?? new List<Reel>();
         }
 

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using MovieApp.DataLayer.Models;
 
@@ -13,6 +14,7 @@ namespace MovieApp.Logic.Features.ReelsFeed
     {
         private const int RecentlyLikedDaysWindow = 7;
         private readonly IRecommendationRepository recommendationRepository;
+        private readonly IRecommendationService _recommendationService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RecommendationService"/> class.
@@ -26,7 +28,11 @@ namespace MovieApp.Logic.Features.ReelsFeed
         /// <inheritdoc />
         public async Task<IList<Reel>> GetRecommendedReelsAsync(int userId, int count)
         {
+            Debug.WriteLine($"[DEBUG] RecommendationService: Checking preferences for User {userId}");
+
             bool userHasPreferences = await this.recommendationRepository.UserHasPreferencesAsync(userId);
+
+            Debug.WriteLine($"[DEBUG] RecommendationService: UserHasPreferences = {userHasPreferences}");
 
             return userHasPreferences
                 ? await this.GetPersonalizedReelsAsync(userId, count)
@@ -35,7 +41,8 @@ namespace MovieApp.Logic.Features.ReelsFeed
 
         private async Task<IList<Reel>> GetPersonalizedReelsAsync(int userId, int count)
         {
-            IList<Reel> allReels = await this.recommendationRepository.GetAllReelsAsync();
+            Debug.WriteLine("[DEBUG] RecommendationService: Executing Personalized Logic");
+            IList<Reel> allReels = await this.recommendationRepository.GetPersonalizedReelsAsync(userId, count);
             Dictionary<int, decimal> userPreferenceScores = await this.recommendationRepository.GetUserPreferenceScoresAsync(userId);
 
             return allReels
@@ -48,11 +55,12 @@ namespace MovieApp.Logic.Features.ReelsFeed
 
         private async Task<IList<Reel>> GetColdStartReelsAsync(int userId, int count)
         {
+            Debug.WriteLine("[DEBUG] RecommendationService: Executing Cold-Start (Popularity) Logic");
             IList<Reel> allReels = await this.recommendationRepository.GetAllReelsAsync();
             List<UserReelInteraction> recentInteractions = await this.recommendationRepository.GetLikesWithinDaysAsync(RecentlyLikedDaysWindow);
 
-            Dictionary<long, int> recentLikeCountsByReelId = recentInteractions
-                .GroupBy(interaction => interaction.Id)
+            Dictionary<int, int> recentLikeCountsByReelId = recentInteractions
+                .GroupBy(interaction => interaction.Reel.Id) 
                 .ToDictionary(group => group.Key, group => group.Count());
 
             return allReels
