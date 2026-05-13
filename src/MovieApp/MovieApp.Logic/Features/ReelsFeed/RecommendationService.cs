@@ -70,5 +70,30 @@ namespace MovieApp.Logic.Features.ReelsFeed
                 .Take(count)
                 .ToList();
         }
+
+        public async Task<bool> UserHasPreferencesAsync(int userId)
+        {
+            return await recommendationRepository.UserHasPreferencesAsync(userId);
+        }
+
+        public async Task<IList<Reel>> GetAllReelsAsync()
+        {
+            return await recommendationRepository.GetAllReelsAsync();
+        }
+
+        public async Task<Dictionary<int, decimal>> GetUserPreferenceScoresAsync(int userId)
+        {
+            return await recommendationRepository.GetUserPreferenceScoresAsync(userId);
+        }
+
+        public async Task<Dictionary<int, int>> GetAllLikeCountsAsync()
+        {
+            return await recommendationRepository.GetAllLikeCountsAsync();
+        }
+
+        public async Task<List<UserReelInteraction>> GetLikesWithinDaysAsync(int days)
+        {
+            return await recommendationRepository.GetLikesWithinDaysAsync(days);
+        }
     }
 }

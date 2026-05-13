@@ -19,8 +19,33 @@ namespace MovieApp.Proxy.Services
             _inner = new RecommendationService(new RecommendationProxyRepository(apiClient));
         }
 
+        public Task<Dictionary<int, int>> GetAllLikeCountsAsync()
+        {
+            return ((IRecommendationService)_inner).GetAllLikeCountsAsync();
+        }
+
+        public Task<IList<Reel>> GetAllReelsAsync()
+        {
+            return ((IRecommendationService)_inner).GetAllReelsAsync();
+        }
+
+        public Task<List<UserReelInteraction>> GetLikesWithinDaysAsync(int days)
+        {
+            return ((IRecommendationService)_inner).GetLikesWithinDaysAsync(days);
+        }
+
         public Task<IList<Reel>> GetRecommendedReelsAsync(int userId, int count)
             => _inner.GetRecommendedReelsAsync(userId, count);
+
+        public Task<Dictionary<int, decimal>> GetUserPreferenceScoresAsync(int userId)
+        {
+            return ((IRecommendationService)_inner).GetUserPreferenceScoresAsync(userId);
+        }
+
+        public Task<bool> UserHasPreferencesAsync(int userId)
+        {
+            return ((IRecommendationService)_inner).UserHasPreferencesAsync(userId);
+        }
 
         //public Task<IList<Reel>> GetPersonalizedReelsAsync(int userid, int count)
         //    => _inner.GetPersonalizedReelsAsync(userid, count);
