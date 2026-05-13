@@ -28,7 +28,7 @@ namespace MovieApp.Logic.Features.TrailerScraping
         private const string Mp4FileFormat = "{0}.mp4";
 
         private const string OutputTemplateFormat = "%(id)s.%(ext)s";
-        private const string YtDlpBaseArgumentsFormat = "--no-playlist --ffmpeg-location \"{0}\" -f \"bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best\" --merge-output-format mp4 -o \"{1}\" ";
+        private const string YtDlpBaseArgumentsFormat = "--force-overwrites --no-playlist --ffmpeg-location \"{0}\" -f \"bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best\" --merge-output-format mp4 -o \"{1}\" ";
         private const string YtDlpDurationArgumentFormat = "--postprocessor-args \"ffmpeg:-t {0}\" ";
 
         private const string ErrorProcessStartFailed = "Failed to start yt-dlp process";
@@ -108,11 +108,13 @@ namespace MovieApp.Logic.Features.TrailerScraping
             string outputTemplate = Path.Combine(this.downloadFolder, OutputTemplateFormat);
             string processArguments = string.Format(YtDlpBaseArgumentsFormat, this.ffmpegPath, outputTemplate);
 
+            string ffmpegArgs = "-nostdin -y";
             if (maxDurationSeconds > 0)
             {
-                processArguments += string.Format(YtDlpDurationArgumentFormat, maxDurationSeconds);
+                ffmpegArgs += $" -t {maxDurationSeconds}";
             }
 
+            processArguments += $"--postprocessor-args \"ffmpeg:{ffmpegArgs}\" ";
             processArguments += $"\"{youtubeUrl}\"";
 
             try
@@ -134,8 +136,20 @@ namespace MovieApp.Logic.Features.TrailerScraping
                     return null;
                 }
 
-                Task<string> standardOutputTask = downloadProcess.StandardOutput.ReadToEndAsync();
-                Task<string> standardErrorTask = downloadProcess.StandardError.ReadToEndAsync();
+                var outputBuilder = new System.Text.StringBuilder();
+                var errorBuilder = new System.Text.StringBuilder();
+
+                downloadProcess.OutputDataReceived += (sender, args) =>
+                {
+                    if (args.Data != null) outputBuilder.AppendLine(args.Data);
+                };
+                downloadProcess.ErrorDataReceived += (sender, args) =>
+                {
+                    if (args.Data != null) errorBuilder.AppendLine(args.Data);
+                };
+
+                downloadProcess.BeginOutputReadLine();
+                downloadProcess.BeginErrorReadLine();
 
                 using CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(ProcessTimeoutMinutes));
                 try
@@ -149,8 +163,8 @@ namespace MovieApp.Logic.Features.TrailerScraping
                     return null;
                 }
 
-                string standardOutput = await standardOutputTask;
-                string standardError = await standardErrorTask;
+                string standardOutput = outputBuilder.ToString();
+                string standardError = errorBuilder.ToString();
 
                 if (downloadProcess.ExitCode != SuccessExitCode)
                 {

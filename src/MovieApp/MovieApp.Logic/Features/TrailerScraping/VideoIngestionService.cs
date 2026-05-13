@@ -112,7 +112,7 @@ namespace MovieApp.Logic.Features.TrailerScraping
                 {
                     ScrapeJobLog logEntry = new ScrapeJobLog
                     {
-                        Id = backgroundJob.Id,
+                        ScrapeJob = backgroundJob,
                         Level = level,
                         Message = message,
                         Timestamp = DateTime.UtcNow,
