@@ -17,6 +17,10 @@ namespace MovieApp.Proxy.Services
     {
         private readonly ApiClient _apiClient;
 
+        private const string JobProperty = "jobId";
+        private const string PendingStatus = "pending";
+        private const string UrlProperty = "url";
+
         public VideoIngestionProxyService(ApiClient apiClient)
         {
             _apiClient = apiClient;
@@ -24,44 +28,48 @@ namespace MovieApp.Proxy.Services
 
         public async Task<IList<ScrapeJob>> GetAllJobsAsync()
         {
-            var result = await _apiClient.GetAsync<List<ScrapeJob>>("api/video-ingestion/jobs");
+            string key = "api/video-ingestion/jobs";
+            var result = await _apiClient.GetAsync<List<ScrapeJob>>(key);
             return result ?? new List<ScrapeJob>();
         }
 
         public async Task<ScrapeJob?> GetJobStatusAsync(int jobId)
         {
-            return await _apiClient.GetAsync<ScrapeJob>($"api/video-ingestion/jobs/{jobId}");
+            string key = $"api/video-ingestion/jobs/{jobId}";
+            return await _apiClient.GetAsync<ScrapeJob>(key);
         }
 
         public async Task<ScrapeJob> RunScrapeJobAsync(Movie movie, int maxResults, Func<ScrapeJobLog, Task>? onLogEntry = null)
         {
-            var response = await _apiClient.PostAsync<object, JsonElement>("api/video-ingestion/run-scrape", new
+            string key = "api/video-ingestion/run-scrape";
+            var response = await _apiClient.PostAsync<object, JsonElement>(key, new
             {
                 MovieId = movie.Id,
                 MaxResults = maxResults
             });
 
-            int jobId = response.GetProperty("jobId").GetInt32();
+            int jobId = response.GetProperty(JobProperty).GetInt32();
 
             return new ScrapeJob
             {
                 Id = jobId,
                 SearchQuery = movie.Title,
                 MaxResults = maxResults,
-                Status = "pending",
+                Status = PendingStatus,
                 StartedAt = DateTime.UtcNow,
             };
         }
 
         public async Task<string> IngestVideoFromUrlAsync(string trailerUrl, int movieId)
         {
-            var result = await _apiClient.PostAsync<object, JsonElement>("api/video-ingestion/ingest-url", new
+            string key = "api/video-ingestion/ingest-url";
+            var result = await _apiClient.PostAsync<object, JsonElement>(key, new
             {
                 TrailerUrl = trailerUrl,
                 MovieId = movieId
             });
 
-            return result.GetProperty("url").GetString() ?? string.Empty;
+            return result.GetProperty(UrlProperty).GetString() ?? string.Empty;
         }
     }
 }

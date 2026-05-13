@@ -6,14 +6,16 @@ using MovieApp.WebApi.Mappings;
 
 namespace MovieApp.Web.Controllers
 {
-    /// <summary>Stub controller for the Trailer Scraping feature.</summary>
     public sealed class TrailerScrapingController : Controller
     {
-        /// <summary>Placeholder index page.</summary>
-
         private readonly IVideoIngestionService _ingestionService;
         private readonly IMovieService _movieService;
         private readonly ICurrentUserService _currentUserService;
+
+        private const string successMessageKey = "SuccessMessage";
+        private const string newJobIdKey = "NewJobId";
+        private const string jobStartedMessage = "Scraping job started successfully!";
+        private const string urlIngestSuccessMessage = "Video ingested successfully from URL!";
 
         public TrailerScrapingController(
             IVideoIngestionService ingestionService,
@@ -54,7 +56,7 @@ namespace MovieApp.Web.Controllers
             if (!string.IsNullOrWhiteSpace(form.YouTubeUrl))
             {
                 await _ingestionService.IngestVideoFromUrlAsync(form.YouTubeUrl, form.MovieId);
-                TempData["SuccessMessage"] = "Video ingested successfully from URL!";
+                TempData[successMessageKey] = urlIngestSuccessMessage;
                 return RedirectToAction(nameof(Index));
             }
             else
@@ -67,8 +69,8 @@ namespace MovieApp.Web.Controllers
                 jobId = job.Id;
             }
 
-            TempData["NewJobId"] = jobId;
-            TempData["SuccessMessage"] = "Scraping job started successfully!";
+            TempData[newJobIdKey] = jobId;
+            TempData[successMessageKey] = jobStartedMessage;
 
             return RedirectToAction(nameof(Index));
         }

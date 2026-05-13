@@ -10,14 +10,22 @@ using MovieApp.Web.ViewModels.ReelUpload;
 
 namespace MovieApp.Mvc.Features.ReelsUpload.Controllers;
 
-//[Authorize]
+
 public class ReelsUploadController : Controller
 {
     private readonly IVideoStorageService _storageService;
     private readonly ICurrentUserService _currentUserService;
-    private readonly IMovieService _movieService; // 1. Added the private field
+    private readonly IMovieService _movieService;
 
-    // 2. Updated constructor to inject IMovieService
+    private const int MaxFileSizeBytes = 100 * 1024 * 1024; // 100 MB
+    private const string TitleKey = "Title";
+    private const string SuccessMessageKey = "SuccessMessage";
+    private const string ErrorMessageKey = "Error";
+    private const string IndexView = "Index";
+    private const string ReelUploadSuccessMessage = "Reel uploaded successfully!";
+    private const string VideoFile = "videoFile";
+    private const string ReelsFeedAction = "ReelsFeed";
+
     public ReelsUploadController(
         IVideoStorageService storageService, 
         ICurrentUserService currentUserService,
@@ -31,9 +39,7 @@ public class ReelsUploadController : Controller
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        ViewData["Title"] = "Upload Reel";
-        
-        // 3. Fetch movies and pass them to the View via ViewBag
+        ViewData[TitleKey] = "Upload Reel";
         var movies = await _movieService.GetAllMoviesAsync();
         ViewBag.AvailableMovies = movies;
 
@@ -42,23 +48,22 @@ public class ReelsUploadController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [RequestSizeLimit(100 * 1024 * 1024)] // 100 MB Limit
+    [RequestSizeLimit(MaxFileSizeBytes)]
     public async Task<IActionResult> Upload(IFormFile videoFile, ReelUploadForm form)
     {
-        // 1. Validate the file is present
         if (videoFile == null || videoFile.Length == 0)
         {
-            ModelState.AddModelError("videoFile", "Please select a valid video file.");
-            return View("Index", form);
+            string errorMegssage = "Please select a video file to upload.";
+            ModelState.AddModelError(VideoFile, errorMegssage);
+            return View(IndexView, form);
         }
 
-        if (!ModelState.IsValid) return View("Index", form);
+        if (!ModelState.IsValid) return View(IndexView, form);
 
         string tempPath = Path.GetTempFileName();
 
         try
         {
-            // 2. Save IFormFile to the temp path
             using (var stream = new FileStream(tempPath, FileMode.Create))
             {
                 await videoFile.CopyToAsync(stream);
@@ -66,34 +71,30 @@ public class ReelsUploadController : Controller
 
             int userId = _currentUserService.UserId;
 
-            // 3. Map to your logic layer's exact request model
             var request = new ReelUploadRequest
             {
                 LocalFilePath = tempPath,
                 Title = form.Title ?? string.Empty,
                 Caption = form.Description ?? string.Empty,
                 UploaderUserId = userId,
-                MovieId = form.MovieId // Use the ID selected by the user
+                MovieId = form.MovieId
             };
 
-            // 4. Pass to the storage service
             await _storageService.UploadVideoAsync(request);
 
-            // 5. On success, set TempData and redirect
-            TempData["SuccessMessage"] = "Reel uploaded successfully!";
-            return RedirectToAction("Index", "ReelsFeed");
+            TempData[SuccessMessageKey] = ReelUploadSuccessMessage;
+            return RedirectToAction(IndexView, ReelsFeedAction);
         }
         catch (Exception ex)
         {
-            ModelState.AddModelError(string.Empty, $"Upload failed: {ex.Message}");
+            string errorMegssage = $"Upload failed: {ex.Message}";
+            ModelState.AddModelError(string.Empty, errorMegssage);
             
-            // Re-populate movies in case of error so the dropdown isn't empty
             ViewBag.AvailableMovies = await _movieService.GetAllMoviesAsync();
-            return View("Index", form);
+            return View(IndexView, form);
         }
         finally
         {
-            // 6. ALWAYS delete the temp file
             if (System.IO.File.Exists(tempPath))
             {
                 System.IO.File.Delete(tempPath);

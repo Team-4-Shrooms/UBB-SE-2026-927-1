@@ -64,7 +64,7 @@ namespace MovieApp.Tests.Integration
         protected override void ConfigureClient(HttpClient client)
         {
             // Use HTTP to avoid HTTPS redirect issues in the test environment.
-            client.BaseAddress = new Uri("https://localhost");
+            client.BaseAddress = new Uri("http://localhost");
         }
     }
 }

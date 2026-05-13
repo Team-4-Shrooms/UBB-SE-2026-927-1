@@ -152,8 +152,6 @@ builder.Services.AddSwaggerGen(options =>
     }
 });
 
-//builder.WebHost.UseUrls("http://localhost:4544");
-
 var app = builder.Build();
 
 using (IServiceScope scope = app.Services.CreateScope())
