@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MovieApp.WebDTOs.DTOs.RequestDTOs;
-using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Interfaces;
 using MovieApp.DataLayer.Models;
 using MovieApp.DataLayer.Repositories;
+using MovieApp.Logic.Features.ReelsUpload;
 using MovieApp.WebApi.DTOs;
+using MovieApp.WebApi.Mappings;
+using MovieApp.WebDTOs.DTOs.RequestDTOs;
 
 namespace MovieApp.WebApi.Endpoints;
 
@@ -23,7 +24,7 @@ public sealed class VideoStorageEndpointsController : ControllerBase
         _context = context;
     }
 
-    [HttpPost("reels")]
+    [HttpPost("insert")]
     public async Task<IActionResult> InsertReelAsync([FromBody] InsertReelRequestBody reel)
     {
         if (reel.CreatorUserId <= 0)
@@ -67,5 +68,12 @@ public sealed class VideoStorageEndpointsController : ControllerBase
 
         ReelDto insertedReel = inserted.ToDto();
         return Ok(insertedReel);
+    }
+
+    [HttpPost("reels")] 
+    public async Task<IActionResult> UploadVideoAsync([FromBody] MovieApp.Logic.Features.ReelsUpload.ReelUploadRequest request, [FromServices] IVideoStorageService storageService)
+    {
+        var reel = await storageService.UploadVideoAsync(request);
+        return Ok(reel);
     }
 }

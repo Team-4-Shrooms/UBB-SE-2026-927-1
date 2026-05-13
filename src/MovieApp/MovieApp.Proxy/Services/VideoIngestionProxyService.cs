@@ -1,18 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Models;
 using MovieApp.Logic.Features.TrailerScraping;
+using System.Text.Json;
 
 namespace MovieApp.Proxy.Services
 {
-    /// <summary>
-    /// Proxy implementation of IVideoIngestionService.
-    /// Read-only operations (GetAllJobsAsync, GetJobStatusAsync) call the scrape-job WebApi.
-    /// RunScrapeJobAsync and IngestVideoFromUrlAsync create scrape-job / reel records on the server;
-    /// the actual YouTube download is done server-side by the real VideoIngestionService.
-    /// </summary>
     public class VideoIngestionProxyService : IVideoIngestionService
     {
         private readonly ApiClient _apiClient;
@@ -24,68 +18,49 @@ namespace MovieApp.Proxy.Services
 
         public async Task<IList<ScrapeJob>> GetAllJobsAsync()
         {
-            var result = await _apiClient.GetAsync<List<ScrapeJob>>("api/scrape-jobs");
+            // Calls the correct controller!
+            var result = await _apiClient.GetAsync<List<ScrapeJob>>("api/video-ingestion/jobs");
             return result ?? new List<ScrapeJob>();
         }
 
         public async Task<ScrapeJob?> GetJobStatusAsync(int jobId)
         {
-            // There is no single-job-by-id endpoint; fall back to filtering the list.
-            var all = await GetAllJobsAsync();
-            return all.FirstOrDefault(j => j.Id == jobId);
+            // Calls the exact endpoint required by T9
+            return await _apiClient.GetAsync<ScrapeJob>($"api/video-ingestion/jobs/{jobId}");
         }
 
-        public async Task<ScrapeJob> RunScrapeJobAsync(Movie movie, int maxResults,
-            Func<ScrapeJobLog, Task>? onLogEntry = null)
+        public async Task<ScrapeJob> RunScrapeJobAsync(Movie movie, int maxResults, Func<ScrapeJobLog, Task>? onLogEntry = null)
         {
-            // Create a scrape-job record on the server (the server-side service handles
-            // the actual YouTube scraping when its own VideoIngestionService runs).
-            int jobId = await _apiClient.PostAsync<object, int>("api/scrape-jobs", new
+            // Triggers the background worker on the server to actually download the videos!
+            var response = await _apiClient.PostAsync<object, JsonElement>("api/video-ingestion/run-scrape", new
             {
-                SearchQuery = movie.Title,
-                MaxResults = maxResults,
-                Status = "running",
-                MoviesFound = 0,
-                ReelsCreated = 0,
-                StartedAt = DateTime.UtcNow,
+                MovieId = movie.Id,
+                MaxResults = maxResults
             });
+
+            // The WebApi returns an object like { JobId = 5 }
+            int jobId = response.GetProperty("jobId").GetInt32();
 
             return new ScrapeJob
             {
                 Id = jobId,
                 SearchQuery = movie.Title,
                 MaxResults = maxResults,
-                Status = "running",
-                MoviesFound = 0,
-                ReelsCreated = 0,
+                Status = "pending",
                 StartedAt = DateTime.UtcNow,
             };
         }
 
         public async Task<string> IngestVideoFromUrlAsync(string trailerUrl, int movieId)
         {
-            // Check if a reel for this URL already exists.
-            bool exists = await _apiClient.GetAsync<bool>(
-                $"api/scrape-jobs/reel-exists?videoUrl={Uri.EscapeDataString(trailerUrl)}");
-            if (exists) return string.Empty;
-
-            // Insert a reel record that points to the remote trailer URL directly.
-            int reelId = await _apiClient.PostAsync<object, int>("api/scrape-jobs/reels", new
+            // Triggers the server to download the direct URL
+            var result = await _apiClient.PostAsync<object, JsonElement>("api/video-ingestion/ingest-url", new
             {
-                VideoUrl = trailerUrl,
-                ThumbnailUrl = string.Empty,
-                Title = "Scraped Trailer",
-                Caption = string.Empty,
-                Source = "scraped",
-                Genre = string.Empty,
-                FeatureDurationSeconds = 0m,
-                CropDataJson = "{}",
-                CreatedAt = DateTime.UtcNow,
-                MovieId = movieId,
-                CreatorUserId = 1,
+                TrailerUrl = trailerUrl,
+                MovieId = movieId
             });
 
-            return reelId.ToString();
+            return result.GetProperty("url").GetString() ?? string.Empty;
         }
     }
 }
