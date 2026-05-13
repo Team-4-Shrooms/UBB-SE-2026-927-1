@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MovieApp.DataLayer.Models;
+using Microsoft.Extensions.DependencyInjection;
 using MovieApp.DataLayer.Interfaces.Repositories;
+using MovieApp.DataLayer.Models;
 
 namespace MovieApp.Logic.Features.TrailerScraping
 {
@@ -45,15 +46,18 @@ namespace MovieApp.Logic.Features.TrailerScraping
         private readonly IYouTubeScraperService scraper;
         private readonly IScrapeRepository repository;
         private readonly IVideoDownloadService downloader;
+        private readonly IServiceScopeFactory scopeFactory;
 
         public VideoIngestionService(
             IYouTubeScraperService scraper,
             IScrapeRepository repository,
-            IVideoDownloadService downloader)
+            IVideoDownloadService downloader,
+            IServiceScopeFactory scopeFactory)
         {
             this.scraper = scraper;
             this.repository = repository;
             this.downloader = downloader;
+            this.scopeFactory = scopeFactory;
         }
 
         public async Task<string> IngestVideoFromUrlAsync(string trailerUrl, int movieId)
@@ -95,28 +99,39 @@ namespace MovieApp.Logic.Features.TrailerScraping
 
             _ = Task.Run(async () =>
             {
+                using IServiceScope scope = this.scopeFactory.CreateScope();
+                var backgroundRepo = scope.ServiceProvider.GetRequiredService<IScrapeRepository>();
+                var backgroundScraper = scope.ServiceProvider.GetRequiredService<IYouTubeScraperService>();
+                var backgroundDownloader = scope.ServiceProvider.GetRequiredService<IVideoDownloadService>();
+
+                var backgroundJob = await backgroundRepo.GetJobByIdAsync(job.Id);
+
+                if (backgroundJob == null) return;
+
                 async Task LogAsync(string level, string message)
                 {
                     ScrapeJobLog logEntry = new ScrapeJobLog
                     {
-                        ScrapeJob = job,
+                        Id = backgroundJob.Id,
                         Level = level,
                         Message = message,
                         Timestamp = DateTime.UtcNow,
                     };
-                    await this.repository.AddLogEntryAsync(logEntry);
+                    await backgroundRepo.AddLogEntryAsync(logEntry);
                     if (onLogEntry is not null) await onLogEntry(logEntry);
                 }
 
                 try
                 {
-                    job.Status = JobStatusRunning;
-                    await this.repository.UpdateJobAsync(job);
+                    // 3. USE BACKGROUNDJOB EVERYWHERE INSTEAD OF 'job'
+                    backgroundJob.Status = JobStatusRunning;
+                    await backgroundRepo.UpdateJobAsync(backgroundJob);
 
+                    // We can safely read primitive properties (strings/ints) from the old 'movie' object
                     await LogAsync(LogLevelInfo, string.Format(LogFormatScrapingMovie, movie.Title, movie.Id));
                     await LogAsync(LogLevelInfo, string.Format(LogFormatYouTubeQuery, searchQuery, maxResults));
 
-                    IList<ScrapedVideoResult> results = await this.scraper.SearchVideosAsync(searchQuery, maxResults);
+                    IList<ScrapedVideoResult> results = await backgroundScraper.SearchVideosAsync(searchQuery, maxResults);
                     await LogAsync(LogLevelInfo, string.Format(LogFormatYouTubeReturned, results.Count));
 
                     int reelsCreated = 0;
@@ -125,7 +140,7 @@ namespace MovieApp.Logic.Features.TrailerScraping
                     {
                         try
                         {
-                            bool reelExists = await this.repository.ReelExistsByVideoUrlAsync(video.VideoUrl);
+                            bool reelExists = await backgroundRepo.ReelExistsByVideoUrlAsync(video.VideoUrl);
                             if (reelExists)
                             {
                                 await LogAsync(LogLevelWarn, string.Format(LogFormatReelExists, video.VideoUrl));
@@ -133,11 +148,11 @@ namespace MovieApp.Logic.Features.TrailerScraping
                             }
 
                             await LogAsync(LogLevelInfo, string.Format(LogFormatDownloadingMp4, video.Title));
-                            string? localMp4Path = await this.downloader.DownloadVideoAsMp4Async(video.VideoUrl, MaxTrailerDurationSeconds);
+                            string? localMp4Path = await backgroundDownloader.DownloadVideoAsMp4Async(video.VideoUrl, MaxTrailerDurationSeconds);
 
                             if (string.IsNullOrEmpty(localMp4Path))
                             {
-                                string reason = this.downloader.LastError ?? UnknownErrorMessage;
+                                string reason = backgroundDownloader.LastError ?? UnknownErrorMessage;
                                 await LogAsync(LogLevelError, string.Format(LogFormatMp4Failed, reason));
                                 await LogAsync(LogLevelWarn, string.Format(LogFormatSkippingNoMp4, video.Title));
                                 continue;
@@ -145,7 +160,8 @@ namespace MovieApp.Logic.Features.TrailerScraping
 
                             Reel reel = new Reel
                             {
-                                Movie = movie,
+                                // 4. THE FIX: Do NOT use 'Movie = movie'. Create a safe stub reference!
+                                Movie = new Movie { Id = movie.Id },
                                 CreatorUser = new User { Id = DefaultCreatorUserId },
                                 VideoUrl = localMp4Path,
                                 ThumbnailUrl = video.ThumbnailUrl,
@@ -155,7 +171,7 @@ namespace MovieApp.Logic.Features.TrailerScraping
                                 CreatedAt = DateTime.UtcNow,
                             };
 
-                            int reelId = await this.repository.InsertScrapedReelAsync(reel);
+                            int reelId = await backgroundRepo.InsertScrapedReelAsync(reel);
                             reelsCreated++;
 
                             string format = !string.IsNullOrEmpty(localMp4Path) ? FormatMp4 : FormatYouTubeUrl;
@@ -167,23 +183,24 @@ namespace MovieApp.Logic.Features.TrailerScraping
                         }
                     }
 
-                    job.MoviesFound = SingleMovieScrapeCount;
-                    job.ReelsCreated = reelsCreated;
-                    job.Status = JobStatusCompleted;
-                    job.CompletedAt = DateTime.UtcNow;
-                    await this.repository.UpdateJobAsync(job);
+                    backgroundJob.MoviesFound = SingleMovieScrapeCount;
+                    backgroundJob.ReelsCreated = reelsCreated;
+                    backgroundJob.Status = JobStatusCompleted;
+                    backgroundJob.CompletedAt = DateTime.UtcNow;
+                    await backgroundRepo.UpdateJobAsync(backgroundJob);
 
                     await LogAsync(LogLevelInfo, string.Format(LogFormatJobCompleted, reelsCreated, movie.Title));
                 }
                 catch (Exception exception)
                 {
-                    job.Status = JobStatusFailed;
-                    job.CompletedAt = DateTime.UtcNow;
-                    job.ErrorMessage = exception.Message;
-                    await this.repository.UpdateJobAsync(job);
+                    backgroundJob.Status = JobStatusFailed;
+                    backgroundJob.CompletedAt = DateTime.UtcNow;
+                    backgroundJob.ErrorMessage = exception.Message;
+
+                    await backgroundRepo.UpdateJobAsync(backgroundJob);
 
                     try { await LogAsync(LogLevelError, string.Format(LogFormatJobFailed, exception.Message)); }
-                    catch {  }
+                    catch { }
                 }
             });
 

@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MovieApp.DataLayer.Interfaces;
-using MovieApp.WebDTOs.DTOs.RequestDTOs;
-using MovieApp.WebApi.Mappings;
+using MovieApp.DataLayer.Interfaces.Repositories;
 using MovieApp.DataLayer.Models;
 using MovieApp.DataLayer.Repositories;
+using MovieApp.WebApi.Mappings;
+using MovieApp.WebDTOs.DTOs.RequestDTOs;
 
 namespace MovieApp.WebApi.Endpoints;
 
@@ -13,10 +14,10 @@ namespace MovieApp.WebApi.Endpoints;
 [Route("api/scrape-jobs")]
 public sealed class ScrapeJobEndpointsController : ControllerBase
 {
-    private readonly ScrapeJobRepository _repository;
+    private readonly IScrapeRepository _repository;
     private readonly IMovieAppDbContext _context;
 
-    public ScrapeJobEndpointsController(ScrapeJobRepository repository, IMovieAppDbContext context)
+    public ScrapeJobEndpointsController(IScrapeRepository repository, IMovieAppDbContext context)
     {
         _repository = repository;
         _context = context;

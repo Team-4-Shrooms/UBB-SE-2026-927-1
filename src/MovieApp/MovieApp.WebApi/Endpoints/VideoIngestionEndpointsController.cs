@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MovieApp.DataLayer.Interfaces.Repositories;
 using MovieApp.DataLayer.Repositories;
 using MovieApp.Logic.Features.TrailerScraping;
 using MovieApp.Logic.Interfaces;
@@ -13,11 +14,11 @@ namespace MovieApp.WebApi.Endpoints
     public class VideoIngestionEndpointsController : ControllerBase
     {
         private readonly IVideoIngestionService _ingestionService;
-        private readonly MovieRepository _movieRepository;
+        private readonly IMovieRepository _movieRepository;
 
         public VideoIngestionEndpointsController(
             IVideoIngestionService ingestionService,
-            MovieRepository movieRepository)
+            IMovieRepository movieRepository)
         {
             _ingestionService = ingestionService;
             _movieRepository = movieRepository;
@@ -56,7 +57,7 @@ namespace MovieApp.WebApi.Endpoints
         public async Task<IActionResult> IngestUrl([FromBody] IngestUrlRequestBody body)
         {
             var result = await _ingestionService.IngestVideoFromUrlAsync(body.TrailerUrl, body.MovieId);
-            return Ok(new { Url = result });
+            return Ok(result);
         }
     }
 }

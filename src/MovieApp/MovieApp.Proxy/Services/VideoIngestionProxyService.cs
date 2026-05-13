@@ -63,13 +63,14 @@ namespace MovieApp.Proxy.Services
         public async Task<string> IngestVideoFromUrlAsync(string trailerUrl, int movieId)
         {
             string key = "api/video-ingestion/ingest-url";
-            var result = await _apiClient.PostAsync<object, JsonElement>(key, new
+
+            var result = await _apiClient.PostAsync<object, string>(key, new
             {
                 TrailerUrl = trailerUrl,
                 MovieId = movieId
             });
 
-            return result.GetProperty(UrlProperty).GetString() ?? string.Empty;
+            return result ?? string.Empty;
         }
     }
 }

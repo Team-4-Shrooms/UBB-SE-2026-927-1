@@ -53,12 +53,15 @@ public class ReelsUploadController : Controller
     {
         if (videoFile == null || videoFile.Length == 0)
         {
-            string errorMegssage = "Please select a video file to upload.";
-            ModelState.AddModelError(VideoFile, errorMegssage);
-            return View(IndexView, form);
+            TempData[ErrorMessageKey] = "Please select a video file to upload.";
+            return RedirectToAction(nameof(Index));
         }
 
-        if (!ModelState.IsValid) return View(IndexView, form);
+        if (!ModelState.IsValid)
+        {
+            TempData[ErrorMessageKey] = "Please fill out all required fields.";
+            return RedirectToAction(nameof(Index));
+        }
 
         string tempPath = Path.GetTempFileName();
 
@@ -87,11 +90,8 @@ public class ReelsUploadController : Controller
         }
         catch (Exception ex)
         {
-            string errorMegssage = $"Upload failed: {ex.Message}";
-            ModelState.AddModelError(string.Empty, errorMegssage);
-            
-            ViewBag.AvailableMovies = await _movieService.GetAllMoviesAsync();
-            return View(IndexView, form);
+            TempData[ErrorMessageKey] = $"Upload failed: {ex.Message}";
+            return RedirectToAction(nameof(Index));
         }
         finally
         {
