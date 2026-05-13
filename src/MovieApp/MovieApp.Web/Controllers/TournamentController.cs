@@ -18,6 +18,12 @@ namespace MovieApp.Web.Controllers
         }
 
         [HttpGet]
+        public IActionResult Index()
+        {
+            return RedirectToAction(nameof(Setup));
+        }
+
+        [HttpGet]
         public IActionResult Setup()
         {
             return View(new TournamentSetupViewModel());
