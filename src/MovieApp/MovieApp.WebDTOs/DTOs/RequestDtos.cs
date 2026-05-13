@@ -166,14 +166,14 @@ public sealed class AddOwnedTicketRequestBody
     public int EventId { get; set; }
 }
 
-public class RunScrapeRequestBody
+public sealed class RemoveMovieRequestBody
 {
+    public int UserId { get; set; }
     public int MovieId { get; set; }
-    public int MaxResults { get; set; }
 }
 
-public class IngestUrlRequestBody
+public sealed class RemoveTicketRequestBody
 {
-    public string TrailerUrl { get; set; } = string.Empty;
-    public int MovieId { get; set; }
+    public int UserId { get; set; }
+    public int EventId { get; set; }
 }

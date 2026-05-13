@@ -23,9 +23,15 @@ public sealed class TransactionEndpointsController : ControllerBase
     }
 
     [HttpGet("users/{userId:int}")]
-    public IActionResult GetTransactionsByUserId(int userId)
+    public IActionResult GetTransactionsByUserId(int userId, [FromQuery] int? page = null, [FromQuery] int? pageSize = null)
     {
-        return Ok(_repository.GetTransactionsByUserId(userId).Select(transaction => transaction.ToDto()));
+        var transactions = _repository.GetTransactionsByUserId(userId);
+        if (page.HasValue && pageSize.HasValue && page.Value > 0 && pageSize.Value > 0)
+        {
+            transactions = transactions.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value).ToList();
+        }
+
+        return Ok(transactions.Select(transaction => transaction.ToDto()));
     }
 
     [HttpPost]

@@ -16,18 +16,18 @@ namespace MovieApp.Proxy.Services
 
         public async Task<UserProfile> BuildProfileFromInteractionsAsync(int userId)
         {
-            var result = await _apiClient.GetAsync<UserProfile>($"api/profile/{userId}/interactions");
+            var result = await _apiClient.GetAsync<UserProfile>($"api/profiles/users/{userId}");
             return result ?? new UserProfile();
         }
 
         public async Task<decimal> GetUserBalanceAsync(int userId)
         {
-            return await _apiClient.GetAsync<decimal>($"api/profile/{userId}/balance");
+            return await _apiClient.GetAsync<decimal>($"api/users/{userId}/balance");
         }
 
         public async Task<List<Transaction>> GetUserTransactionsAsync(int userId, int page, int pageSize)
         {
-            var result = await _apiClient.GetAsync<List<Transaction>>($"api/profile/{userId}/transactions?page={page}&pageSize={pageSize}");
+            var result = await _apiClient.GetAsync<List<Transaction>>($"api/transactions/users/{userId}?page={page}&pageSize={pageSize}");
             return result ?? new List<Transaction>();
         }
     }

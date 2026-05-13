@@ -13,6 +13,11 @@ namespace MovieApp.Logic.Interfaces.Services
         Task RemoveOwnedTicketAsync(int userId, int eventId);
         Task<List<Movie>> GetOwnedMoviesAsync(int userId);
         Task<List<OwnedTicket>> GetOwnedTicketsAsync(int userId);
+        Task<List<OwnedMovie>> GetMovieOwnershipsAsync(int userId, int movieId);
+        Task RemoveMovieOwnershipsAsync(IEnumerable<int> ownershipIds);
+        Task<List<OwnedTicket>> GetTicketOwnershipsAsync(int userId, int eventId);
+        Task RemoveTicketOwnershipsAsync(IEnumerable<int> ownershipIds);
+        Task AddOwnedMovieAsync(int userId, int movieId);
     }
 }
 
