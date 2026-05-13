@@ -7,5 +7,7 @@ namespace MovieApp.Web.Models
         public string? Genre { get; set; }
 
         public decimal? MinRating { get; set; }
+
+        public string? Sort { get; set; }
     }
 }
