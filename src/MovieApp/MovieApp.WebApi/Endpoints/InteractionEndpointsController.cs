@@ -6,6 +6,9 @@ using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Interfaces;
 using MovieApp.DataLayer.Models;
 using MovieApp.DataLayer.Repositories;
+using MovieApp.Logic.Features.ReelsFeed;
+using MovieApp.DataLayer.Interfaces.Repositories;
+using System.Diagnostics;
 
 namespace MovieApp.WebApi.Endpoints;
 
@@ -14,12 +17,14 @@ namespace MovieApp.WebApi.Endpoints;
 [Route("api/interactions")]
 public sealed class InteractionEndpointsController : ControllerBase
 {
-    private readonly InteractionRepository _repository;
+    private readonly IInteractionRepository _repository;
+    private readonly IReelInteractionService _service;
     private readonly IMovieAppDbContext _context;
 
-    public InteractionEndpointsController(InteractionRepository repository, IMovieAppDbContext context)
+    public InteractionEndpointsController(IInteractionRepository repository, IReelInteractionService service, IMovieAppDbContext context)
     {
         _repository = repository;
+        _service = service;
         _context = context;
     }
 
@@ -53,28 +58,33 @@ public sealed class InteractionEndpointsController : ControllerBase
     [HttpPut("users/{userId:int}/reels/{reelId:int}/like")]
     public async Task<IActionResult> ToggleLikeAsync(int userId, int reelId)
     {
-        await _repository.ToggleLikeAsync(userId, reelId);
+        Debug.WriteLine($"liked in controller");
+        await _service.ToggleLikeAsync(userId, reelId);
         return Ok();
     }
 
     [HttpPut("users/{userId:int}/reels/{reelId:int}/view")]
-    public async Task<IActionResult> UpdateViewDataAsync(int userId, int reelId, [FromBody] UpdateViewDataRequestBody request)
+    public async Task<IActionResult> RecordViewAsync(int userId, int reelId, [FromBody] UpdateViewDataRequestBody request)
     {
-        await _repository.UpdateViewDataAsync(userId, reelId, request.WatchDurationSeconds, request.WatchPercentage);
+        await _service.RecordViewAsync(userId, reelId, (double)request.WatchDurationSeconds, (double)request.WatchPercentage);
         return Ok();
     }
 
     [HttpGet("users/{userId:int}/reels/{reelId:int}")]
     public async Task<IActionResult> GetInteractionAsync(int userId, int reelId)
     {
-        UserReelInteraction? interaction = await _repository.GetInteractionAsync(userId, reelId);
-        return Ok(interaction?.ToDto());
+        var interaction = await _service.GetInteractionAsync(userId, reelId);
+        if (interaction == null)
+        {
+            return Ok(null);
+        }
+        return Ok(interaction);
     }
 
     [HttpGet("reels/{reelId:int}/likes")]
     public async Task<IActionResult> GetLikeCountAsync(int reelId)
     {
-        return Ok(await _repository.GetLikeCountAsync(reelId));
+        return Ok(await _service.GetLikeCountAsync(reelId));
     }
 
     [HttpGet("reels/{reelId:int}/movie-id")]

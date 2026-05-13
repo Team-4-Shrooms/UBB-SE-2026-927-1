@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using MovieApp.WebDTOs.DTOs.RequestDTOs;
 using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Repositories;
+using MovieApp.Logic.Features.ReelsFeed;
+using MovieApp.DataLayer.Interfaces.Repositories;
 
 namespace MovieApp.WebApi.Endpoints;
 
@@ -11,11 +13,13 @@ namespace MovieApp.WebApi.Endpoints;
 [Route("api/recommendations")]
 public sealed class RecommendationEndpointsController : ControllerBase
 {
-    private readonly RecommendationRepository _repository;
+    private readonly IRecommendationRepository _repository;
+    private readonly IRecommendationService _service;
 
-    public RecommendationEndpointsController(RecommendationRepository repository)
+    public RecommendationEndpointsController(IRecommendationRepository repository, IRecommendationService service)
     {
         _repository = repository;
+        _service = service;
     }
 
     [HttpGet("users/{userId:int}/has-preferences")]
@@ -28,6 +32,13 @@ public sealed class RecommendationEndpointsController : ControllerBase
     public async Task<IActionResult> GetAllReelsAsync()
     {
         var reels = await _repository.GetAllReelsAsync();
+        return Ok(reels.Select(reel => reel.ToDto()));
+    }
+
+    [HttpGet("users/{userId:int}/recommended-reels/count={n:int}")]
+    public async Task<IActionResult> GetRecommendedReelsAsync(int userId, int n)
+    {
+        var reels = await _service.GetRecommendedReelsAsync(userId, n);
         return Ok(reels.Select(reel => reel.ToDto()));
     }
 

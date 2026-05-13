@@ -353,6 +353,11 @@ namespace MovieApp.Features.ReelsEditing.ViewModels
                 this.CurrentEdits.CropHeight = (int)((FullPercentage - ((this.CropMarginTop + this.CropMarginBottom) / PercentageDivisor)) * BaseVideoHeight);
 
                 string cropJson = this.CurrentEdits.ToCropDataJson();
+                System.Diagnostics.Debug.WriteLine($"DEBUG JSON: {cropJson}");
+
+                // Optional: Also show it in the UI to be 100% sure
+                this.StatusMessage = $"Sending JSON: {cropJson}";
+
                 string processedVideoPath = await this.videoProcessing.ApplyCropAsync(this.SelectedReel.VideoUrl, cropJson);
 
                 int rowsAffected = await this.reelRepository.UpdateReelEditsAsync(
@@ -376,6 +381,8 @@ namespace MovieApp.Features.ReelsEditing.ViewModels
                 this.SelectedReel.CropDataJson = persistedReel.CropDataJson;
                 this.SelectedReel.LastEditedAt = persistedReel.LastEditedAt;
                 this.CropVideoUpdated?.Invoke(this.SelectedReel.VideoUrl);
+
+                this.ResetCropUi();
 
                 this.StatusMessage = string.Format(
                     StatusCropUpdatedFormat,
@@ -523,6 +530,19 @@ namespace MovieApp.Features.ReelsEditing.ViewModels
             {
                 // Keep defaults if previously stored JSON is malformed.
             }
+        }
+
+        private void ResetCropUi()
+        {
+            CropMarginLeft = EmptyValue;
+            CropMarginTop = EmptyValue;
+            CropMarginRight = EmptyValue;
+            CropMarginBottom = EmptyValue;
+
+            CurrentEdits.CropXCoordinate = 0;
+            CurrentEdits.CropYCoordinate = 0;
+            CurrentEdits.CropWidth = BaseVideoWidth;
+            CurrentEdits.CropHeight = BaseVideoHeight;
         }
 
         private void NormalizeMusicTimingForSelectedTrack()

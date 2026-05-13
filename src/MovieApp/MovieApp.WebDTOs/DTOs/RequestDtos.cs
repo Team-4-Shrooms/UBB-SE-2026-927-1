@@ -131,6 +131,15 @@ public sealed class UpdateReelEditsRequestBody
     public string VideoUrl { get; set; } = string.Empty;
 }
 
+public sealed class MergeAudioRequestBody
+{
+    public string VideoPath { get; set; } = string.Empty;
+    public int MusicTrackId { get; set; }
+    public double StartOffsetSec { get; set; }
+    public double MusicDurationSec { get; set; }
+    public int VolumePercent { get; set; }
+}
+
 public sealed class AddReviewRequestBody
 {
     public int MovieId { get; set; }

@@ -83,5 +83,22 @@ namespace MovieApp.DataLayer.Repositories
                 .Where(interaction => interaction.IsLiked && interaction.ViewedAt >= cutoff)
                 .ToListAsync();
         }
+
+        public async Task<IList<Reel>> GetPersonalizedReelsAsync(int userId, int count)
+        {
+            var preferredMovieIds = await _context.UserMoviePreferences
+            .Where(p => p.User.Id == userId && p.Score > 0)
+            .Select(p => p.Movie.Id)
+            .ToListAsync();
+
+            return await _context.Reels
+                .Include(reel => reel.Movie)
+                .Include(reel => reel.CreatorUser)
+                .Where(reel => preferredMovieIds.Contains(reel.Movie.Id))
+                .OrderByDescending(reel => reel.CreatedAt)
+                .Take(count)
+                .ToListAsync();
+
+        }
     }
 }

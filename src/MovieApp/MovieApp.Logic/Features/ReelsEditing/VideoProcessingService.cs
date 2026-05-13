@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Models;
+using MovieApp.Logic.Features.ReelsUpload;
 
 namespace MovieApp.Logic.Features.ReelsEditing
 {
@@ -41,8 +42,12 @@ namespace MovieApp.Logic.Features.ReelsEditing
         private const string FfmpegCropArgumentsFormat = "-hide_banner -loglevel error -i \"{0}\" -vf \"{1}\" -c:v libx264 -preset veryfast -crf 20 -c:a copy -movflags +faststart -y \"{2}\"";
         private const string DurationFilterFormat = ",atrim=duration={0}";
         private const string VolumeFilterFormat = ",volume={0}";
-        private const string AudioFilterComplexFormat = "[1:a]aresample=async=1:first_pts=0{0}{1},apad[aout]";
-        private const string FfmpegMusicArgumentsFormat = "-hide_banner -loglevel error -i \"{0}\" -stream_loop -1 -ss {1} -i \"{2}\" -filter_complex \"{3}\" -map 0:v:0 -map \"[aout]\" -c:v copy -c:a aac -b:a 192k -movflags +faststart -shortest -y \"{4}\"";
+
+        //private const string AudioFilterComplexFormat = "[1:a]aresample=async=1:first_pts=0{0}{1},apad[aout]";
+
+        //private const string AudioFilterComplexFormat = "[1:a]aresample=async=1:first_pts=0{0}{1}[aout]";
+        private const string AudioFilterComplexFormat = "[1:a]aresample=async=1:first_pts=0[aout]";
+        private const string FfmpegMusicArgumentsFormat = "-hide_banner -loglevel error -i \"{0}\" -stream_loop -1 -i \"{2}\" -filter_complex \"{3}\" -map 0:v:0 -map \"[aout]\" -c:v copy -c:a aac -b:a 192k -movflags +faststart -shortest -y \"{4}\"";
         private const string FfprobeDurationArgumentsFormat = "-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"{0}\"";
 
         private const string ErrorCropOutputMissing = "FFmpeg did not produce the cropped output file.";
@@ -59,26 +64,52 @@ namespace MovieApp.Logic.Features.ReelsEditing
         private const string InvariantNumberFormat = "0.###";
 
         private static TimeSpan ffmpegTimeout = TimeSpan.FromMinutes(5);
-        private static readonly string LocalFfmpegPath = Path.Combine(AppContext.BaseDirectory, FfmpegExecutableName);
-        private static readonly string LocalFfprobePath = Path.Combine(AppContext.BaseDirectory, FfprobeExecutableName);
+        private static readonly string LocalFfmpegPath = Path.Combine(AppContext.BaseDirectory, "External", FfmpegExecutableName);
+        private static readonly string LocalFfprobePath = Path.Combine(AppContext.BaseDirectory, "External", FfprobeExecutableName);
         private static Action<string>? cropOutputPostProcessHook;
 
         private readonly IAudioLibraryRepository audioLibrary;
+        private readonly IVideoStorageService _storageService;
 
-        public VideoProcessingService(IAudioLibraryRepository audioLibrary)
+        public VideoProcessingService(IAudioLibraryRepository audioLibrary, IVideoStorageService storageService)
         {
             this.audioLibrary = audioLibrary;
+            _storageService = storageService;
         }
+
+
 
         public async Task<string> ApplyCropAsync(string videoPath, string cropDataJson)
         {
-            string sourcePath = ResolveMediaInput(videoPath);
-            if (string.IsNullOrWhiteSpace(sourcePath) || !File.Exists(sourcePath)) return videoPath;
+            Console.WriteLine($"Processing videoPath: {videoPath}");
+            string tempInputPath;
+            if (videoPath.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+            {
+                tempInputPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.mp4");
+                using (var client = new HttpClient())
+                {
+                    var data = await client.GetByteArrayAsync(videoPath);
+                    await File.WriteAllBytesAsync(tempInputPath, data);
+                }
+            }
+            else
+            {
+                tempInputPath = videoPath.Replace("\"", "");
+
+                if (!File.Exists(tempInputPath))
+                {
+                    throw new FileNotFoundException("The local video file path saved in the database does not exist on this machine.", tempInputPath);
+                }
+            }
+
+            string tempOutputPath = Path.Combine(Path.GetTempPath(), $"cropped_{Guid.NewGuid()}.mp4");
 
             (int cropX, int cropY, int cropWidth, int cropHeight) = ReadCropData(cropDataJson);
 
             if (cropX == EmptyCoordinate && cropY == EmptyCoordinate && cropWidth == BaseWidth && cropHeight == BaseHeight)
+            {
                 return videoPath;
+            }
 
             double widthRatio = (double)cropWidth / BaseWidth;
             double heightRatio = (double)cropHeight / BaseHeight;
@@ -87,19 +118,19 @@ namespace MovieApp.Logic.Features.ReelsEditing
 
             string cropFilter = string.Format(CultureInfo.InvariantCulture, CropFilterFormat, widthRatio, heightRatio, xRatio, yRatio);
 
-            string directory = Path.GetDirectoryName(sourcePath)!;
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(sourcePath);
-            string extension = Path.GetExtension(sourcePath);
-            string tempPath = Path.Combine(directory, $"{fileNameWithoutExt}{TempCropFileSuffix}{Guid.NewGuid():N}{extension}");
+            string directory = Path.GetDirectoryName(tempInputPath)!;
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(tempInputPath);
+            string extension = Path.GetExtension(tempInputPath);
+            //string tempPath = Path.Combine(directory, $"{fileNameWithoutExt}{TempCropFileSuffix}{Guid.NewGuid():N}{extension}");
 
-            string ffmpegArguments = string.Format(FfmpegCropArgumentsFormat, sourcePath, cropFilter, tempPath);
+            string ffmpegArguments = string.Format(FfmpegCropArgumentsFormat, tempInputPath, cropFilter, tempOutputPath);
 
             await RunFfmpegAsync(ffmpegArguments, directory);
-            cropOutputPostProcessHook?.Invoke(tempPath);
+            cropOutputPostProcessHook?.Invoke(tempOutputPath);
 
-            if (!File.Exists(tempPath)) throw new InvalidOperationException(ErrorCropOutputMissing);
+            if (!File.Exists(tempOutputPath)) throw new InvalidOperationException(ErrorCropOutputMissing);
 
-            return FinalizeProcessedFile(sourcePath, tempPath, FinalCroppedSuffix);
+            return FinalizeProcessedFile(tempInputPath, tempOutputPath, FinalCroppedSuffix);
         }
 
         public async Task<string> MergeAudioAsync(string videoPath, int musicTrackId, double startOffsetSec, double musicDurationSec, double musicVolumePercent)
@@ -115,7 +146,8 @@ namespace MovieApp.Logic.Features.ReelsEditing
                 throw new FileNotFoundException(string.Format(ErrorMusicFileNotFoundFormat, audioInput));
 
             double safeStart = Math.Clamp(startOffsetSec, EmptyCoordinate, MaxStartOffsetSeconds);
-            double safeVolume = Math.Clamp(musicVolumePercent / VolumePercentageDivisor, MinimumVolumeMultiplier, MaxVolumeMultiplier);
+            double safeVolume = musicVolumePercent;
+                //Math.Clamp(musicVolumePercent , MinimumVolumeMultiplier, MaxVolumeMultiplier);
 
             string directory = Path.GetDirectoryName(sourcePath)!;
 

@@ -21,6 +21,8 @@ namespace MovieApp.DataLayer.Interfaces.Repositories
         /// The list will be empty if there are no reels available.</returns>
         Task<IList<Reel>> GetAllReelsAsync();
 
+        Task<IList<Reel>> GetPersonalizedReelsAsync(int userId, int count);
+
         /// <summary>
         /// Retrieves the user's preference score per movie.
         /// </summary>
