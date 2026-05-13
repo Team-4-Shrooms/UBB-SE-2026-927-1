@@ -187,6 +187,12 @@ public sealed class RemoveTicketRequestBody
     public int EventId { get; set; }
 }
 
+public sealed class RemoveEquipmentRequestBody
+{
+    public int UserId { get; set; }
+    public int EquipmentId { get; set; }
+}
+
 public sealed class UpdatePreferenceScoreRequestBody
 {
     public int UserId { get; set; }

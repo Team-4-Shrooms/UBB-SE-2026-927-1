@@ -69,10 +69,17 @@ public sealed class InventoryEndpointsController : ControllerBase
         {
             t.Id,
             t.PurchaseDate,
-            EventId = t.Event?.Id ?? 0,
-            EventTitle = t.Event?.Title ?? string.Empty,
-            EventDate = t.Event?.Date,
-            EventLocation = t.Event?.Location ?? string.Empty,
+            Event = t.Event == null ? null : (object)new
+            {
+                t.Event.Id,
+                t.Event.Title,
+                t.Event.Description,
+                t.Event.Date,
+                t.Event.Location,
+                t.Event.TicketPrice,
+                t.Event.PosterUrl,
+                t.Event.Capacity,
+            },
         }));
     }
 
@@ -87,6 +94,20 @@ public sealed class InventoryEndpointsController : ControllerBase
     public async Task<IActionResult> RemoveOwnedTicket([FromBody] RemoveTicketRequestBody body)
     {
         await _inventoryService.RemoveOwnedTicketAsync(body.UserId, body.EventId);
+        return Ok();
+    }
+
+    [HttpGet("users/{userId:int}/equipment")]
+    public async Task<IActionResult> GetOwnedEquipment(int userId)
+    {
+        var equipment = await _inventoryService.GetOwnedEquipmentAsync(userId);
+        return Ok(equipment.Select(e => e.ToDto()));
+    }
+
+    [HttpPost("remove-equipment")]
+    public async Task<IActionResult> RemoveOwnedEquipment([FromBody] RemoveEquipmentRequestBody body)
+    {
+        await _inventoryService.RemoveOwnedEquipmentAsync(body.UserId, body.EquipmentId);
         return Ok();
     }
 }
