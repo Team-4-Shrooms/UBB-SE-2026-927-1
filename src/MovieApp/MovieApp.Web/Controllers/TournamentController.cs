@@ -1,15 +1,104 @@
+using Microsoft.AspNetCore.Mvc;
+using MovieApp.Logic.Features.MovieTournament;
+using MovieApp.Logic.Interfaces;
+using MovieApp.Logic.Interfaces.Services;
+using MovieApp.Web.Models;
+
 namespace MovieApp.Web.Controllers
 {
-    using Microsoft.AspNetCore.Mvc;
-
-    /// <summary>Stub controller for the Movie Tournament feature.</summary>
-    public sealed class TournamentController : Controller
+    public class TournamentController : Controller
     {
-        /// <summary>Placeholder index page.</summary>
+        private readonly ITournamentLogicService _tournamentLogicService;
+        private readonly ICurrentUserService _currentUserService;
+
+        public TournamentController(ITournamentLogicService tournamentLogicService, ICurrentUserService currentUserService)
+        {
+            _tournamentLogicService = tournamentLogicService;
+            _currentUserService = currentUserService;
+        }
+
+        [HttpGet]
         public IActionResult Index()
         {
-            ViewData["Title"] = "Movie Tournament";
-            return this.View();
+            return RedirectToAction(nameof(Setup));
+        }
+
+        [HttpGet]
+        public IActionResult Setup()
+        {
+            return View(new TournamentSetupViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Start(int poolSize)
+        {
+            await _tournamentLogicService.StartTournamentAsync(_currentUserService.UserId, poolSize);
+            return RedirectToAction(nameof(Match));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Match()
+        {
+            var matchPair = await _tournamentLogicService.GetCurrentMatchAsync(_currentUserService.UserId);
+
+            if (matchPair == null)
+            {
+                bool isComplete = await _tournamentLogicService.IsTournamentCompleteAsync(_currentUserService.UserId);
+                if (isComplete)
+                {
+                    return RedirectToAction(nameof(Winner));
+                }
+                return RedirectToAction(nameof(Setup));
+            }
+
+            var viewModel = new TournamentMatchViewModel
+            {
+                Left = matchPair.FirstMovie,
+                Right = matchPair.SecondMovie,
+                CurrentRound = 1, 
+                TotalRounds = 1
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PickWinner(int winnerMovieId)
+        {
+            await _tournamentLogicService.AdvanceWinnerAsync(_currentUserService.UserId, winnerMovieId);
+
+            bool isComplete = await _tournamentLogicService.IsTournamentCompleteAsync(_currentUserService.UserId);
+            if (isComplete)
+            {
+                return RedirectToAction(nameof(Winner));
+            }
+
+            return RedirectToAction(nameof(Match));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Winner()
+        {
+            try
+            {
+                var winner = await _tournamentLogicService.GetFinalWinnerAsync(_currentUserService.UserId);
+                var viewModel = new TournamentWinnerViewModel { Winner = winner };
+                return View(viewModel);
+            }
+            catch (InvalidOperationException)
+            {
+                return RedirectToAction(nameof(Setup));
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reset()
+        {
+            await _tournamentLogicService.ResetTournamentAsync(_currentUserService.UserId);
+            return RedirectToAction(nameof(Setup));
         }
     }
 }

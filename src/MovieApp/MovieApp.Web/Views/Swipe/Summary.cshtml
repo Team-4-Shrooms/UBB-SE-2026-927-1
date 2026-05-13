@@ -1,0 +1,37 @@
+@model MovieApp.Web.Models.SwipeSummaryViewModel
+@{
+    ViewData["Title"] = "Swipe Summary";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h2 class="mb-4">Your Swipe Session</h2>
+            <p class="lead text-muted">Here is how your session went.</p>
+
+            <div class="row g-4 mb-5">
+                <div class="col-6">
+                    <div class="card shadow-sm border-success h-100 p-4">
+                        <div style="font-size: 3rem;">👍</div>
+                        <div class="display-5 fw-bold text-success mt-2">@Model.LikedCount</div>
+                        <div class="text-muted">Liked</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card shadow-sm border-danger h-100 p-4">
+                        <div style="font-size: 3rem;">👎</div>
+                        <div class="display-5 fw-bold text-danger mt-2">@Model.DislikedCount</div>
+                        <div class="text-muted">Disliked</div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-muted mb-4">Your preferences have been saved and will improve your recommendations.</p>
+
+            <div class="d-flex gap-3 justify-content-center">
+                <a asp-controller="Catalog" asp-action="Index" class="btn btn-primary btn-lg">Browse Movie Catalog</a>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-lg">Swipe More</a>
+            </div>
+        </div>
+    </div>
+</div>

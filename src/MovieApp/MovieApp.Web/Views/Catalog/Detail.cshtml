@@ -1,0 +1,158 @@
+@model MovieApp.Web.Models.CatalogDetailViewModel
+
+@{
+    ViewData["Title"] = Model.Movie.Title;
+    
+    var totalReviews = Model.StarRatingBuckets.Sum();
+}
+
+<div class="mb-3">
+    <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Catalog</a>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-4 mb-4 mb-md-0">
+        <div class="card box-shadow rounded-3 overflow-hidden">
+            @if (string.IsNullOrEmpty(Model.Movie.PosterUrl))
+            {
+                <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 500px;">
+                    <h2>No Poster Available</h2>
+                </div>
+            }
+            else
+            {
+                <img src="@Model.Movie.PosterUrl" alt="@Model.Movie.Title" class="img-fluid w-100" style="object-fit: cover;" />
+            }
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <h1 class="fw-bold mb-1">@Model.Movie.Title <span class="text-muted fs-3">(@Model.Movie.ReleaseYear)</span></h1>
+        
+        <div class="mb-3">
+            <span class="badge bg-secondary fs-6 me-2">@Model.Movie.Genre</span>
+            <span class="badge bg-warning text-dark fs-6"><i class="bi bi-star-fill"></i> @Model.Movie.Rating.ToString("0.0") / 10</span>
+        </div>
+
+        <h3 class="mb-4">
+            @if (Model.Movie.HasActiveSale)
+            {
+                <span class="text-danger fw-bold">$@Model.Movie.DiscountedPriceText</span>
+                <del class="text-muted fs-5 ms-2">$@Model.Movie.OriginalPriceText</del>
+                <span class="badge bg-danger ms-2 align-middle">ON SALE</span>
+            }
+            else
+            {
+                <span class="fw-bold">$@Model.Movie.OriginalPriceText</span>
+            }
+        </h3>
+
+        <h5 class="fw-bold border-bottom pb-2">Synopsis</h5>
+        <p class="lead" style="white-space: pre-line;">@Model.Movie.Synopsis</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-5 mb-5">
+        
+        <h4 class="fw-bold mb-3">Customer Reviews</h4>
+        <div class="card box-shadow mb-4">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <h2 class="fw-bold mb-0 me-2">@Model.Movie.Rating.ToString("0.0")</h2>
+                    <div class="text-warning fs-4">
+                        @for (int i = 0; i < 5; i++)
+                        {
+                            <text>★</text>
+                        }
+                    </div>
+                </div>
+                <p class="text-muted">Based on @totalReviews reviews</p>
+
+                @for (int i = 5; i >= 1; i--)
+                {
+                    var count = Model.StarRatingBuckets[i - 1];
+                    var percentage = totalReviews > 0 ? (count * 100) / totalReviews : 0;
+                    
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="text-nowrap me-2" style="width: 50px;">@i star</div>
+                        <div class="progress flex-grow-1" style="height: 12px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: @percentage%" aria-valuenow="@percentage" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <div class="text-muted text-end ms-2" style="width: 40px;">@percentage%</div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <h4 class="fw-bold mb-3">Write a Review</h4>
+        <div class="card box-shadow">
+            <div class="card-body bg-light">
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+                }
+
+                <form asp-action="AddReview" method="post">
+                    <input type="hidden" asp-for="Form.MovieId" />
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Star Rating</label>
+                        <select asp-for="Form.StarRating" class="form-select w-50">
+                            <option value="5">5 - Excellent</option>
+                            <option value="4">4 - Good</option>
+                            <option value="3">3 - Average</option>
+                            <option value="2">2 - Poor</option>
+                            <option value="1">1 - Terrible</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Your Review</label>
+                        <textarea asp-for="Form.Comment" class="form-control" rows="4" placeholder="What did you think of the movie?"></textarea>
+                        <span asp-validation-for="Form.Comment" class="text-danger small"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Submit Review</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <h4 class="fw-bold mb-3">Recent Reviews</h4>
+        
+        @if (!Model.Reviews.Any())
+        {
+            <div class="alert alert-secondary">
+                No reviews yet. Be the first to review this movie!
+            </div>
+        }
+        else
+        {
+            <div class="list-group box-shadow">
+                @foreach (var review in Model.Reviews)
+                {
+                    <div class="list-group-item p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="fw-bold mb-0">@(review.User?.Username ?? "AnonymousUser")</h6>
+                            <small class="text-muted">@review.DisplayCreatedAt</small>
+                        </div>
+                        <div class="text-warning mb-2">
+                            @for (int i = 0; i < review.StarRating; i++)
+                            {
+                                <text>★</text>
+                            }
+                            @for (int i = (int)review.StarRating; i < 5; i++)
+                            {
+                                <text>☆</text>
+                            }
+                            <span class="badge bg-secondary ms-2 text-white">@review.DisplayStarRating</span>
+                        </div>
+                        <p class="mb-0 text-break" style="white-space: pre-line;">@review.Comment</p>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

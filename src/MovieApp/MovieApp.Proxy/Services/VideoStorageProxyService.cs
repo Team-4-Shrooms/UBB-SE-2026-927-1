@@ -16,7 +16,7 @@ namespace MovieApp.Proxy.Services
 
         public async Task<Reel> UploadVideoAsync(ReelUploadRequest request)
         {
-            var result = await _apiClient.PostAsync<ReelUploadRequest, Reel>("api/reels/upload", request);
+            var result = await _apiClient.PostAsync<ReelUploadRequest, Reel>("api/video-storage/reels", request);
             return result ?? new Reel();
         }
 

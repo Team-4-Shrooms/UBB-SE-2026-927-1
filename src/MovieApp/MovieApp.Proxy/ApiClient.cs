@@ -61,6 +61,14 @@ namespace MovieApp.Proxy
 
         public async Task<T?> GetAsync<T>(string uri)
         {
+            var token = _tokenProvider.GetToken();
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            }
+
             var response = await SendWithRetryAsync(() => _httpClient.GetAsync(uri));
             return await response.Content.ReadFromJsonAsync<T>(DeserializeOptions);
         }

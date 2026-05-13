@@ -88,98 +88,104 @@ namespace MovieApp.Logic.Features.TrailerScraping
             {
                 SearchQuery = searchQuery,
                 MaxResults = maxResults,
-                Status = JobStatusRunning,
+                Status = "pending",
                 StartedAt = DateTime.UtcNow,
             };
             job.Id = await this.repository.CreateJobAsync(job);
 
-            async Task LogAsync(string level, string message)
+            _ = Task.Run(async () =>
             {
-                ScrapeJobLog logEntry = new ScrapeJobLog
+                async Task LogAsync(string level, string message)
                 {
-                    ScrapeJob = job,
-                    Level = level,
-                    Message = message,
-                    Timestamp = DateTime.UtcNow,
-                };
-                await this.repository.AddLogEntryAsync(logEntry);
-                if (onLogEntry is not null) await onLogEntry(logEntry);
-            }
-
-            try
-            {
-                await LogAsync(LogLevelInfo, string.Format(LogFormatScrapingMovie, movie.Title, movie.Id));
-                await LogAsync(LogLevelInfo, string.Format(LogFormatYouTubeQuery, searchQuery, maxResults));
-
-                IList<ScrapedVideoResult> results = await this.scraper.SearchVideosAsync(searchQuery, maxResults);
-                await LogAsync(LogLevelInfo, string.Format(LogFormatYouTubeReturned, results.Count));
-
-                int reelsCreated = 0;
-
-                foreach (ScrapedVideoResult video in results)
-                {
-                    try
+                    ScrapeJobLog logEntry = new ScrapeJobLog
                     {
-                        bool reelExists = await this.repository.ReelExistsByVideoUrlAsync(video.VideoUrl);
-                        if (reelExists)
-                        {
-                            await LogAsync(LogLevelWarn, string.Format(LogFormatReelExists, video.VideoUrl));
-                            continue;
-                        }
-
-                        await LogAsync(LogLevelInfo, string.Format(LogFormatDownloadingMp4, video.Title));
-                        string? localMp4Path = await this.downloader.DownloadVideoAsMp4Async(video.VideoUrl, MaxTrailerDurationSeconds);
-
-                        if (string.IsNullOrEmpty(localMp4Path))
-                        {
-                            string reason = this.downloader.LastError ?? UnknownErrorMessage;
-                            await LogAsync(LogLevelError, string.Format(LogFormatMp4Failed, reason));
-                            await LogAsync(LogLevelWarn, string.Format(LogFormatSkippingNoMp4, video.Title));
-                            continue;
-                        }
-
-                        Reel reel = new Reel
-                        {
-                            Movie = movie,
-                            CreatorUser = new User { Id = DefaultCreatorUserId },
-                            VideoUrl = localMp4Path,
-                            ThumbnailUrl = video.ThumbnailUrl,
-                            Title = video.Title,
-                            Caption = string.Format(CaptionFormat, movie.Title, video.ChannelTitle, video.VideoUrl),
-                            Source = SourceScraped,
-                            CreatedAt = DateTime.UtcNow,
-                        };
-
-                        int reelId = await this.repository.InsertScrapedReelAsync(reel);
-                        reelsCreated++;
-
-                        string format = !string.IsNullOrEmpty(localMp4Path) ? FormatMp4 : FormatYouTubeUrl;
-                        await LogAsync(LogLevelInfo, string.Format(LogFormatCreatedReel, reelId, movie.Title, format));
-                    }
-                    catch (Exception exception)
-                    {
-                        await LogAsync(LogLevelError, string.Format(LogFormatFailedToProcess, video.Title, exception.Message));
-                    }
+                        ScrapeJob = job,
+                        Level = level,
+                        Message = message,
+                        Timestamp = DateTime.UtcNow,
+                    };
+                    await this.repository.AddLogEntryAsync(logEntry);
+                    if (onLogEntry is not null) await onLogEntry(logEntry);
                 }
 
-                job.MoviesFound = SingleMovieScrapeCount;
-                job.ReelsCreated = reelsCreated;
-                job.Status = JobStatusCompleted;
-                job.CompletedAt = DateTime.UtcNow;
-                await this.repository.UpdateJobAsync(job);
+                try
+                {
+                    job.Status = JobStatusRunning;
+                    await this.repository.UpdateJobAsync(job);
 
-                await LogAsync(LogLevelInfo, string.Format(LogFormatJobCompleted, reelsCreated, movie.Title));
-            }
-            catch (Exception exception)
-            {
-                job.Status = JobStatusFailed;
-                job.CompletedAt = DateTime.UtcNow;
-                job.ErrorMessage = exception.Message;
-                await this.repository.UpdateJobAsync(job);
+                    await LogAsync(LogLevelInfo, string.Format(LogFormatScrapingMovie, movie.Title, movie.Id));
+                    await LogAsync(LogLevelInfo, string.Format(LogFormatYouTubeQuery, searchQuery, maxResults));
 
-                try { await LogAsync(LogLevelError, string.Format(LogFormatJobFailed, exception.Message)); }
-                catch { /* best effort */ }
-            }
+                    IList<ScrapedVideoResult> results = await this.scraper.SearchVideosAsync(searchQuery, maxResults);
+                    await LogAsync(LogLevelInfo, string.Format(LogFormatYouTubeReturned, results.Count));
+
+                    int reelsCreated = 0;
+
+                    foreach (ScrapedVideoResult video in results)
+                    {
+                        try
+                        {
+                            bool reelExists = await this.repository.ReelExistsByVideoUrlAsync(video.VideoUrl);
+                            if (reelExists)
+                            {
+                                await LogAsync(LogLevelWarn, string.Format(LogFormatReelExists, video.VideoUrl));
+                                continue;
+                            }
+
+                            await LogAsync(LogLevelInfo, string.Format(LogFormatDownloadingMp4, video.Title));
+                            string? localMp4Path = await this.downloader.DownloadVideoAsMp4Async(video.VideoUrl, MaxTrailerDurationSeconds);
+
+                            if (string.IsNullOrEmpty(localMp4Path))
+                            {
+                                string reason = this.downloader.LastError ?? UnknownErrorMessage;
+                                await LogAsync(LogLevelError, string.Format(LogFormatMp4Failed, reason));
+                                await LogAsync(LogLevelWarn, string.Format(LogFormatSkippingNoMp4, video.Title));
+                                continue;
+                            }
+
+                            Reel reel = new Reel
+                            {
+                                Movie = movie,
+                                CreatorUser = new User { Id = DefaultCreatorUserId },
+                                VideoUrl = localMp4Path,
+                                ThumbnailUrl = video.ThumbnailUrl,
+                                Title = video.Title,
+                                Caption = string.Format(CaptionFormat, movie.Title, video.ChannelTitle, video.VideoUrl),
+                                Source = SourceScraped,
+                                CreatedAt = DateTime.UtcNow,
+                            };
+
+                            int reelId = await this.repository.InsertScrapedReelAsync(reel);
+                            reelsCreated++;
+
+                            string format = !string.IsNullOrEmpty(localMp4Path) ? FormatMp4 : FormatYouTubeUrl;
+                            await LogAsync(LogLevelInfo, string.Format(LogFormatCreatedReel, reelId, movie.Title, format));
+                        }
+                        catch (Exception exception)
+                        {
+                            await LogAsync(LogLevelError, string.Format(LogFormatFailedToProcess, video.Title, exception.Message));
+                        }
+                    }
+
+                    job.MoviesFound = SingleMovieScrapeCount;
+                    job.ReelsCreated = reelsCreated;
+                    job.Status = JobStatusCompleted;
+                    job.CompletedAt = DateTime.UtcNow;
+                    await this.repository.UpdateJobAsync(job);
+
+                    await LogAsync(LogLevelInfo, string.Format(LogFormatJobCompleted, reelsCreated, movie.Title));
+                }
+                catch (Exception exception)
+                {
+                    job.Status = JobStatusFailed;
+                    job.CompletedAt = DateTime.UtcNow;
+                    job.ErrorMessage = exception.Message;
+                    await this.repository.UpdateJobAsync(job);
+
+                    try { await LogAsync(LogLevelError, string.Format(LogFormatJobFailed, exception.Message)); }
+                    catch {  }
+                }
+            });
 
             return job;
         }

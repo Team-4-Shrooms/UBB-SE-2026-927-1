@@ -1,9 +1,137 @@
+@model IEnumerable<MovieApp.DataLayer.Models.Equipment>
+
 @{
     ViewData["Title"] = "Marketplace";
 }
 
-<div class="text-center py-5">
-    <h1 class="display-5">Marketplace</h1>
-    <p class="lead text-muted">This feature is coming soon.</p>
-    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary mt-3">Back to Home</a>
+<div class="marketplace-container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-4 fw-bold text-gradient">Marketplace</h1>
+        <div class="d-flex gap-3">
+            <input type="text" id="searchInput" class="form-control search-bar" placeholder="Search equipment by name..." />
+            <a asp-action="Sell" class="btn btn-primary btn-lg shadow-sm rounded-pill">Sell Equipment</a>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="equipmentList">
+        @foreach (var item in Model)
+        {
+            <div class="col equipment-card-wrapper" data-name="@item.Title">
+                <div class="card h-100 border-0 shadow-lg premium-card">
+                    <div class="card-img-container">
+                        <img src="@item.ImageUrl" class="card-img-top" alt="@item.Title" onerror="this.src='https://placehold.co/600x400?text=@item.Title'">
+                        <div class="card-badge">@item.Category</div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">@item.Title</h5>
+                        <p class="card-text text-muted text-truncate">@item.Description</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="h4 mb-0 fw-bold text-primary">@item.Price.ToString("C")</span>
+                            <a asp-action="Detail" asp-route-id="@item.Id" class="btn btn-outline-dark rounded-pill px-4">Details</a>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pb-3">
+                        <form asp-action="Buy" asp-route-id="@item.Id" method="post">
+                            <button type="submit" class="btn btn-gradient w-100 shadow-sm rounded-pill py-2">Buy Now</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            console.log("Marketplace Search Initialized (Robust jQuery)");
+            
+            var $searchInput = $("#searchInput");
+            var $cards = $(".equipment-card-wrapper");
+            
+            $searchInput.on("input keyup", function() {
+                var query = $(this).val().toLowerCase().trim();
+                console.log("Query: " + query);
+                
+                $cards.each(function() {
+                    var $card = $(this);
+                    var title = $card.attr("data-name") || "";
+                    var isMatch = title.toLowerCase().indexOf(query) > -1;
+                    
+                    if (isMatch) {
+                        $card.show();
+                    } else {
+                        $card.hide();
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+<style>
+    .text-gradient {
+        background: linear-gradient(90deg, #212529, #495057);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .search-bar {
+        border-radius: 25px;
+        padding-left: 20px;
+        width: 300px;
+        border: 2px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+    .search-bar:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 10px rgba(13, 110, 253, 0.2);
+    }
+    .premium-card {
+        border-radius: 20px;
+        overflow: hidden;
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+    }
+    .premium-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2) !important;
+    }
+    .card-img-container {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
+    }
+    .card-img-top {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    .premium-card:hover .card-img-top {
+        transform: scale(1.1);
+    }
+    .card-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(0,0,0,0.6);
+        color: white;
+        padding: 6px 16px;
+        border-radius: 30px;
+        font-size: 0.75rem;
+        backdrop-filter: blur(8px);
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    .btn-gradient {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        color: white;
+        border: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .btn-gradient:hover {
+        opacity: 0.9;
+        color: white;
+        transform: scale(1.02);
+    }
+</style>

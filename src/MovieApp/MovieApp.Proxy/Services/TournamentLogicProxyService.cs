@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Models;
 using MovieApp.Logic.Features.MovieTournament;
@@ -6,47 +7,50 @@ namespace MovieApp.Proxy.Services
 {
     /// <summary>
     /// Proxy implementation of ITournamentLogicService.
-    /// Delegates to the real TournamentLogicService backed by MovieTournamentProxyRepository.
-    /// Tournament bracket state is held in memory locally (same as the real service);
-    /// only pool/boost data fetching goes over HTTP.
+    /// Routes all async tournament actions to the WebApi Singleton over HTTP.
     /// </summary>
     public class TournamentLogicProxyService : ITournamentLogicService
     {
-        private readonly TournamentLogicService _inner;
+        private readonly ApiClient _apiClient;
 
         public TournamentLogicProxyService(ApiClient apiClient)
         {
-            _inner = new TournamentLogicService(new MovieTournamentProxyRepository(apiClient));
+            _apiClient = apiClient;
         }
 
-        public TournamentState CurrentState => _inner.CurrentState;
-
-        public bool IsTournamentActive => _inner.IsTournamentActive;
+        // --- HTTP PROXIED ASYNC METHODS ---
 
         public Task StartTournamentAsync(int userId, int poolSize)
-            => _inner.StartTournamentAsync(userId, poolSize);
+            => _apiClient.PostAsync<object>($"/api/tournament-game/{userId}/start?poolSize={poolSize}", null);
 
         public Task AdvanceWinnerAsync(int userId, int winnerId)
-            => _inner.AdvanceWinnerAsync(userId, winnerId);
-
-        public void ResetTournament() => _inner.ResetTournament();
-
-        public MatchPair? GetCurrentMatch() => _inner.GetCurrentMatch();
-
-        public bool IsTournamentComplete() => _inner.IsTournamentComplete();
-
-        public Movie GetFinalWinner() => _inner.GetFinalWinner();
+            => _apiClient.PostAsync<object>($"/api/tournament-game/{userId}/advance", winnerId);
 
         public Task<MatchPair?> GetCurrentMatchAsync(int userId)
-            => _inner.GetCurrentMatchAsync(userId);
+            => _apiClient.GetAsync<MatchPair?>($"/api/tournament-game/{userId}/current-match");
 
         public Task<bool> IsTournamentCompleteAsync(int userId)
-            => _inner.IsTournamentCompleteAsync(userId);
+            => _apiClient.GetAsync<bool>($"/api/tournament-game/{userId}/is-complete");
 
         public Task<Movie> GetFinalWinnerAsync(int userId)
-            => _inner.GetFinalWinnerAsync(userId);
+            => _apiClient.GetAsync<Movie>($"/api/tournament-game/{userId}/winner");
 
         public Task ResetTournamentAsync(int userId)
-            => _inner.ResetTournamentAsync(userId);
+            => _apiClient.PostAsync<object>($"/api/tournament-game/{userId}/reset", null);
+
+
+        // --- SYNCHRONOUS LEGACY METHODS (Not supported over HTTP) ---
+
+        public TournamentState CurrentState => throw new NotSupportedException("Synchronous tournament state is not supported via proxy. Use Async methods.");
+
+        public bool IsTournamentActive => throw new NotSupportedException("Synchronous tournament state is not supported via proxy. Use Async methods.");
+
+        public void ResetTournament() => throw new NotSupportedException("Synchronous tournament state is not supported via proxy. Use Async methods.");
+
+        public MatchPair? GetCurrentMatch() => throw new NotSupportedException("Synchronous tournament state is not supported via proxy. Use Async methods.");
+
+        public bool IsTournamentComplete() => throw new NotSupportedException("Synchronous tournament state is not supported via proxy. Use Async methods.");
+
+        public Movie GetFinalWinner() => throw new NotSupportedException("Synchronous tournament state is not supported via proxy. Use Async methods.");
     }
 }

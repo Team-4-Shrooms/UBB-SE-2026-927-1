@@ -11,9 +11,9 @@ namespace MovieApp.Logic.Features.TrailerScraping
     /// </summary>
     public interface IVideoIngestionService
     {
-        Task<string> IngestVideoFromUrlAsync(string trailerUrl, int movieId);
-        Task<ScrapeJob> RunScrapeJobAsync(Movie movie, int maxResults, Func<ScrapeJobLog, Task>? onLogEntry = null);
-        Task<ScrapeJob?> GetJobStatusAsync(int jobId);
         Task<IList<ScrapeJob>> GetAllJobsAsync();
+        Task<ScrapeJob?> GetJobStatusAsync(int jobId);
+        Task<ScrapeJob> RunScrapeJobAsync(Movie movie, int maxResults, Func<ScrapeJobLog, Task>? onLogEntry = null);
+        Task<string> IngestVideoFromUrlAsync(string trailerUrl, int movieId);
     }
 }

@@ -1,9 +1,55 @@
+@model MovieApp.Web.Models.PersonalityMatchIndexViewModel
 @{
     ViewData["Title"] = "Personality Match";
+    int progressPercent = Model.TotalQuestions > 0
+        ? (int)Math.Round((double)Model.QuestionIndex / Model.TotalQuestions * 100)
+        : 0;
 }
 
-<div class="text-center py-5">
-    <h1 class="display-5">Personality Match</h1>
-    <p class="lead text-muted">This feature is coming soon.</p>
-    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary mt-3">Back to Home</a>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h2 class="mb-2">Personality Match</h2>
+            <p class="text-muted mb-3">Question @(Model.QuestionIndex + 1) of @Model.TotalQuestions</p>
+
+            <div class="progress mb-4" style="height: 8px;">
+                <div class="progress-bar bg-primary" role="progressbar"
+                     style="width: @progressPercent%"
+                     aria-valuenow="@progressPercent" aria-valuemin="0" aria-valuemax="100">
+                </div>
+            </div>
+
+            <div class="card p-4 shadow-sm">
+                <h5 class="fw-bold mb-4">@Model.QuestionText</h5>
+
+                <div class="d-flex flex-column gap-3">
+                    @foreach (var option in Model.Options)
+                    {
+                    <form asp-action="Answer" method="post">
+                        <input type="hidden" name="questionIndex" value="@Model.QuestionIndex" />
+                        <input type="hidden" name="answer" value="@option" />
+                        <button type="submit" class="btn btn-outline-primary w-100 text-start py-3 px-4 option-btn">
+                            @option
+                        </button>
+                    </form>
+                    }
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-sm">Cancel</a>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+    document.querySelectorAll('.option-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            this.disabled = true;
+            this.closest('form').submit();
+        });
+    });
+    </script>
+}

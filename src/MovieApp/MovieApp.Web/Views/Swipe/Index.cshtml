@@ -1,9 +1,85 @@
+@model MovieApp.Web.Models.SwipeCardViewModel
 @{
     ViewData["Title"] = "Movie Swipe";
 }
 
-<div class="text-center py-5">
-    <h1 class="display-5">Movie Swipe</h1>
-    <p class="lead text-muted">This feature is coming soon.</p>
-    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary mt-3">Back to Home</a>
+<div class="container mt-4">
+    <div class="text-center mb-4">
+        <h2>Movie Swipe</h2>
+        <p class="text-muted">Like or dislike movies to improve your recommendations!</p>
+        <small class="text-muted">👍 <strong>@Model.LikedCount</strong> liked &nbsp;|&nbsp; 👎 <strong>@Model.DislikedCount</strong> disliked</small>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-5 col-sm-8 col-10">
+            <div class="card shadow-sm" id="swipeCard">
+                @if (!string.IsNullOrEmpty(Model.Movie.PosterUrl))
+                {
+                <img src="@Model.Movie.PosterUrl" class="card-img-top" alt="@Model.Movie.Title" style="height: 500px; object-fit: cover;">
+                }
+                else
+                {
+                <div class="d-flex align-items-center justify-content-center bg-secondary text-white" style="height: 500px;">
+                    <span class="fs-1">🎬</span>
+                </div>
+                }
+                <div class="card-body text-center bg-light">
+                    <h5 class="card-title">@Model.Movie.Title</h5>
+                    <span class="badge bg-secondary">@Model.Movie.ReleaseYear</span>
+                    @if (!string.IsNullOrEmpty(Model.Movie.PrimaryGenre))
+                    {
+                    <span class="badge bg-primary">@Model.Movie.PrimaryGenre</span>
+                    }
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center gap-4 mt-4">
+                <form asp-action="Swipe" method="post" id="dislikeForm">
+                    <input type="hidden" name="movieId" value="@Model.Movie.Id" />
+                    <input type="hidden" name="liked" value="false" />
+                    <button type="button" class="btn btn-outline-danger btn-lg px-4" id="dislikeBtn">✗ Dislike</button>
+                </form>
+
+                <form asp-action="Swipe" method="post" id="likeForm">
+                    <input type="hidden" name="movieId" value="@Model.Movie.Id" />
+                    <input type="hidden" name="liked" value="true" />
+                    <button type="button" class="btn btn-outline-success btn-lg px-4" id="likeBtn">✓ Like</button>
+                </form>
+            </div>
+
+            <div class="text-center mt-3">
+                <a asp-action="Summary" class="btn btn-outline-secondary btn-sm">View Summary</a>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    #swipeCard {
+        transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+</style>
+
+@section Scripts {
+    <script>
+    (function () {
+        var card = document.getElementById('swipeCard');
+
+        function swipeAndSubmit(form, direction) {
+            card.style.transform = direction === 'right'
+                ? 'translateX(120%) rotate(15deg)'
+                : 'translateX(-120%) rotate(-15deg)';
+            card.style.opacity = '0';
+            setTimeout(function () { form.submit(); }, 300);
+        }
+
+        document.getElementById('likeBtn').addEventListener('click', function () {
+            swipeAndSubmit(document.getElementById('likeForm'), 'right');
+        });
+
+        document.getElementById('dislikeBtn').addEventListener('click', function () {
+            swipeAndSubmit(document.getElementById('dislikeForm'), 'left');
+        });
+    })();
+    </script>
+}

@@ -42,6 +42,7 @@ namespace MovieApp.DataLayer
             await SeedMovieEventsAsync();
             await SeedMovieReviewsAsync();
             await SeedEquipmentAsync();
+            await FixExistingDataAsync();
         }
 
         /// <summary>
@@ -59,7 +60,7 @@ namespace MovieApp.DataLayer
                     Username = "admin",
                     Email = "admin@movieapp.com",
                     PasswordHash = "placeholder_admin",
-                    Balance = 0m,
+                    Balance = 50000m,
                 });
                 await _context.SaveChangesAsync();
             }
@@ -78,21 +79,21 @@ namespace MovieApp.DataLayer
                     Username = "User1",
                     Email = "user1@movieapp.com",
                     PasswordHash = "placeholder_hash_1",
-                    Balance = 100m,
+                    Balance = 50000m,
                 },
                 new User
                 {
                     Username = "Alice",
                     Email = "alice@movieapp.com",
                     PasswordHash = "placeholder_hash_2",
-                    Balance = 100m,
+                    Balance = 50000m,
                 },
                 new User
                 {
                     Username = "Bob",
                     Email = "bob@movieapp.com",
                     PasswordHash = "placeholder_hash_3",
-                    Balance = 100m,
+                    Balance = 50000m,
                 },
                 new User
                 {
@@ -1196,7 +1197,7 @@ namespace MovieApp.DataLayer
                     Username = "dummy1",
                     Email = "dummy1@gmail.com",
                     PasswordHash = "pass1",
-                    Balance = 0m,
+                    Balance = 50000m,
                 });
             }
 
@@ -1207,7 +1208,7 @@ namespace MovieApp.DataLayer
                     Username = "dummy2",
                     Email = "dummy2@gmail.com",
                     PasswordHash = "pass2",
-                    Balance = 50m,
+                    Balance = 50000m,
                 });
             }
 
@@ -1286,6 +1287,7 @@ namespace MovieApp.DataLayer
                     Date = currentDate.AddDays(7),
                     Location = "Cinema Hall A",
                     TicketPrice = 12.50m,
+                    Capacity = 100,
                     PosterUrl = "https://m.media-amazon.com/images/I/71DwIcSgFcS._AC_UF894,1000_QL80_.jpg",
                 },
                 new MovieEvent
@@ -1296,6 +1298,7 @@ namespace MovieApp.DataLayer
                     Date = currentDate.AddDays(14),
                     Location = "Retro Theater",
                     TicketPrice = 18.00m,
+                    Capacity = 100,
                     PosterUrl = "https://m.media-amazon.com/images/I/51EG732BV3L.jpg",
                 },
                 new MovieEvent
@@ -1306,6 +1309,7 @@ namespace MovieApp.DataLayer
                     Date = currentDate.AddDays(21),
                     Location = "Science Center Auditorium",
                     TicketPrice = 15.00m,
+                    Capacity = 100,
                     PosterUrl = "https://m.media-amazon.com/images/I/91vIHsL-zjL._AC_UF894,1000_QL80_.jpg",
                 },
                 new MovieEvent
@@ -1316,6 +1320,7 @@ namespace MovieApp.DataLayer
                     Date = currentDate.AddDays(10),
                     Location = "Downtown Arts Cinema",
                     TicketPrice = 14.00m,
+                    Capacity = 100,
                     PosterUrl = "https://m.media-amazon.com/images/I/81hKZ6oTqUL._AC_UF894,1000_QL80_.jpg",
                 });
 
@@ -1508,6 +1513,27 @@ namespace MovieApp.DataLayer
                 });
 
             await _context.SaveChangesAsync();
+        }
+        private async Task FixExistingDataAsync()
+        {
+            // Fix existing events with 0 capacity from previous migrations
+            var zeroCapacityEvents = await _context.MovieEvents.Where(e => e.Capacity == 0).ToListAsync();
+            foreach (var e in zeroCapacityEvents)
+            {
+                e.Capacity = 100;
+            }
+
+            // Fix users with 0 or low balance to enable marketplace testing
+            var lowBalanceUsers = await _context.Users.Where(u => u.Balance < 50000).ToListAsync();
+            foreach (var u in lowBalanceUsers)
+            {
+                u.Balance = 50000;
+            }
+
+            if (zeroCapacityEvents.Any() || lowBalanceUsers.Any())
+            {
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

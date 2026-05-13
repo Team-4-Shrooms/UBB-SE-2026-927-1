@@ -47,4 +47,13 @@ public sealed class ReelEndpointsController : ControllerBase
         await _repository.DeleteReelAsync(reelId);
         return Ok();
     }
+
+    [HttpPost("upload")]
+    public async Task<IActionResult> UploadVideoAsync(
+        [FromBody] MovieApp.Logic.Features.ReelsUpload.ReelUploadRequest request,
+        [FromServices] MovieApp.Logic.Features.ReelsUpload.IVideoStorageService videoStorageService)
+    {
+        var result = await videoStorageService.UploadVideoAsync(request);
+        return Ok(result);
+    }
 }
