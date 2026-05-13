@@ -7,6 +7,12 @@ using System.Text.Json;
 
 namespace MovieApp.Proxy.Services
 {
+    /// <summary>
+    /// Proxy implementation of IVideoIngestionService.
+    /// Read-only operations (GetAllJobsAsync, GetJobStatusAsync) call the scrape-job WebApi.
+    /// RunScrapeJobAsync and IngestVideoFromUrlAsync create scrape-job / reel records on the server;
+    /// the actual YouTube download is done server-side by the real VideoIngestionService.
+    /// </summary>
     public class VideoIngestionProxyService : IVideoIngestionService
     {
         private readonly ApiClient _apiClient;
@@ -18,27 +24,23 @@ namespace MovieApp.Proxy.Services
 
         public async Task<IList<ScrapeJob>> GetAllJobsAsync()
         {
-            // Calls the correct controller!
             var result = await _apiClient.GetAsync<List<ScrapeJob>>("api/video-ingestion/jobs");
             return result ?? new List<ScrapeJob>();
         }
 
         public async Task<ScrapeJob?> GetJobStatusAsync(int jobId)
         {
-            // Calls the exact endpoint required by T9
             return await _apiClient.GetAsync<ScrapeJob>($"api/video-ingestion/jobs/{jobId}");
         }
 
         public async Task<ScrapeJob> RunScrapeJobAsync(Movie movie, int maxResults, Func<ScrapeJobLog, Task>? onLogEntry = null)
         {
-            // Triggers the background worker on the server to actually download the videos!
             var response = await _apiClient.PostAsync<object, JsonElement>("api/video-ingestion/run-scrape", new
             {
                 MovieId = movie.Id,
                 MaxResults = maxResults
             });
 
-            // The WebApi returns an object like { JobId = 5 }
             int jobId = response.GetProperty("jobId").GetInt32();
 
             return new ScrapeJob
@@ -53,7 +55,6 @@ namespace MovieApp.Proxy.Services
 
         public async Task<string> IngestVideoFromUrlAsync(string trailerUrl, int movieId)
         {
-            // Triggers the server to download the direct URL
             var result = await _apiClient.PostAsync<object, JsonElement>("api/video-ingestion/ingest-url", new
             {
                 TrailerUrl = trailerUrl,
