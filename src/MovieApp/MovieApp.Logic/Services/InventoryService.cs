@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Interfaces.Repositories;
 using MovieApp.Logic.Interfaces.Services;
@@ -84,6 +85,40 @@ namespace MovieApp.Logic.Services
         public async Task<List<OwnedTicket>> GetOwnedTicketsAsync(int userId)
         {
             return await _inventoryRepo.GetAllTicketsForUserAsync(userId);
+        }
+
+        public async Task<List<OwnedMovie>> GetMovieOwnershipsAsync(int userId, int movieId)
+        {
+            return await _inventoryRepo.GetMovieOwnershipsAsync(userId, movieId);
+        }
+
+        public async Task RemoveMovieOwnershipsAsync(IEnumerable<int> ownershipIds)
+        {
+            var ownerships = ownershipIds.Select(id => new OwnedMovie { Id = id });
+            await _inventoryRepo.RemoveMovieOwnershipsAsync(ownerships);
+            await _inventoryRepo.SaveChangesAsync();
+        }
+
+        public async Task<List<OwnedTicket>> GetTicketOwnershipsAsync(int userId, int eventId)
+        {
+            return await _inventoryRepo.GetTicketOwnershipsAsync(userId, eventId);
+        }
+
+        public async Task RemoveTicketOwnershipsAsync(IEnumerable<int> ownershipIds)
+        {
+            var ownerships = ownershipIds.Select(id => new OwnedTicket { Id = id });
+            await _inventoryRepo.RemoveTicketOwnershipsAsync(ownerships);
+            await _inventoryRepo.SaveChangesAsync();
+        }
+
+        public async Task AddOwnedMovieAsync(int userId, int movieId)
+        {
+            User user = await _userRepo.GetUserByIdAsync(userId)
+                ?? throw new KeyNotFoundException($"User {userId} not found.");
+            Movie movie = await _movieRepo.GetMovieByIdAsync(movieId)
+                ?? throw new KeyNotFoundException($"Movie {movieId} not found.");
+            await _movieRepo.AddOwnedMovieAsync(new OwnedMovie { User = user, Movie = movie });
+            await _movieRepo.SaveChangesAsync();
         }
     }
 }
