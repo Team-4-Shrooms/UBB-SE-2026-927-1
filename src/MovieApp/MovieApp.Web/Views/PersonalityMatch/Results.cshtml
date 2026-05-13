@@ -1,0 +1,48 @@
+@model MovieApp.Web.Models.PersonalityMatchResultsViewModel
+@{
+    ViewData["Title"] = "Your Matches";
+}
+
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h1 class="display-4 text-primary fw-bold">🎭 Your Matches 🎭</h1>
+        <p class="lead">These users share your taste in movies.</p>
+    </div>
+
+    @if (Model.Matches.Count == 0)
+    {
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <p class="text-muted fs-5 mb-4">No matches found yet. Try swiping more movies to build your profile!</p>
+            <a asp-controller="Swipe" asp-action="Index" class="btn btn-primary btn-lg px-5">Go to Movie Swipe</a>
+        </div>
+    </div>
+    }
+    else
+    {
+    <div class="row g-4 justify-content-center">
+        @foreach (var match in Model.Matches)
+            {
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm border-primary border-2 h-100">
+                <div class="card-body text-center bg-light">
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3"
+                         style="width: 64px; height: 64px; font-size: 1.6rem; font-weight: 700;">
+                        @(match.Username.Length > 0 ? match.Username[0].ToString().ToUpper() : "?")
+                    </div>
+                    <h5 class="card-title">@match.Username</h5>
+                    <p class="text-muted">@($"{match.MatchScore:P0}") match</p>
+                </div>
+            </div>
+        </div>
+            }
+    </div>
+
+    <div class="text-center mt-5">
+        <form asp-action="Index" method="get" class="d-inline">
+            <button type="submit" class="btn btn-outline-secondary btn-lg px-5">Retake Quiz</button>
+        </form>
+        <a asp-controller="Catalog" asp-action="Index" class="btn btn-primary btn-lg px-5 ms-3">Browse Movie Catalog</a>
+    </div>
+    }
+</div>
