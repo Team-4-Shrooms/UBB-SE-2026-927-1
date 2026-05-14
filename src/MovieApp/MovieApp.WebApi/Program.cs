@@ -1,7 +1,9 @@
 using System.Reflection;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using MovieApp.WebApi.Auth;
 using MovieApp.DataLayer;
@@ -47,63 +49,63 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddScoped<IMovieAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
+builder.Services.AddScoped<IMovieAppDbContext>(serviceProvider => serviceProvider.GetRequiredService<AppDbContext>());
 
 // Repositories — concrete types registered first so controllers can inject them directly;
 // interface registrations delegate to the same scoped instance.
 builder.Services.AddScoped<ActiveSalesRepository>();
-builder.Services.AddScoped<IActiveSalesRepository>(sp => sp.GetRequiredService<ActiveSalesRepository>());
+builder.Services.AddScoped<IActiveSalesRepository>(serviceProvider => serviceProvider.GetRequiredService<ActiveSalesRepository>());
 
 builder.Services.AddScoped<AudioLibraryRepository>();
-builder.Services.AddScoped<IAudioLibraryRepository>(sp => sp.GetRequiredService<AudioLibraryRepository>());
+builder.Services.AddScoped<IAudioLibraryRepository>(serviceProvider => serviceProvider.GetRequiredService<AudioLibraryRepository>());
 
 builder.Services.AddScoped<EquipmentRepository>();
-builder.Services.AddScoped<IEquipmentRepository>(sp => sp.GetRequiredService<EquipmentRepository>());
+builder.Services.AddScoped<IEquipmentRepository>(serviceProvider => serviceProvider.GetRequiredService<EquipmentRepository>());
 
 builder.Services.AddScoped<EventRepository>();
-builder.Services.AddScoped<IEventRepository>(sp => sp.GetRequiredService<EventRepository>());
+builder.Services.AddScoped<IEventRepository>(serviceProvider => serviceProvider.GetRequiredService<EventRepository>());
 
 builder.Services.AddScoped<InteractionRepository>();
-builder.Services.AddScoped<IInteractionRepository>(sp => sp.GetRequiredService<InteractionRepository>());
+builder.Services.AddScoped<IInteractionRepository>(serviceProvider => serviceProvider.GetRequiredService<InteractionRepository>());
 
 builder.Services.AddScoped<InventoryRepository>();
-builder.Services.AddScoped<IInventoryRepository>(sp => sp.GetRequiredService<InventoryRepository>());
+builder.Services.AddScoped<IInventoryRepository>(serviceProvider => serviceProvider.GetRequiredService<InventoryRepository>());
 
 builder.Services.AddScoped<MovieRepository>();
-builder.Services.AddScoped<IMovieRepository>(sp => sp.GetRequiredService<MovieRepository>());
+builder.Services.AddScoped<IMovieRepository>(serviceProvider => serviceProvider.GetRequiredService<MovieRepository>());
 
 builder.Services.AddScoped<MovieTournamentRepository>();
-builder.Services.AddScoped<IMovieTournamentRepository>(sp => sp.GetRequiredService<MovieTournamentRepository>());
+builder.Services.AddScoped<IMovieTournamentRepository>(serviceProvider => serviceProvider.GetRequiredService<MovieTournamentRepository>());
 
 builder.Services.AddScoped<PersonalityMatchRepository>();
-builder.Services.AddScoped<IPersonalityMatchRepository>(sp => sp.GetRequiredService<PersonalityMatchRepository>());
+builder.Services.AddScoped<IPersonalityMatchRepository>(serviceProvider => serviceProvider.GetRequiredService<PersonalityMatchRepository>());
 
 builder.Services.AddScoped<PreferenceRepository>();
-builder.Services.AddScoped<IPreferenceRepository>(sp => sp.GetRequiredService<PreferenceRepository>());
+builder.Services.AddScoped<IPreferenceRepository>(serviceProvider => serviceProvider.GetRequiredService<PreferenceRepository>());
 
 builder.Services.AddScoped<ProfileRepository>();
-builder.Services.AddScoped<IProfileRepository>(sp => sp.GetRequiredService<ProfileRepository>());
+builder.Services.AddScoped<IProfileRepository>(serviceProvider => serviceProvider.GetRequiredService<ProfileRepository>());
 
 builder.Services.AddScoped<RecommendationRepository>();
-builder.Services.AddScoped<IRecommendationRepository>(sp => sp.GetRequiredService<RecommendationRepository>());
+builder.Services.AddScoped<IRecommendationRepository>(serviceProvider => serviceProvider.GetRequiredService<RecommendationRepository>());
 
 builder.Services.AddScoped<ReelRepository>();
-builder.Services.AddScoped<IReelRepository>(sp => sp.GetRequiredService<ReelRepository>());
+builder.Services.AddScoped<IReelRepository>(serviceProvider => serviceProvider.GetRequiredService<ReelRepository>());
 
 builder.Services.AddScoped<ReviewRepository>();
-builder.Services.AddScoped<IReviewRepository>(sp => sp.GetRequiredService<ReviewRepository>());
+builder.Services.AddScoped<IReviewRepository>(serviceProvider => serviceProvider.GetRequiredService<ReviewRepository>());
 
 builder.Services.AddScoped<ScrapeJobRepository>();
-builder.Services.AddScoped<IScrapeJobRepository>(sp => sp.GetRequiredService<ScrapeJobRepository>());
+builder.Services.AddScoped<IScrapeJobRepository>(serviceProvider => serviceProvider.GetRequiredService<ScrapeJobRepository>());
 
 builder.Services.AddScoped<TransactionRepository>();
-builder.Services.AddScoped<ITransactionRepository>(sp => sp.GetRequiredService<TransactionRepository>());
+builder.Services.AddScoped<ITransactionRepository>(serviceProvider => serviceProvider.GetRequiredService<TransactionRepository>());
 
 builder.Services.AddScoped<UserRepository>();
-builder.Services.AddScoped<IUserRepository>(sp => sp.GetRequiredService<UserRepository>());
+builder.Services.AddScoped<IUserRepository>(serviceProvider => serviceProvider.GetRequiredService<UserRepository>());
 
 builder.Services.AddScoped<VideoStorageRepository>();
-builder.Services.AddScoped<IVideoStorageRepository>(sp => sp.GetRequiredService<VideoStorageRepository>());
+builder.Services.AddScoped<IVideoStorageRepository>(serviceProvider => serviceProvider.GetRequiredService<VideoStorageRepository>());
 
 // Core services
 builder.Services.AddScoped<IMovieService, MovieService>();
@@ -129,7 +131,14 @@ builder.Services.AddScoped<IPersonalityMatchingService, PersonalityMatchingServi
 builder.Services.AddScoped<IReelInteractionService, ReelInteractionService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<IVideoProcessingService, VideoProcessingService>();
-builder.Services.AddScoped<IVideoStorageService, VideoStorageService>();
+string videoUploadDir = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "uploads", "videos");
+Directory.CreateDirectory(videoUploadDir);
+builder.Services.AddScoped<IVideoStorageService>(serviceProvider =>
+    new VideoStorageService(
+        serviceProvider.GetRequiredService<IVideoStorageRepository>(),
+        serviceProvider.GetRequiredService<IReelRepository>(),
+        videoUploadDir,
+        "/uploads/videos"));
 builder.Services.AddScoped<IVideoIngestionService, VideoIngestionService>();
 builder.Services.AddSingleton<ITournamentLogicService, TournamentLogicService>();
 
@@ -190,7 +199,7 @@ using (IServiceScope scope = app.Services.CreateScope())
         await seeder.SeedAsync();
 
         // Replace placeholder hashes with real BCrypt hashes on first run.
-        foreach (var user in context.Users.Where(u => u.PasswordHash.StartsWith("placeholder_")))
+        foreach (var user in context.Users.Where(user => user.PasswordHash.StartsWith("placeholder_")))
         {
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(config["Auth:SeedPassword"] ?? "password123");
         }
@@ -219,6 +228,16 @@ if (!app.Environment.IsEnvironment("Testing"))
     app.UseHttpsRedirection();
 }
 
+string uploadsPhysicalPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot", "uploads");
+Directory.CreateDirectory(uploadsPhysicalPath);
+FileExtensionContentTypeProvider contentTypeProvider = new FileExtensionContentTypeProvider();
+contentTypeProvider.Mappings[".tmp"] = "video/mp4";
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadsPhysicalPath),
+    RequestPath = "/uploads",
+    ContentTypeProvider = contentTypeProvider,
+});
 app.UseAuthentication();
 app.UseAuthorization();
 

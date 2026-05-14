@@ -21,15 +21,19 @@ namespace MovieApp.Logic.Features.ReelsUpload
         private const int NullId = 0;
         private const double MaximumReelDurationSeconds = 60.0;
 
-        public VideoStorageService(IVideoStorageRepository memoryRepository, IReelRepository reelRepository)
+        private readonly string urlBase;
+
+        public VideoStorageService(
+            IVideoStorageRepository memoryRepository,
+            IReelRepository reelRepository,
+            string uploadDirectory,
+            string urlBase)
         {
             this.memoryRepository = memoryRepository;
             this.reelRepository = reelRepository;
+            this.urlBase = urlBase;
 
-            blobStorageDirectory = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "MeioAI",
-                "Videos");
+            blobStorageDirectory = uploadDirectory;
 
             if (!Directory.Exists(blobStorageDirectory))
             {
@@ -52,7 +56,7 @@ namespace MovieApp.Logic.Features.ReelsUpload
             if (!File.Exists(request.LocalFilePath))
                 throw new FileNotFoundException("The selected video file could not be found.", request.LocalFilePath);
 
-            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(request.LocalFilePath);
+            string fileName = Guid.NewGuid().ToString() + VideoFileExtension;
             string destinationBlobPath = Path.Combine(blobStorageDirectory, fileName);
 
             await Task.Run(() => File.Copy(request.LocalFilePath, destinationBlobPath, overwrite: true));
@@ -63,7 +67,7 @@ namespace MovieApp.Logic.Features.ReelsUpload
             {
                 Movie = new Movie { Id = request.MovieId ?? NullId },
                 CreatorUser = new User { Id = request.UploaderUserId },
-                VideoUrl = destinationBlobPath,
+                VideoUrl = urlBase.TrimEnd('/') + "/" + fileName,
                 ThumbnailUrl = EmptyURL,
                 Title = request.Title,
                 Caption = request.Caption,

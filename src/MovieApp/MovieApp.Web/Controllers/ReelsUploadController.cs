@@ -88,9 +88,9 @@ public class ReelsUploadController : Controller
             TempData[SuccessMessageKey] = ReelUploadSuccessMessage;
             return RedirectToAction(IndexView, ReelsFeedAction);
         }
-        catch (Exception ex)
+        catch (Exception exception)
         {
-            TempData[ErrorMessageKey] = $"Upload failed: {ex.Message}";
+            TempData[ErrorMessageKey] = $"Upload failed: {exception.Message}";
             return RedirectToAction(nameof(Index));
         }
         finally

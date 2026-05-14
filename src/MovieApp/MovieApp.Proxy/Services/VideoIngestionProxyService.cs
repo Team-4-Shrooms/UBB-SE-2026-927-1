@@ -28,15 +28,15 @@ namespace MovieApp.Proxy.Services
 
         public async Task<IList<ScrapeJob>> GetAllJobsAsync()
         {
-            string key = "api/video-ingestion/jobs";
-            var result = await _apiClient.GetAsync<List<ScrapeJob>>(key);
+            string endpoint = "api/video-ingestion/jobs";
+            var result = await _apiClient.GetAsync<List<ScrapeJob>>(endpoint);
             return result ?? new List<ScrapeJob>();
         }
 
         public async Task<ScrapeJob?> GetJobStatusAsync(int jobId)
         {
-            string key = $"api/video-ingestion/jobs/{jobId}";
-            return await _apiClient.GetAsync<ScrapeJob>(key);
+            string endpoint = $"api/video-ingestion/jobs/{jobId}";
+            return await _apiClient.GetAsync<ScrapeJob>(endpoint);
         }
 
         public async Task<ScrapeJob> RunScrapeJobAsync(Movie movie, int maxResults, Func<ScrapeJobLog, Task>? onLogEntry = null)

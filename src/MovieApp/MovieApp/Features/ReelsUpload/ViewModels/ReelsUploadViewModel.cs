@@ -65,9 +65,9 @@ namespace MovieApp.Features.ReelsUpload.ViewModels
                 var movies = await movieService.GetAllMoviesAsync();
                 _allMovies = movies.ToList();
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                StatusMessage = $"Failed to load movies: {ex.Message}";
+                StatusMessage = $"Failed to load movies: {exception.Message}";
             }
         }
 
@@ -145,9 +145,9 @@ namespace MovieApp.Features.ReelsUpload.ViewModels
                 ReelCaption = string.Empty;
                 LinkedMovie = null;
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                StatusMessage = $"Upload Failed: {ex.Message}";
+                StatusMessage = $"Upload Failed: {exception.Message}";
             }
         }
 
@@ -177,7 +177,7 @@ namespace MovieApp.Features.ReelsUpload.ViewModels
             }
 
             var filteredMovies = _allMovies
-                .Where(m => m.Title.Contains(partialMovieName, StringComparison.OrdinalIgnoreCase))
+                .Where(movie => movie.Title.Contains(partialMovieName, StringComparison.OrdinalIgnoreCase))
                 .ToList();
 
             foreach (Movie movie in filteredMovies)
