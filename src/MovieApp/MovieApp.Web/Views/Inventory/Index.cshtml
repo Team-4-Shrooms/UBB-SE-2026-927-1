@@ -3,6 +3,7 @@
     ViewData["Title"] = "Inventory";
     var movies = (List<Movie>?)ViewBag.Movies ?? new List<Movie>();
     var tickets = (List<OwnedTicket>?)ViewBag.Tickets ?? new List<OwnedTicket>();
+    var equipment = (List<Equipment>?)ViewBag.Equipment ?? new List<Equipment>();
 }
 
 <h1 class="mb-4">My Inventory</h1>
@@ -33,6 +34,11 @@
             My Tickets <span class="badge bg-secondary">@tickets.Count</span>
         </button>
     </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="equipment-tab" data-bs-toggle="tab" data-bs-target="#equipment" type="button" role="tab" aria-controls="equipment" aria-selected="false">
+            My Equipment <span class="badge bg-secondary">@equipment.Count</span>
+        </button>
+    </li>
 </ul>
 
 <div class="tab-content" id="inventoryTabContent">
@@ -51,20 +57,22 @@
                 {
                     <div class="col">
                         <div class="card h-100">
-                            @if (!string.IsNullOrEmpty(movie.PosterUrl))
-                            {
-                                <img src="@movie.PosterUrl" class="card-img-top" alt="@movie.Title" style="height: 280px; object-fit: cover;">
-                            }
-                            else
-                            {
-                                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center text-white" style="height: 280px;">
-                                    <span>No Poster</span>
+                            <a asp-controller="Catalog" asp-action="Detail" asp-route-id="@movie.Id" class="text-decoration-none">
+                                @if (!string.IsNullOrEmpty(movie.PosterUrl))
+                                {
+                                    <img src="@movie.PosterUrl" class="card-img-top" alt="@movie.Title" style="height: 280px; object-fit: cover;">
+                                }
+                                else
+                                {
+                                    <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center text-white" style="height: 280px;">
+                                        <span>No Poster</span>
+                                    </div>
+                                }
+                                <div class="card-body">
+                                    <h5 class="card-title text-dark">@movie.Title</h5>
+                                    <p class="card-text text-muted">@movie.ReleaseYear &middot; @movie.PrimaryGenre</p>
                                 </div>
-                            }
-                            <div class="card-body">
-                                <h5 class="card-title">@movie.Title</h5>
-                                <p class="card-text text-muted">@movie.ReleaseYear &middot; @movie.PrimaryGenre</p>
-                            </div>
+                            </a>
                             <div class="card-footer">
                                 <form asp-action="RemoveMovie" method="post">
                                     <input type="hidden" name="movieId" value="@movie.Id" />
@@ -90,37 +98,82 @@
         }
         else
         {
-            <div class="table-responsive">
-                <table class="table table-striped align-middle">
-                    <thead>
-                        <tr>
-                            <th>Ticket ID</th>
-                            <th>Event</th>
-                            <th>Date</th>
-                            <th>Purchased</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var ticket in tickets)
-                        {
-                            <tr>
-                                <td>@ticket.Id</td>
-                                <td>@(ticket.Event?.Title ?? "—")</td>
-                                <td>@(ticket.Event?.Date.ToString("MMM dd, yyyy") ?? "—")</td>
-                                <td>@ticket.PurchaseDate.ToString("MMM dd, yyyy")</td>
-                                <td>
-                                    <form asp-action="RemoveTicket" method="post">
-                                        <input type="hidden" name="eventId" value="@(ticket.Event?.Id ?? 0)" />
-                                        <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Remove this ticket?')">
-                                            Remove
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+                @foreach (var ticket in tickets)
+                {
+                    <div class="col">
+                        <div class="card h-100">
+                            @if (!string.IsNullOrEmpty(ticket.Event?.PosterUrl))
+                            {
+                                <img src="@ticket.Event.PosterUrl" class="card-img-top" alt="@ticket.Event.Title" style="height: 150px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center text-white" style="height: 150px;">
+                                    <span>No Poster</span>
+                                </div>
+                            }
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold">@(ticket.Event?.Title ?? "—")</h5>
+                                <p class="card-text text-muted small">@(ticket.Event?.DisplayDate ?? "—")</p>
+                                <p class="card-text fw-semibold" style="color: #1DB954;">@(ticket.Event?.DisplayTicketPrice ?? "—")</p>
+                            </div>
+                            <div class="card-footer">
+                                <form asp-action="RemoveTicket" method="post">
+                                    <input type="hidden" name="eventId" value="@(ticket.Event?.Id ?? 0)" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm w-100" onclick="return confirm('Remove this ticket?')">
+                                        Remove
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="tab-pane fade" id="equipment" role="tabpanel" aria-labelledby="equipment-tab">
+        @if (equipment.Count == 0)
+        {
+            <div class="text-center py-5 text-muted">
+                <p class="lead">You don't own any equipment yet.</p>
+                <a asp-controller="Marketplace" asp-action="Index" class="btn btn-outline-primary">Browse Marketplace</a>
+            </div>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+                @foreach (var item in equipment)
+                {
+                    <div class="col">
+                        <div class="card h-100">
+                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                            {
+                                <img src="@item.ImageUrl" class="card-img-top" alt="@item.Title" style="height: 160px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center text-white" style="height: 160px;">
+                                    <span>No Image</span>
+                                </div>
+                            }
+                            <div class="card-body">
+                                <h5 class="card-title fw-semibold">@item.Title</h5>
+                                <p class="card-text text-muted small">@item.Category</p>
+                                <p class="card-text fw-semibold" style="color: #1DB954;">@item.Price.ToString("C")</p>
+                            </div>
+                            <div class="card-footer">
+                                <form asp-action="RemoveEquipment" method="post">
+                                    <input type="hidden" name="equipmentId" value="@item.Id" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm w-100" onclick="return confirm('Remove this equipment from your inventory?')">
+                                        Remove
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
         }
     </div>

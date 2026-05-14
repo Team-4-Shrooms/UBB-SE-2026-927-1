@@ -37,6 +37,17 @@ namespace MovieApp.Proxy.Services
             return result ?? new List<OwnedTicket>();
         }
 
+        public async Task<List<Equipment>> GetOwnedEquipmentAsync(int userId)
+        {
+            var result = await _apiClient.GetAsync<List<Equipment>>($"api/inventory/users/{userId}/equipment");
+            return result ?? new List<Equipment>();
+        }
+
+        public async Task RemoveOwnedEquipmentAsync(int userId, int equipmentId)
+        {
+            await _apiClient.PostAsync("api/inventory/remove-equipment", new { userId, equipmentId });
+        }
+
         public async Task<List<OwnedMovie>> GetMovieOwnershipsAsync(int userId, int movieId)
         {
             var result = await _apiClient.GetAsync<List<OwnedMovie>>($"api/inventory/users/{userId}/movies/{movieId}/ownerships");

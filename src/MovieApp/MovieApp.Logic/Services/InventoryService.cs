@@ -37,13 +37,16 @@ namespace MovieApp.Logic.Services
 
             List<OwnedMovie> ownerships = await _inventoryRepo.GetMovieOwnershipsAsync(userId, movieId);
 
+            decimal refund = movie.GetEffectivePrice();
+            user.Balance += refund;
+
             await _inventoryRepo.RemoveMovieOwnershipsAsync(ownerships);
 
             await _inventoryRepo.AddTransactionAsync(new Transaction
             {
                 Buyer = user,
                 Movie = movie,
-                Amount = 0m,
+                Amount = refund,
                 Type = RemoveOwnedMovieTransactionType,
                 Status = CompletedTransactionStatus,
                 Timestamp = DateTime.UtcNow
@@ -62,13 +65,16 @@ namespace MovieApp.Logic.Services
 
             List<OwnedTicket> ownerships = await _inventoryRepo.GetTicketOwnershipsAsync(userId, eventId);
 
+            decimal refund = movieEvent.TicketPrice;
+            user.Balance += refund;
+
             await _inventoryRepo.RemoveTicketOwnershipsAsync(ownerships);
 
             await _inventoryRepo.AddTransactionAsync(new Transaction
             {
                 Buyer = user,
                 Event = movieEvent,
-                Amount = 0m,
+                Amount = refund,
                 Type = RemoveOwnedTicketTransactionType,
                 Status = CompletedTransactionStatus,
                 Timestamp = DateTime.UtcNow
@@ -85,6 +91,25 @@ namespace MovieApp.Logic.Services
         public async Task<List<OwnedTicket>> GetOwnedTicketsAsync(int userId)
         {
             return await _inventoryRepo.GetAllTicketsForUserAsync(userId);
+        }
+
+        public async Task<List<Equipment>> GetOwnedEquipmentAsync(int userId)
+        {
+            return await _inventoryRepo.GetOwnedEquipmentAsync(userId);
+        }
+
+        public async Task RemoveOwnedEquipmentAsync(int userId, int equipmentId)
+        {
+            User user = await _userRepo.GetUserByIdAsync(userId)
+                ?? throw new KeyNotFoundException($"User {userId} not found.");
+
+            Equipment equipment = await _inventoryRepo.GetEquipmentByIdAsync(equipmentId)
+                ?? throw new KeyNotFoundException($"Equipment {equipmentId} not found.");
+
+            user.Balance += equipment.Price;
+
+            await _inventoryRepo.RemoveOwnedEquipmentAsync(userId, equipmentId);
+            await _inventoryRepo.SaveChangesAsync();
         }
 
         public async Task<List<OwnedMovie>> GetMovieOwnershipsAsync(int userId, int movieId)

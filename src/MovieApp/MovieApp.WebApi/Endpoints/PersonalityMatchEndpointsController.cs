@@ -54,6 +54,20 @@ public sealed class PersonalityMatchEndpointsController : ControllerBase
         return Ok(flat);
     }
 
+    [HttpGet("users/{userId:int}/top-matches")]
+    public async Task<IActionResult> GetTopMatchesAsync(int userId, [FromQuery] int count)
+    {
+        var matches = await _personalityMatchingService.GetTopMatchesAsync(userId, count);
+        return Ok(matches);
+    }
+
+    [HttpGet("users/{userId:int}/random-users")]
+    public async Task<IActionResult> GetRandomUsersAsync(int userId, [FromQuery] int count)
+    {
+        var users = await _personalityMatchingService.GetRandomUsersAsync(userId, count);
+        return Ok(users);
+    }
+
     [HttpGet("users/{userId:int}/top-preferences")]
     public async Task<IActionResult> GetTopPreferencesWithTitlesAsync(int userId, [FromQuery] int count)
     {

@@ -21,10 +21,12 @@ namespace MovieApp.Web.Controllers
             var userId = _currentUser.UserId;
             var moviesTask = _inventoryService.GetOwnedMoviesAsync(userId);
             var ticketsTask = _inventoryService.GetOwnedTicketsAsync(userId);
-            await Task.WhenAll(moviesTask, ticketsTask);
+            var equipmentTask = _inventoryService.GetOwnedEquipmentAsync(userId);
+            await Task.WhenAll(moviesTask, ticketsTask, equipmentTask);
 
             ViewBag.Movies = moviesTask.Result;
             ViewBag.Tickets = ticketsTask.Result;
+            ViewBag.Equipment = equipmentTask.Result;
 
             return this.View();
         }
@@ -58,6 +60,23 @@ namespace MovieApp.Web.Controllers
             catch
             {
                 TempData["Error"] = "Failed to remove ticket.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveEquipment(int equipmentId)
+        {
+            try
+            {
+                await _inventoryService.RemoveOwnedEquipmentAsync(_currentUser.UserId, equipmentId);
+                TempData["Success"] = "Equipment removed from your inventory.";
+            }
+            catch
+            {
+                TempData["Error"] = "Failed to remove equipment.";
             }
 
             return RedirectToAction(nameof(Index));
