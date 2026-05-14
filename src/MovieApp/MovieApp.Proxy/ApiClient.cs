@@ -69,7 +69,20 @@ namespace MovieApp.Proxy
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             }
 
-            var response = await SendWithRetryAsync(() => _httpClient.GetAsync(uri));
+            AttachToken();
+            var response = await _httpClient.GetAsync(uri);
+
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                await _tokenProvider.RefreshAsync();
+                AttachToken();
+                response = await _httpClient.GetAsync(uri);
+            }
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+                return default;
+
+            response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<T>(DeserializeOptions);
         }
 

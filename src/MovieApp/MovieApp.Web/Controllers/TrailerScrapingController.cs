@@ -85,6 +85,7 @@ namespace MovieApp.Web.Controllers
             return Json(new
             {
                 status = job.Status,
+                reelsCreated = job.ReelsCreated,
                 logCount = job.Logs?.Count ?? 0
             });
         }
