@@ -13,5 +13,11 @@ namespace MovieApp.Logic.Features.ReelsUpload
         Task<bool> ValidateVideoAsync(string localFilePath);
         Task<IList<Reel>> GetUserReelsAsync(int userId);
         Task<Reel> InsertReelAsync(Reel reel);
+
+        /// <summary>
+        /// Moves a locally-processed video file into permanent storage and returns
+        /// the relative URL that the static-files middleware will serve.
+        /// </summary>
+        Task<string> StoreProcessedFileAsync(string localProcessedFilePath);
     }
 }

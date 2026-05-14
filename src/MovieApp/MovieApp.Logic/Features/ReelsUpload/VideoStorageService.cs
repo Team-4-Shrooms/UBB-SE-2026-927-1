@@ -87,5 +87,18 @@ namespace MovieApp.Logic.Features.ReelsUpload
         {
             return await memoryRepository.InsertReelAsync(reel);
         }
+
+        public async Task<string> StoreProcessedFileAsync(string localProcessedFilePath)
+        {
+            if (!File.Exists(localProcessedFilePath))
+                throw new FileNotFoundException("Processed video file not found.", localProcessedFilePath);
+
+            string destinationFileName = Guid.NewGuid().ToString() + VideoFileExtension;
+            string destinationFilePath = Path.Combine(blobStorageDirectory, destinationFileName);
+
+            await Task.Run(() => File.Move(localProcessedFilePath, destinationFilePath, overwrite: true));
+
+            return urlBase.TrimEnd('/') + "/" + destinationFileName;
+        }
     }
 }
