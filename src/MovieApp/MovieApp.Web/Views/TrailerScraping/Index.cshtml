@@ -119,9 +119,70 @@
 							@job.Status
 						</span>
 					</td>
-					<td>@job.ReelsCreated</td>
+					<td class="reels-created-cell">@job.ReelsCreated</td>
 				</tr>
 			}
 		</tbody>
 	</table>
 </div>
+
+<script>
+(function () {
+    const POLL_MS = 2000;
+
+    function isActive(status) {
+        return status === 'running' || status === 'pending';
+    }
+
+    function applyUpdate(row, data) {
+        const status = (data.status || '').toLowerCase();
+        row.dataset.status = status;
+
+        const cell = row.querySelector('.status-cell');
+        const spinner = cell.querySelector('.spinner-border');
+        const badge = cell.querySelector('.badge');
+
+        if (isActive(status)) {
+            if (!spinner) {
+                const s = document.createElement('span');
+                s.className = 'spinner-border spinner-border-sm text-primary me-2';
+                s.setAttribute('role', 'status');
+                cell.insertBefore(s, badge);
+            }
+        } else {
+            if (spinner) spinner.remove();
+        }
+
+        badge.textContent = status;
+        badge.className = 'badge text-capitalize ' + (
+            status === 'completed' ? 'bg-success' :
+            status === 'failed'    ? 'bg-danger'  : 'bg-primary'
+        );
+
+        const reelsCell = row.querySelector('.reels-created-cell');
+        if (reelsCell != null) reelsCell.textContent = data.reelsCreated ?? reelsCell.textContent;
+    }
+
+    async function pollOnce(row) {
+        const jobId = row.dataset.jobId;
+        try {
+            const resp = await fetch('/TrailerScraping/Status?jobId=' + jobId);
+            if (!resp.ok) return;
+            const data = await resp.json();
+            applyUpdate(row, data);
+        } catch (_) { /* network hiccup — try again next tick */ }
+    }
+
+    function tick() {
+        const active = [...document.querySelectorAll('#jobsTable tbody tr')]
+            .filter(r => isActive(r.dataset.status));
+        if (active.length === 0) return;
+        active.forEach(pollOnce);
+        setTimeout(tick, POLL_MS);
+    }
+
+    if (document.querySelectorAll('#jobsTable tbody tr[data-status="running"], #jobsTable tbody tr[data-status="pending"]').length > 0) {
+        setTimeout(tick, POLL_MS);
+    }
+})();
+</script>
