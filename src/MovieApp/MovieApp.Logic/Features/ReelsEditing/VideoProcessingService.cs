@@ -350,15 +350,15 @@ namespace MovieApp.Logic.Features.ReelsEditing
 
         private static string ResolveMediaInput(string value)
         {
-            if (Uri.TryCreate(value, UriKind.Absolute, out Uri uri) && uri.IsFile) return uri.LocalPath;
+            if (Uri.TryCreate(value, UriKind.Absolute, out Uri parsedUri) && parsedUri.IsFile) return parsedUri.LocalPath;
             return value;
         }
 
         private static bool IsHttpUrl(string value)
         {
-            if (!Uri.TryCreate(value, UriKind.Absolute, out Uri uri)) return false;
-            return string.Equals(uri.Scheme, Uri.UriSchemeHttp, StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(uri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase);
+            if (!Uri.TryCreate(value, UriKind.Absolute, out Uri parsedUri)) return false;
+            return string.Equals(parsedUri.Scheme, Uri.UriSchemeHttp, StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(parsedUri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase);
         }
 
         private static string ToInvariantNumber(double value) => value.ToString(InvariantNumberFormat, CultureInfo.InvariantCulture);

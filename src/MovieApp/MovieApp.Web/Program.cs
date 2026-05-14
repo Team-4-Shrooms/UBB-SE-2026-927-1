@@ -18,13 +18,13 @@ builder.Services.AddControllersWithViews();
 
 // HTTP client for auto-login and for ApiClient
 builder.Services.AddHttpClient();
-builder.Services.AddHttpClient<ApiClient>(c =>
-    c.BaseAddress = new Uri(config["WebApi:BaseUrl"]!));
+builder.Services.AddHttpClient<ApiClient>(httpClient =>
+    httpClient.BaseAddress = new Uri(config["WebApi:BaseUrl"]!));
 
 // JWT token store — single instance satisfying both IAuthTokenProvider and ICurrentUserService
 builder.Services.AddSingleton<JwtTokenStore>();
-builder.Services.AddSingleton<IAuthTokenProvider>(sp => sp.GetRequiredService<JwtTokenStore>());
-builder.Services.AddSingleton<ICurrentUserService>(sp => sp.GetRequiredService<JwtTokenStore>());
+builder.Services.AddSingleton<IAuthTokenProvider>(serviceProvider => serviceProvider.GetRequiredService<JwtTokenStore>());
+builder.Services.AddSingleton<ICurrentUserService>(serviceProvider => serviceProvider.GetRequiredService<JwtTokenStore>());
 
 // Auto-login on startup
 builder.Services.AddHostedService<JwtAutoLoginService>();
