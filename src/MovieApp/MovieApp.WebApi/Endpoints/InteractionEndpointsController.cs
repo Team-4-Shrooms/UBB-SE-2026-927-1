@@ -3,10 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieApp.WebDTOs.DTOs.RequestDTOs;
 using MovieApp.WebApi.Mappings;
-using MovieApp.DataLayer.Interfaces;
 using MovieApp.DataLayer.Models;
-using MovieApp.DataLayer.Repositories;
-
+using MovieApp.Logic.Interfaces.Services;
+using MovieApp.Logic.Features.ReelsFeed;
 namespace MovieApp.WebApi.Endpoints;
 
 [Authorize]
@@ -14,24 +13,30 @@ namespace MovieApp.WebApi.Endpoints;
 [Route("api/interactions")]
 public sealed class InteractionEndpointsController : ControllerBase
 {
-    private readonly InteractionRepository _repository;
-    private readonly IMovieAppDbContext _context;
+    private readonly IReelInteractionService _interactionService;
+    private readonly IUserService _userService;
+    private readonly IReelService _reelService;
 
-    public InteractionEndpointsController(InteractionRepository repository, IMovieAppDbContext context)
+    public InteractionEndpointsController(
+        IReelInteractionService interactionService,
+        IUserService userService,
+        IReelService reelService)
     {
-        _repository = repository;
-        _context = context;
+        _interactionService = interactionService;
+        _userService = userService;
+        _reelService = reelService;
     }
 
     [HttpPost]
     public async Task<IActionResult> InsertInteractionAsync([FromBody] InsertInteractionRequestBody interaction)
     {
-        User user = await _context.Users.FindAsync(interaction.UserId)
-            ?? throw new InvalidOperationException($"User {interaction.UserId} not found.");
-        Reel reel = await _context.Reels.FindAsync(interaction.ReelId)
-            ?? throw new InvalidOperationException($"Reel {interaction.ReelId} not found.");
+        User? user = await _userService.GetUserByIdAsync(interaction.UserId);
+        if (user == null) return NotFound($"User {interaction.UserId} not found.");
 
-        await _repository.InsertInteractionAsync(new UserReelInteraction
+        Reel? reel = await _reelService.GetReelByIdAsync(interaction.ReelId);
+        if (reel == null) return NotFound($"Reel {interaction.ReelId} not found.");
+
+        await _interactionService.InsertInteractionAsync(new UserReelInteraction
         {
             IsLiked = interaction.IsLiked,
             WatchDurationSeconds = interaction.WatchDurationSeconds,
@@ -46,51 +51,51 @@ public sealed class InteractionEndpointsController : ControllerBase
     [HttpPost("users/{userId:int}/reels/{reelId:int}")]
     public async Task<IActionResult> UpsertInteractionAsync(int userId, int reelId)
     {
-        await _repository.UpsertInteractionAsync(userId, reelId);
+        await _interactionService.UpsertInteractionAsync(userId, reelId);
         return Ok();
     }
 
     [HttpPut("users/{userId:int}/reels/{reelId:int}/like")]
     public async Task<IActionResult> ToggleLikeAsync(int userId, int reelId)
     {
-        await _repository.ToggleLikeAsync(userId, reelId);
+        await _interactionService.ToggleLikeAsync(userId, reelId);
         return Ok();
     }
 
     [HttpPut("users/{userId:int}/reels/{reelId:int}/view")]
-    public async Task<IActionResult> UpdateViewDataAsync(int userId, int reelId, [FromBody] UpdateViewDataRequestBody request)
+    public async Task<IActionResult> RecordViewAsync(int userId, int reelId, [FromBody] UpdateViewDataRequestBody request)
     {
-        await _repository.UpdateViewDataAsync(userId, reelId, request.WatchDurationSeconds, request.WatchPercentage);
+        await _interactionService.RecordViewAsync(userId, reelId, (double)request.WatchDurationSeconds, (double)request.WatchPercentage);
         return Ok();
     }
 
     [HttpGet("users/{userId:int}/reels/{reelId:int}")]
     public async Task<IActionResult> GetInteractionAsync(int userId, int reelId)
     {
-        UserReelInteraction? interaction = await _repository.GetInteractionAsync(userId, reelId);
-        return Ok(interaction?.ToDto());
+        var interaction = await _interactionService.GetInteractionAsync(userId, reelId);
+        if (interaction == null)
+        {
+            return Ok(null);
+        }
+        return Ok(interaction);
     }
 
     [HttpGet("reels/{reelId:int}/likes")]
     public async Task<IActionResult> GetLikeCountAsync(int reelId)
     {
-        return Ok(await _repository.GetLikeCountAsync(reelId));
+        return Ok(await _interactionService.GetLikeCountAsync(reelId));
     }
 
     [HttpGet("reels/{reelId:int}/movie-id")]
     public async Task<IActionResult> GetReelMovieIdAsync(int reelId)
     {
-        return Ok(await _repository.GetReelMovieIdAsync(reelId));
+        return Ok(await _interactionService.GetReelMovieIdAsync(reelId));
     }
 
     [HttpGet("users/{userId:int}")]
     public async Task<IActionResult> GetInteractionsForUser(int userId)
     {
-        var interactions = await _context.UserReelInteractions
-            .Include(i => i.User)
-            .Include(i => i.Reel)
-            .Where(i => i.User.Id == userId)
-            .ToListAsync();
+        var interactions = await _interactionService.GetInteractionsForUserAsync(userId);
         return Ok(interactions.Select(i => i.ToDto()));
     }
 }

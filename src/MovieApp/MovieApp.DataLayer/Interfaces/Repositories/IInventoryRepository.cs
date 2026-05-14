@@ -14,6 +14,9 @@ namespace MovieApp.DataLayer.Interfaces.Repositories
         Task<List<OwnedTicket>> GetTicketOwnershipsAsync(int userId, int eventId);
         Task RemoveTicketOwnershipsAsync(IEnumerable<OwnedTicket> ownerships);
         Task<List<OwnedTicket>> GetAllTicketsForUserAsync(int userId);
+        Task<List<Equipment>> GetOwnedEquipmentAsync(int userId);
+        Task<Equipment?> GetEquipmentByIdAsync(int equipmentId);
+        Task RemoveOwnedEquipmentAsync(int userId, int equipmentId);
         Task AddTransactionAsync(Transaction transaction);
         Task<int> SaveChangesAsync();
     }

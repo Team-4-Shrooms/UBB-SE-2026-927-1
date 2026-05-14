@@ -76,5 +76,25 @@ namespace MovieApp.Logic.Features.ReelsFeed
         {
             return await this.interactionRepository.GetLikeCountAsync(reelId);
         }
+
+        public async Task InsertInteractionAsync(UserReelInteraction interaction)
+        {
+            await this.interactionRepository.InsertInteractionAsync(interaction);
+        }
+
+        public async Task UpsertInteractionAsync(int userId, int reelId)
+        {
+            await this.interactionRepository.UpsertInteractionAsync(userId, reelId);
+        }
+
+        public async Task<int> GetReelMovieIdAsync(int reelId)
+        {
+            return (await this.interactionRepository.GetReelMovieIdAsync(reelId)) ?? 0;
+        }
+
+        public async Task<IList<UserReelInteraction>> GetInteractionsForUserAsync(int userId)
+        {
+            return await this.interactionRepository.GetInteractionsForUserAsync(userId);
+        }
     }
 }

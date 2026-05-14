@@ -11,5 +11,9 @@ namespace MovieApp.Web.Models
         public int[] StarRatingBuckets { get; set; } = new int[5];
 
         public AddReviewForm Form { get; set; } = new AddReviewForm();
+
+        public bool UserOwnsMovie { get; set; }
+
+        public bool IsLoggedIn { get; set; }
     }
 }

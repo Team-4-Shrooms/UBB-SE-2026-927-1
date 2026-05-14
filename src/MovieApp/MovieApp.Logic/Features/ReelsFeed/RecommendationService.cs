@@ -40,7 +40,7 @@ namespace MovieApp.Logic.Features.ReelsFeed
 
             return allReels
                 .OrderByDescending(reel =>
-                    userPreferenceScores.TryGetValue(reel.Id, out Decimal preferenceScore) ? preferenceScore : 0)
+                    userPreferenceScores.TryGetValue(reel.Movie.Id, out Decimal preferenceScore) ? preferenceScore : 0)
                 .ThenByDescending(reel => reel.CreatedAt)
                 .Take(count)
                 .ToList();
@@ -51,8 +51,8 @@ namespace MovieApp.Logic.Features.ReelsFeed
             IList<Reel> allReels = await this.recommendationRepository.GetAllReelsAsync();
             List<UserReelInteraction> recentInteractions = await this.recommendationRepository.GetLikesWithinDaysAsync(RecentlyLikedDaysWindow);
 
-            Dictionary<long, int> recentLikeCountsByReelId = recentInteractions
-                .GroupBy(interaction => interaction.Id)
+            Dictionary<int, int> recentLikeCountsByReelId = recentInteractions
+                .GroupBy(interaction => interaction.Reel.Id) 
                 .ToDictionary(group => group.Key, group => group.Count());
 
             return allReels
@@ -61,6 +61,31 @@ namespace MovieApp.Logic.Features.ReelsFeed
                 .ThenByDescending(reel => reel.CreatedAt)
                 .Take(count)
                 .ToList();
+        }
+
+        public async Task<bool> UserHasPreferencesAsync(int userId)
+        {
+            return await this.recommendationRepository.UserHasPreferencesAsync(userId);
+        }
+
+        public async Task<IList<Reel>> GetAllReelsAsync()
+        {
+            return await this.recommendationRepository.GetAllReelsAsync();
+        }
+
+        public async Task<IDictionary<int, decimal>> GetUserPreferenceScoresAsync(int userId)
+        {
+            return await this.recommendationRepository.GetUserPreferenceScoresAsync(userId);
+        }
+
+        public async Task<IDictionary<int, int>> GetAllLikeCountsAsync()
+        {
+            return await this.recommendationRepository.GetAllLikeCountsAsync();
+        }
+
+        public async Task<IList<UserReelInteraction>> GetLikesWithinDaysAsync(int days)
+        {
+            return await this.recommendationRepository.GetLikesWithinDaysAsync(days);
         }
     }
 }

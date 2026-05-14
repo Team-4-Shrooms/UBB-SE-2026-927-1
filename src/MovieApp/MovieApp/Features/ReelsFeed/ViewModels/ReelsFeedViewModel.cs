@@ -101,13 +101,13 @@ namespace MovieApp.Features.ReelsFeed.ViewModels
             try
             {
                 var recommendedReels = await this.recommendationService.GetRecommendedReelsAsync(MockUserId, RecommendedReelCount);
+                await this.LoadLikeDataAsync(recommendedReels);
                 foreach (var recommendedReel in recommendedReels)
                 {
                     this.ReelQueue.Add(recommendedReel);
                 }
 
                 // Load IsLiked and LikeCount onto each Reel so the UI can bind directly
-                await this.LoadLikeDataAsync(recommendedReels);
 
                 if (this.ReelQueue.Count > 0)
                 {
@@ -348,6 +348,7 @@ namespace MovieApp.Features.ReelsFeed.ViewModels
             }
             catch
             {
+                return null;
                 return null;
             }
         }

@@ -4,7 +4,8 @@ namespace MovieApp.Web.Models
 {
     public class TournamentSetupViewModel
     {
-        public int PoolSize { get; set; } = 8; 
+        public int PoolSize { get; set; } = 8;
+        public int AvailableCount { get; set; }
     }
 
     public class TournamentMatchViewModel

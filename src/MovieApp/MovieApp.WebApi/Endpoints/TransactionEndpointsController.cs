@@ -2,9 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MovieApp.WebDTOs.DTOs.RequestDTOs;
 using MovieApp.WebApi.Mappings;
-using MovieApp.DataLayer.Interfaces;
 using MovieApp.DataLayer.Models;
-using MovieApp.DataLayer.Repositories;
+using MovieApp.Logic.Interfaces.Services;
 
 namespace MovieApp.WebApi.Endpoints;
 
@@ -13,24 +12,39 @@ namespace MovieApp.WebApi.Endpoints;
 [Route("api/transactions")]
 public sealed class TransactionEndpointsController : ControllerBase
 {
-    private readonly TransactionRepository _repository;
-    private readonly IMovieAppDbContext _context;
+    private readonly ITransactionService _transactionService;
+    private readonly IUserService _userService;
+    private readonly IMovieService _movieService;
+    private readonly IEquipmentService _equipmentService;
+    private readonly IEventService _eventService;
 
-    public TransactionEndpointsController(TransactionRepository repository, IMovieAppDbContext context)
+    public TransactionEndpointsController(
+        ITransactionService transactionService,
+        IUserService userService,
+        IMovieService movieService,
+        IEquipmentService equipmentService,
+        IEventService eventService)
     {
-        _repository = repository;
-        _context = context;
+        _transactionService = transactionService;
+        _userService = userService;
+        _movieService = movieService;
+        _equipmentService = equipmentService;
+        _eventService = eventService;
     }
 
     [HttpGet("users/{userId:int}")]
-    public IActionResult GetTransactionsByUserId(int userId)
+    public async Task<IActionResult> GetTransactionsByUserId(int userId, [FromQuery] int? page = null, [FromQuery] int? pageSize = null)
     {
-        return Ok(_repository.GetTransactionsByUserId(userId).Select(transaction => transaction.ToDto()));
+        var transactions = await _transactionService.GetTransactionsByUserIdAsync(userId, page, pageSize);
+        return Ok(transactions.Select(transaction => transaction.ToDto()));
     }
 
     [HttpPost]
     public async Task<IActionResult> LogTransaction([FromBody] LogTransactionRequestBody body)
     {
+        var buyer = await _userService.GetUserByIdAsync(body.BuyerId)
+            ?? throw new InvalidOperationException($"User {body.BuyerId} not found.");
+
         var transaction = new Transaction
         {
             Amount = body.Amount,
@@ -38,21 +52,20 @@ public sealed class TransactionEndpointsController : ControllerBase
             Status = body.Status ?? string.Empty,
             Timestamp = body.Timestamp,
             ShippingAddress = body.ShippingAddress,
-            Buyer = await _context.Users.FindAsync(body.BuyerId)
-                ?? throw new InvalidOperationException($"User {body.BuyerId} not found."),
-            Seller = body.SellerId.HasValue ? await _context.Users.FindAsync(body.SellerId.Value) : null,
-            Equipment = body.EquipmentId.HasValue ? await _context.Equipment.FindAsync(body.EquipmentId.Value) : null,
-            Movie = body.MovieId.HasValue ? await _context.Movies.FindAsync(body.MovieId.Value) : null,
-            Event = body.EventId.HasValue ? await _context.MovieEvents.FindAsync(body.EventId.Value) : null,
+            Buyer = buyer,
+            Seller = body.SellerId.HasValue ? await _userService.GetUserByIdAsync(body.SellerId.Value) : null,
+            Equipment = body.EquipmentId.HasValue ? await _equipmentService.GetEquipmentByIdAsync(body.EquipmentId.Value) : null,
+            Movie = body.MovieId.HasValue ? await _movieService.GetMovieByIdAsync(body.MovieId.Value) : null,
+            Event = body.EventId.HasValue ? await _eventService.GetEventByIdAsync(body.EventId.Value) : null,
         };
-        _repository.LogTransaction(transaction);
+        await _transactionService.LogTransactionAsync(transaction);
         return Ok();
     }
 
     [HttpPut("{transactionId:int}/status")]
-    public IActionResult UpdateTransactionStatus(int transactionId, [FromBody] UpdateTransactionStatusRequestBody body)
+    public async Task<IActionResult> UpdateTransactionStatus(int transactionId, [FromBody] UpdateTransactionStatusRequestBody body)
     {
-        _repository.UpdateTransactionStatus(transactionId, body.NewStatus);
+        await _transactionService.UpdateTransactionStatusAsync(transactionId, body.NewStatus);
         return Ok();
     }
 }

@@ -21,23 +21,7 @@ namespace MovieApp.Proxy.Services
 
         public async Task UpdatePreferenceScoreAsync(int userId, int movieId, bool isLiked)
         {
-            decimal delta = (decimal)(isLiked ? LikeDelta : SkipDelta);
-
-            bool exists = await _apiClient.GetAsync<bool>(
-                $"api/preferences/users/{userId}/movies/{movieId}/exists");
-
-            if (exists)
-            {
-                await _apiClient.PutAsync(
-                    $"api/preferences/users/{userId}/movies/{movieId}/boost",
-                    new { Boost = delta });
-            }
-            else
-            {
-                await _apiClient.PostAsync(
-                    "api/preferences",
-                    new { UserId = userId, MovieId = movieId, Score = delta });
-            }
+            await _apiClient.PostAsync("api/swipe", new { UserId = userId, MovieId = movieId, IsLiked = isLiked });
         }
     }
 }

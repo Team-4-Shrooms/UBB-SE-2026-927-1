@@ -38,7 +38,7 @@ namespace MovieApp.DataLayer.Repositories
                 Movie = await _context.Movies.FindAsync(movieId) ?? throw new InvalidOperationException($"Movie {movieId} not found."),
                 Score = score,
                 LastModified = DateTime.UtcNow,
-                ChangeFromPreviousValue = 0,
+                ChangeFromPreviousValue = score > 0 ? 1 : -1,
             };
 
             _context.UserMoviePreferences.Add(preference);
@@ -58,7 +58,7 @@ namespace MovieApp.DataLayer.Repositories
 
             preference.Score += boost;
             preference.LastModified = DateTime.UtcNow;
-            preference.ChangeFromPreviousValue = (int)boost;
+            preference.ChangeFromPreviousValue = boost > 0 ? 1 : -1;
 
             await _context.SaveChangesAsync();
         }

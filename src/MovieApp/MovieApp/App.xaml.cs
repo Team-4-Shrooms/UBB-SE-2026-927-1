@@ -81,6 +81,13 @@ namespace MovieApp
             services.AddTransient<IEventService, EventProxyService>();
             services.AddTransient<IProfileService, ProfileProxyService>();
             services.AddTransient<IPersonalityMatchService, PersonalityMatchProxyService>();
+            services.AddTransient<IAudioLibraryService, AudioLibraryProxyService>();
+            services.AddTransient<IPreferenceService, PreferenceProxyService>();
+            services.AddTransient<IMovieTournamentService, MovieTournamentProxyService>();
+            services.AddTransient<ITransactionService, TransactionProxyService>();
+            services.AddTransient<IUserService, UserProxyService>();
+            services.AddTransient<IScrapeJobService, ScrapeJobProxyService>();
+            services.AddTransient<IReelService, ReelProxyService>();
 
             // Reels Upload
             services.AddTransient<MovieApp.Logic.Features.ReelsUpload.IVideoStorageService, VideoStorageProxyService>();

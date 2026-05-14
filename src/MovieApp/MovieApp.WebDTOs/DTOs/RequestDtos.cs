@@ -131,6 +131,15 @@ public sealed class UpdateReelEditsRequestBody
     public string VideoUrl { get; set; } = string.Empty;
 }
 
+public sealed class MergeAudioRequestBody
+{
+    public string VideoPath { get; set; } = string.Empty;
+    public int MusicTrackId { get; set; }
+    public double StartOffsetSec { get; set; }
+    public double MusicDurationSec { get; set; }
+    public int VolumePercent { get; set; }
+}
+
 public sealed class AddReviewRequestBody
 {
     public int MovieId { get; set; }
@@ -166,13 +175,38 @@ public sealed class AddOwnedTicketRequestBody
     public int EventId { get; set; }
 }
 
-public class RunScrapeRequestBody
+public sealed class RemoveMovieRequestBody
+{
+    public int UserId { get; set; }
+    public int MovieId { get; set; }
+}
+
+public sealed class RemoveTicketRequestBody
+{
+    public int UserId { get; set; }
+    public int EventId { get; set; }
+}
+
+public sealed class RemoveEquipmentRequestBody
+{
+    public int UserId { get; set; }
+    public int EquipmentId { get; set; }
+}
+
+public sealed class UpdatePreferenceScoreRequestBody
+{
+    public int UserId { get; set; }
+    public int MovieId { get; set; }
+    public bool IsLiked { get; set; }
+}
+
+public sealed class RunScrapeRequestBody
 {
     public int MovieId { get; set; }
     public int MaxResults { get; set; }
 }
 
-public class IngestUrlRequestBody
+public sealed class IngestUrlRequestBody
 {
     public string TrailerUrl { get; set; } = string.Empty;
     public int MovieId { get; set; }

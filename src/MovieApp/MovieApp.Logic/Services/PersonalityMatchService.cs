@@ -61,6 +61,16 @@ namespace MovieApp.Logic.Services
             }
             return displayModels;
         }
+
+        public async Task<List<UserMoviePreference>> GetCurrentUserPreferencesAsync(int userId)
+        {
+            return await _matchRepo.GetCurrentUserPreferencesAsync(userId);
+        }
+
+        public async Task<List<int>> GetRandomUserIdsAsync(int excludedUserId, int userIdsCount)
+        {
+            return await _matchRepo.GetRandomUserIdsAsync(excludedUserId, userIdsCount);
+        }
     }
 }
 

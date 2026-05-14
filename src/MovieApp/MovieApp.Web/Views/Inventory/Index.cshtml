@@ -1,9 +1,180 @@
+@using MovieApp.DataLayer.Models
 @{
     ViewData["Title"] = "Inventory";
+    var movies = (List<Movie>?)ViewBag.Movies ?? new List<Movie>();
+    var tickets = (List<OwnedTicket>?)ViewBag.Tickets ?? new List<OwnedTicket>();
+    var equipment = (List<Equipment>?)ViewBag.Equipment ?? new List<Equipment>();
 }
 
-<div class="text-center py-5">
-    <h1 class="display-5">Inventory</h1>
-    <p class="lead text-muted">This feature is coming soon.</p>
-    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary mt-3">Back to Home</a>
+<h1 class="mb-4">My Inventory</h1>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<ul class="nav nav-tabs mb-3" id="inventoryTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="movies-tab" data-bs-toggle="tab" data-bs-target="#movies" type="button" role="tab" aria-controls="movies" aria-selected="true">
+            My Movies <span class="badge bg-secondary">@movies.Count</span>
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tickets-tab" data-bs-toggle="tab" data-bs-target="#tickets" type="button" role="tab" aria-controls="tickets" aria-selected="false">
+            My Tickets <span class="badge bg-secondary">@tickets.Count</span>
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="equipment-tab" data-bs-toggle="tab" data-bs-target="#equipment" type="button" role="tab" aria-controls="equipment" aria-selected="false">
+            My Equipment <span class="badge bg-secondary">@equipment.Count</span>
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="inventoryTabContent">
+    <div class="tab-pane fade show active" id="movies" role="tabpanel" aria-labelledby="movies-tab">
+        @if (movies.Count == 0)
+        {
+            <div class="text-center py-5 text-muted">
+                <p class="lead">You don't own any movies yet.</p>
+                <a asp-controller="Catalog" asp-action="Index" class="btn btn-outline-primary">Browse Catalog</a>
+            </div>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                @foreach (var movie in movies)
+                {
+                    <div class="col">
+                        <div class="card h-100">
+                            <a asp-controller="Catalog" asp-action="Detail" asp-route-id="@movie.Id" class="text-decoration-none">
+                                @if (!string.IsNullOrEmpty(movie.PosterUrl))
+                                {
+                                    <img src="@movie.PosterUrl" class="card-img-top" alt="@movie.Title" style="height: 280px; object-fit: cover;">
+                                }
+                                else
+                                {
+                                    <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center text-white" style="height: 280px;">
+                                        <span>No Poster</span>
+                                    </div>
+                                }
+                                <div class="card-body">
+                                    <h5 class="card-title text-dark">@movie.Title</h5>
+                                    <p class="card-text text-muted">@movie.ReleaseYear &middot; @movie.PrimaryGenre</p>
+                                </div>
+                            </a>
+                            <div class="card-footer">
+                                <form asp-action="RemoveMovie" method="post">
+                                    <input type="hidden" name="movieId" value="@movie.Id" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm w-100" onclick="return confirm('Remove this movie from your inventory?')">
+                                        Remove
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="tab-pane fade" id="tickets" role="tabpanel" aria-labelledby="tickets-tab">
+        @if (tickets.Count == 0)
+        {
+            <div class="text-center py-5 text-muted">
+                <p class="lead">You don't have any tickets yet.</p>
+                <a asp-controller="Events" asp-action="Index" class="btn btn-outline-primary">Browse Events</a>
+            </div>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+                @foreach (var ticket in tickets)
+                {
+                    <div class="col">
+                        <div class="card h-100">
+                            @if (!string.IsNullOrEmpty(ticket.Event?.PosterUrl))
+                            {
+                                <img src="@ticket.Event.PosterUrl" class="card-img-top" alt="@ticket.Event.Title" style="height: 150px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center text-white" style="height: 150px;">
+                                    <span>No Poster</span>
+                                </div>
+                            }
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold">@(ticket.Event?.Title ?? "—")</h5>
+                                <p class="card-text text-muted small">@(ticket.Event?.DisplayDate ?? "—")</p>
+                                <p class="card-text fw-semibold" style="color: #1DB954;">@(ticket.Event?.DisplayTicketPrice ?? "—")</p>
+                            </div>
+                            <div class="card-footer">
+                                <form asp-action="RemoveTicket" method="post">
+                                    <input type="hidden" name="eventId" value="@(ticket.Event?.Id ?? 0)" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm w-100" onclick="return confirm('Remove this ticket?')">
+                                        Remove
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="tab-pane fade" id="equipment" role="tabpanel" aria-labelledby="equipment-tab">
+        @if (equipment.Count == 0)
+        {
+            <div class="text-center py-5 text-muted">
+                <p class="lead">You don't own any equipment yet.</p>
+                <a asp-controller="Marketplace" asp-action="Index" class="btn btn-outline-primary">Browse Marketplace</a>
+            </div>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+                @foreach (var item in equipment)
+                {
+                    <div class="col">
+                        <div class="card h-100">
+                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                            {
+                                <img src="@item.ImageUrl" class="card-img-top" alt="@item.Title" style="height: 160px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center text-white" style="height: 160px;">
+                                    <span>No Image</span>
+                                </div>
+                            }
+                            <div class="card-body">
+                                <h5 class="card-title fw-semibold">@item.Title</h5>
+                                <p class="card-text text-muted small">@item.Category</p>
+                                <p class="card-text fw-semibold" style="color: #1DB954;">@item.Price.ToString("C")</p>
+                            </div>
+                            <div class="card-footer">
+                                <form asp-action="RemoveEquipment" method="post">
+                                    <input type="hidden" name="equipmentId" value="@item.Id" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm w-100" onclick="return confirm('Remove this equipment from your inventory?')">
+                                        Remove
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
 </div>

@@ -89,6 +89,8 @@ public sealed class UserReelInteractionDto
     public decimal WatchDurationSeconds { get; set; }
     public decimal WatchPercentage { get; set; }
     public DateTime ViewedAt { get; set; }
+    public int UserId { get; set; }
+    public int ReelId { get; set; }
     public UserReferenceDto? User { get; set; }
     public ReelReferenceDto? Reel { get; set; }
 }
@@ -143,6 +145,11 @@ public sealed class ReelDto
     public DateTime? LastEditedAt { get; set; }
     public MovieReferenceDto? Movie { get; set; }
     public UserReferenceDto? CreatorUser { get; set; }
+}
+
+public class VideoProcessingResponse
+{
+    public string OutputPath { get; set; } = string.Empty;
 }
 
 public sealed class TransactionDto
