@@ -43,5 +43,10 @@ namespace MovieApp.Proxy.Services
             var result = await _apiClient.PostAsync<Reel, Reel>("api/video-storage/insert", reel);
             return result ?? new Reel();
         }
+
+        public Task<string> StoreProcessedFileAsync(string localProcessedFilePath)
+        {
+            throw new NotSupportedException("StoreProcessedFileAsync is a server-side operation and cannot be called through the proxy.");
+        }
     }
 }

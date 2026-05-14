@@ -1,9 +1,86 @@
+@model MovieApp.Web.ViewModels.ReelsEditing.ReelsEditingGalleryViewModel
+
 @{
     ViewData["Title"] = "Reels Editing";
 }
 
-<div class="text-center py-5">
-    <h1 class="display-5">Reels Editing</h1>
-    <p class="lead text-muted">This feature is coming soon.</p>
-    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary mt-3">Back to Home</a>
+<div class="d-flex align-items-baseline gap-3 mb-4">
+    <h1 class="mb-0">Reel Editing</h1>
+    <span class="text-muted">Select a reel to edit</span>
 </div>
+
+@if (!Model.UserReels.Any())
+{
+    <div class="text-center py-5">
+        <p class="text-muted fs-5">You have no reels to edit.</p>
+        <a asp-controller="ReelsUpload" asp-action="Index" class="btn btn-primary mt-2">Upload a Reel</a>
+    </div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-3 row-cols-xl-4 g-4">
+        @foreach (ReelGalleryItem galleryItem in Model.UserReels)
+        {
+            <div class="col">
+                <a asp-action="Edit" asp-route-reelId="@galleryItem.ReelId" class="text-decoration-none">
+                    <div class="card h-100 reel-gallery-card border-0 shadow-sm">
+                        <div class="reel-thumbnail-container bg-secondary-subtle rounded-top">
+                            @if (!string.IsNullOrEmpty(galleryItem.ThumbnailUrl))
+                            {
+                                <img src="@galleryItem.ThumbnailUrl"
+                                     alt="@galleryItem.Title thumbnail"
+                                     class="reel-thumbnail-image" />
+                            }
+                            else
+                            {
+                                <div class="reel-thumbnail-placeholder d-flex align-items-center justify-content-center">
+                                    <span class="text-secondary" style="font-size: 3rem;">&#127916;</span>
+                                </div>
+                            }
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title fw-semibold text-body text-truncate mb-1">@galleryItem.Title</h6>
+                            <p class="card-text text-muted small mb-1">@galleryItem.Source</p>
+                            @if (galleryItem.LastEditedAt.HasValue)
+                            {
+                                <p class="card-text text-muted small mb-0">
+                                    Edited @galleryItem.LastEditedAt.Value.ToString("MMM dd, yyyy")
+                                </p>
+                            }
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+}
+
+@section Styles {
+    <style>
+        .reel-gallery-card {
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            cursor: pointer;
+        }
+
+        .reel-gallery-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .reel-thumbnail-container {
+            height: 180px;
+            overflow: hidden;
+        }
+
+        .reel-thumbnail-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .reel-thumbnail-placeholder {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+}

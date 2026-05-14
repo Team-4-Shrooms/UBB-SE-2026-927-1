@@ -16,7 +16,7 @@ namespace MovieApp.Proxy.Services
 
         public async Task<IList<Reel>> GetUserReelsAsync(int userId)
         {
-            var result = await _apiClient.GetAsync<List<Reel>>($"api/reels/user/{userId}");
+            var result = await _apiClient.GetAsync<List<Reel>>($"api/reels/users/{userId}");
             return result ?? new List<Reel>();
         }
 
@@ -27,7 +27,7 @@ namespace MovieApp.Proxy.Services
 
         public async Task<int> UpdateReelEditsAsync(int reelId, string cropDataJson, int? backgroundMusicId, string videoUrl)
         {
-            return await _apiClient.PutAsync<object, int>($"api/reels/{reelId}/edits", new { CropDataJson = cropDataJson, BackgroundMusicId = backgroundMusicId, VideoUrl = videoUrl });
+            return await _apiClient.PutAsync<object, int>($"api/reels/{reelId}", new { CropDataJson = cropDataJson, BackgroundMusicId = backgroundMusicId, VideoUrl = videoUrl });
         }
 
         public async Task DeleteReelAsync(int reelId)

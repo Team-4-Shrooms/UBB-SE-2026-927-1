@@ -1,0 +1,497 @@
+@model MovieApp.Web.ViewModels.ReelsEditing.ReelsEditingEditorViewModel
+
+@{
+    ViewData["Title"] = $"Edit: {Model.ReelTitle}";
+}
+
+<!-- Header row: back button, title, delete button -->
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div class="d-flex align-items-center gap-3">
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">&#8592; Back</a>
+        <h1 class="h4 mb-0">Reel Editing</h1>
+    </div>
+
+    <form asp-action="DeleteReel" method="post" id="deleteReelForm">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="reelId" value="@Model.ReelId" />
+        <button type="button" class="btn btn-outline-danger btn-sm"
+                onclick="confirmDeleteReel()">
+            Delete Reel
+        </button>
+    </form>
+</div>
+
+<!-- Reel title -->
+<h5 class="fw-semibold mb-2">@Model.ReelTitle</h5>
+
+<!-- Status message -->
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="alert @(Model.IsStatusSuccess ? "alert-success" : "alert-danger") py-2 mb-3" role="alert">
+        @Model.StatusMessage
+    </div>
+}
+
+<!-- Main two-column layout -->
+<div class="row g-4">
+
+    <!-- Left column: video player -->
+    <div class="col-lg-8">
+        <div class="bg-black rounded position-relative" id="videoPlayerContainer">
+            <video id="reelVideoPlayer"
+                   src="@Model.VideoUrl"
+                   class="w-100 rounded"
+                   style="max-height: 500px; display: block;"
+                   preload="metadata">
+                Your browser does not support the video tag.
+            </video>
+
+            <!-- Crop overlay: shown when crop panel is active -->
+            <div id="cropOverlayContainer"
+                 class="position-absolute top-0 start-0 w-100 h-100 d-none"
+                 style="pointer-events: none; overflow: hidden; border-radius: inherit;">
+                <div id="cropRectangleHighlight"
+                     class="position-absolute"
+                     style="border: 3px solid white;
+                            box-shadow: 0 0 0 9999px rgba(0,0,0,0.45);
+                            border-radius: 4px;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Video controls bar -->
+        <div class="card border-0 bg-dark text-light mt-2 p-2">
+            <input type="range"
+                   id="videoSeekSlider"
+                   class="form-range mb-2"
+                   min="0" max="0" value="0" step="0.1" />
+
+            <div class="d-flex align-items-center">
+                <span id="videoCurrentTimeDisplay" class="small me-2">0:00</span>
+
+                <div class="d-flex gap-2 mx-auto">
+                    <button id="videoPlayPauseButton"
+                            type="button"
+                            class="btn btn-outline-light btn-sm"
+                            style="width: 40px;">
+                        &#9654;
+                    </button>
+                    <button id="videoMuteToggleButton"
+                            type="button"
+                            class="btn btn-outline-light btn-sm"
+                            style="width: 40px;">
+                        &#128266;
+                    </button>
+                </div>
+
+                <span id="videoDurationDisplay" class="small ms-2">0:00</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right column: editing options -->
+    <div class="col-lg-4">
+
+        <!-- Toggle buttons -->
+        <div class="d-grid gap-2 mb-3">
+            <button type="button"
+                    id="toggleCropPanelButton"
+                    class="btn btn-outline-primary"
+                    onclick="toggleEditPanel('Crop')">
+                Crop Dimensions
+            </button>
+            <button type="button"
+                    id="toggleMusicPanelButton"
+                    class="btn btn-outline-primary"
+                    onclick="toggleEditPanel('Music')">
+                Background Music
+            </button>
+        </div>
+
+        <!-- Crop dimensions panel -->
+        <div id="cropEditPanel" class="card border-0 bg-body-secondary p-3 mb-3 d-none">
+            <h6 class="fw-semibold mb-1">Crop Dimensions</h6>
+            <p class="text-muted small mb-3">
+                Adjust the margins to define the visible crop region.
+                The overlay on the video previews the result in real time.
+            </p>
+
+            <form asp-action="SaveCrop" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="ReelId" value="@Model.ReelId" />
+
+                <div class="mb-3">
+                    <label class="form-label small">
+                        Left Margin &mdash; <span id="cropLeftValueDisplay">@Model.CropMarginLeft.ToString("F1")</span>%
+                    </label>
+                    <input type="range"
+                           id="cropLeftSlider"
+                           name="CropMarginLeft"
+                           class="form-range crop-margin-slider"
+                           min="0" max="45" step="0.5"
+                           value="@Model.CropMarginLeft.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)"
+                           oninput="onCropSliderChanged()" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small">
+                        Top Margin &mdash; <span id="cropTopValueDisplay">@Model.CropMarginTop.ToString("F1")</span>%
+                    </label>
+                    <input type="range"
+                           id="cropTopSlider"
+                           name="CropMarginTop"
+                           class="form-range crop-margin-slider"
+                           min="0" max="45" step="0.5"
+                           value="@Model.CropMarginTop.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)"
+                           oninput="onCropSliderChanged()" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small">
+                        Right Margin &mdash; <span id="cropRightValueDisplay">@Model.CropMarginRight.ToString("F1")</span>%
+                    </label>
+                    <input type="range"
+                           id="cropRightSlider"
+                           name="CropMarginRight"
+                           class="form-range crop-margin-slider"
+                           min="0" max="45" step="0.5"
+                           value="@Model.CropMarginRight.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)"
+                           oninput="onCropSliderChanged()" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small">
+                        Bottom Margin &mdash; <span id="cropBottomValueDisplay">@Model.CropMarginBottom.ToString("F1")</span>%
+                    </label>
+                    <input type="range"
+                           id="cropBottomSlider"
+                           name="CropMarginBottom"
+                           class="form-range crop-margin-slider"
+                           min="0" max="45" step="0.5"
+                           value="@Model.CropMarginBottom.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)"
+                           oninput="onCropSliderChanged()" />
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Save Crop Edits</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Background music panel -->
+        <div id="musicEditPanel" class="card border-0 bg-body-secondary p-3 mb-3 d-none">
+            <h6 class="fw-semibold mb-1">Background Music</h6>
+            <p class="text-muted small mb-2">
+                Select a track from the music library and configure its timing.
+            </p>
+
+            <p class="small mb-2">
+                <strong>Current track:</strong>
+                <span id="currentMusicTrackLabel">@(Model.CurrentMusicTrackName ?? "None")</span>
+            </p>
+
+            <form asp-action="SaveMusic" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="ReelId" value="@Model.ReelId" />
+                <input type="hidden" name="MusicTrackId" id="selectedMusicTrackIdInput" value="@(Model.SelectedMusicTrackId ?? 0)" />
+
+                <!-- Music track selection list -->
+                @if (Model.AvailableMusicTracks.Any())
+                {
+                    <div class="border rounded bg-body mb-3" style="max-height: 200px; overflow-y: auto;">
+                        @foreach (MusicTrackViewModel musicTrack in Model.AvailableMusicTracks)
+                        {
+                            <div class="music-track-row d-flex align-items-center gap-2 px-3 py-2 border-bottom @(Model.SelectedMusicTrackId == musicTrack.TrackId ? "bg-primary-subtle" : "")"
+                                 style="cursor: pointer;"
+                                 id="musicTrackRow_@musicTrack.TrackId"
+                                 data-track-id="@musicTrack.TrackId"
+                                 data-track-name="@musicTrack.TrackName"
+                                 data-audio-url="@musicTrack.AudioUrl"
+                                 onclick="selectMusicTrack(@musicTrack.TrackId, '@musicTrack.TrackName', '@musicTrack.AudioUrl')">
+                                <div class="flex-grow-1 overflow-hidden">
+                                    <div class="fw-semibold small text-truncate">@musicTrack.TrackName</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">@musicTrack.Author &bull; @musicTrack.FormattedDuration</div>
+                                </div>
+                                <span class="music-track-selected-indicator text-primary @(Model.SelectedMusicTrackId == musicTrack.TrackId ? "" : "invisible")"
+                                      id="musicTrackCheckmark_@musicTrack.TrackId">&#10003;</span>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted small mb-3">No music tracks available.</p>
+                }
+
+                <!-- Hidden audio element for preview -->
+                <audio id="musicPreviewPlayer" preload="none"></audio>
+
+                <!-- Preview controls -->
+                <div class="d-flex gap-2 mb-3">
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-sm"
+                            onclick="playMusicPreview()">
+                        &#9654; Play Preview
+                    </button>
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-sm"
+                            onclick="stopMusicPreview()">
+                        &#9632; Stop Preview
+                    </button>
+                </div>
+
+                <!-- Timing controls -->
+                <div class="mb-3">
+                    <label class="form-label small">
+                        Start Time &mdash; <span id="musicStartTimeDisplay">@Model.MusicStartTime.ToString("F1")</span>s
+                    </label>
+                    <input type="range"
+                           id="musicStartTimeSlider"
+                           name="MusicStartTime"
+                           class="form-range"
+                           min="0" max="300" step="0.5"
+                           value="@Model.MusicStartTime.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)"
+                           oninput="document.getElementById('musicStartTimeDisplay').textContent = parseFloat(this.value).toFixed(1)" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small">
+                        Duration &mdash; <span id="musicDurationDisplay">@Model.MusicDuration.ToString("F1")</span>s
+                    </label>
+                    <input type="range"
+                           id="musicDurationSlider"
+                           name="MusicDuration"
+                           class="form-range"
+                           min="5" max="120" step="0.5"
+                           value="@Model.MusicDuration.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)"
+                           oninput="document.getElementById('musicDurationDisplay').textContent = parseFloat(this.value).toFixed(1)" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small">
+                        Volume &mdash; <span id="musicVolumeDisplay">@Model.MusicVolume.ToString("F0")</span>%
+                    </label>
+                    <input type="range"
+                           id="musicVolumeSlider"
+                           name="MusicVolume"
+                           class="form-range"
+                           min="0" max="100" step="1"
+                           value="@Model.MusicVolume.ToString("F0", System.Globalization.CultureInfo.InvariantCulture)"
+                           oninput="onMusicVolumeChanged(this.value)" />
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Save Music Edits</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // ─── Video player ──────────────────────────────────────────────────────────
+
+        const reelVideoPlayer = document.getElementById('reelVideoPlayer');
+        const videoSeekSlider = document.getElementById('videoSeekSlider');
+        const videoPlayPauseButton = document.getElementById('videoPlayPauseButton');
+        const videoMuteToggleButton = document.getElementById('videoMuteToggleButton');
+        const videoCurrentTimeDisplay = document.getElementById('videoCurrentTimeDisplay');
+        const videoDurationDisplay = document.getElementById('videoDurationDisplay');
+
+        function formatVideoTime(totalSeconds) {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = Math.floor(totalSeconds % 60);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        reelVideoPlayer.addEventListener('loadedmetadata', function () {
+            videoSeekSlider.max = reelVideoPlayer.duration;
+            videoDurationDisplay.textContent = formatVideoTime(reelVideoPlayer.duration);
+        });
+
+        reelVideoPlayer.addEventListener('timeupdate', function () {
+            videoSeekSlider.value = reelVideoPlayer.currentTime;
+            videoCurrentTimeDisplay.textContent = formatVideoTime(reelVideoPlayer.currentTime);
+        });
+
+        reelVideoPlayer.addEventListener('play', function () {
+            videoPlayPauseButton.innerHTML = '&#9646;&#9646;';
+        });
+
+        reelVideoPlayer.addEventListener('pause', function () {
+            videoPlayPauseButton.innerHTML = '&#9654;';
+        });
+
+        videoPlayPauseButton.addEventListener('click', function () {
+            if (reelVideoPlayer.paused) {
+                reelVideoPlayer.play();
+            } else {
+                reelVideoPlayer.pause();
+            }
+        });
+
+        videoMuteToggleButton.addEventListener('click', function () {
+            reelVideoPlayer.muted = !reelVideoPlayer.muted;
+            videoMuteToggleButton.innerHTML = reelVideoPlayer.muted ? '&#128263;' : '&#128266;';
+        });
+
+        videoSeekSlider.addEventListener('input', function () {
+            reelVideoPlayer.currentTime = parseFloat(videoSeekSlider.value);
+        });
+
+        // ─── Edit panel toggle ─────────────────────────────────────────────────────
+
+        const cropEditPanel = document.getElementById('cropEditPanel');
+        const musicEditPanel = document.getElementById('musicEditPanel');
+        const cropOverlayContainer = document.getElementById('cropOverlayContainer');
+        const toggleCropPanelButton = document.getElementById('toggleCropPanelButton');
+        const toggleMusicPanelButton = document.getElementById('toggleMusicPanelButton');
+
+        function toggleEditPanel(panelName) {
+            if (panelName === 'Crop') {
+                const cropPanelIsNowVisible = cropEditPanel.classList.contains('d-none');
+                cropEditPanel.classList.toggle('d-none');
+                musicEditPanel.classList.add('d-none');
+                toggleMusicPanelButton.classList.remove('btn-primary');
+                toggleMusicPanelButton.classList.add('btn-outline-primary');
+
+                if (cropPanelIsNowVisible) {
+                    toggleCropPanelButton.classList.remove('btn-outline-primary');
+                    toggleCropPanelButton.classList.add('btn-primary');
+                    cropOverlayContainer.classList.remove('d-none');
+                    reelVideoPlayer.pause();
+                    updateCropOverlay();
+                } else {
+                    toggleCropPanelButton.classList.remove('btn-primary');
+                    toggleCropPanelButton.classList.add('btn-outline-primary');
+                    cropOverlayContainer.classList.add('d-none');
+                }
+            } else if (panelName === 'Music') {
+                const musicPanelIsNowVisible = musicEditPanel.classList.contains('d-none');
+                musicEditPanel.classList.toggle('d-none');
+                cropEditPanel.classList.add('d-none');
+                cropOverlayContainer.classList.add('d-none');
+                toggleCropPanelButton.classList.remove('btn-primary');
+                toggleCropPanelButton.classList.add('btn-outline-primary');
+
+                if (musicPanelIsNowVisible) {
+                    toggleMusicPanelButton.classList.remove('btn-outline-primary');
+                    toggleMusicPanelButton.classList.add('btn-primary');
+                } else {
+                    toggleMusicPanelButton.classList.remove('btn-primary');
+                    toggleMusicPanelButton.classList.add('btn-outline-primary');
+                    stopMusicPreview();
+                }
+            }
+        }
+
+        // ─── Crop overlay preview ──────────────────────────────────────────────────
+
+        const cropRectangleHighlight = document.getElementById('cropRectangleHighlight');
+
+        function updateCropOverlay() {
+            const leftMarginPercent = parseFloat(document.getElementById('cropLeftSlider').value);
+            const topMarginPercent = parseFloat(document.getElementById('cropTopSlider').value);
+            const rightMarginPercent = parseFloat(document.getElementById('cropRightSlider').value);
+            const bottomMarginPercent = parseFloat(document.getElementById('cropBottomSlider').value);
+
+            const cropWidthPercent = Math.max(0, 100 - leftMarginPercent - rightMarginPercent);
+            const cropHeightPercent = Math.max(0, 100 - topMarginPercent - bottomMarginPercent);
+
+            cropRectangleHighlight.style.left = leftMarginPercent + '%';
+            cropRectangleHighlight.style.top = topMarginPercent + '%';
+            cropRectangleHighlight.style.width = cropWidthPercent + '%';
+            cropRectangleHighlight.style.height = cropHeightPercent + '%';
+        }
+
+        function onCropSliderChanged() {
+            const leftSliderValue = parseFloat(document.getElementById('cropLeftSlider').value);
+            const topSliderValue = parseFloat(document.getElementById('cropTopSlider').value);
+            const rightSliderValue = parseFloat(document.getElementById('cropRightSlider').value);
+            const bottomSliderValue = parseFloat(document.getElementById('cropBottomSlider').value);
+
+            document.getElementById('cropLeftValueDisplay').textContent = leftSliderValue.toFixed(1);
+            document.getElementById('cropTopValueDisplay').textContent = topSliderValue.toFixed(1);
+            document.getElementById('cropRightValueDisplay').textContent = rightSliderValue.toFixed(1);
+            document.getElementById('cropBottomValueDisplay').textContent = bottomSliderValue.toFixed(1);
+
+            updateCropOverlay();
+        }
+
+        // ─── Music track selection ─────────────────────────────────────────────────
+
+        const selectedMusicTrackIdInput = document.getElementById('selectedMusicTrackIdInput');
+        const currentMusicTrackLabel = document.getElementById('currentMusicTrackLabel');
+        const musicPreviewPlayer = document.getElementById('musicPreviewPlayer');
+
+        function selectMusicTrack(trackId, trackName, audioUrl) {
+            // Clear previous selection highlight
+            document.querySelectorAll('.music-track-row').forEach(function (trackRow) {
+                trackRow.classList.remove('bg-primary-subtle');
+            });
+            document.querySelectorAll('.music-track-selected-indicator').forEach(function (checkmark) {
+                checkmark.classList.add('invisible');
+            });
+
+            // Apply new selection
+            const selectedRow = document.getElementById('musicTrackRow_' + trackId);
+            const selectedCheckmark = document.getElementById('musicTrackCheckmark_' + trackId);
+
+            if (selectedRow) selectedRow.classList.add('bg-primary-subtle');
+            if (selectedCheckmark) selectedCheckmark.classList.remove('invisible');
+
+            selectedMusicTrackIdInput.value = trackId;
+            currentMusicTrackLabel.textContent = trackName;
+
+            // Update preview player source
+            musicPreviewPlayer.src = audioUrl;
+            musicPreviewPlayer.load();
+        }
+
+        function onMusicVolumeChanged(volumePercentage) {
+            document.getElementById('musicVolumeDisplay').textContent = Math.round(volumePercentage);
+            musicPreviewPlayer.volume = parseFloat(volumePercentage) / 100;
+        }
+
+        function playMusicPreview() {
+            if (!musicPreviewPlayer.src || musicPreviewPlayer.src === window.location.href) {
+                return;
+            }
+            musicPreviewPlayer.currentTime = parseFloat(document.getElementById('musicStartTimeSlider').value);
+            musicPreviewPlayer.volume = parseFloat(document.getElementById('musicVolumeSlider').value) / 100;
+            musicPreviewPlayer.play();
+        }
+
+        function stopMusicPreview() {
+            musicPreviewPlayer.pause();
+            musicPreviewPlayer.currentTime = 0;
+        }
+
+        // ─── Delete confirmation ───────────────────────────────────────────────────
+
+        function confirmDeleteReel() {
+            if (confirm('Are you sure you want to delete this reel? This cannot be undone.')) {
+                document.getElementById('deleteReelForm').submit();
+            }
+        }
+    </script>
+}
+
+@section Styles {
+    <style>
+        .music-track-row:hover {
+            background-color: var(--bs-secondary-bg) !important;
+        }
+
+        .music-track-row.bg-primary-subtle:hover {
+            background-color: var(--bs-primary-bg-subtle) !important;
+        }
+
+        #reelVideoPlayer {
+            max-height: 500px;
+            object-fit: contain;
+        }
+    </style>
+}

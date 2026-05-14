@@ -30,6 +30,8 @@ builder.Services.AddSingleton<ICurrentUserService>(sp => sp.GetRequiredService<J
 builder.Services.AddHostedService<JwtAutoLoginService>();
 
 // Proxy services
+builder.Services.AddTransient<IReelService, ReelProxyService>();
+builder.Services.AddTransient<IAudioLibraryService, AudioLibraryProxyService>();
 builder.Services.AddTransient<IMovieService, MovieProxyService>();
 builder.Services.AddTransient<IEquipmentService, EquipmentProxyService>();
 builder.Services.AddTransient<IEventService, EventProxyService>();
