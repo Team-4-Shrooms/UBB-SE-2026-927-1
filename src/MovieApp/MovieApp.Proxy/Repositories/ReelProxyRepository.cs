@@ -11,6 +11,12 @@ namespace MovieApp.Proxy
 
         public ReelProxyRepository(ApiClient apiClient) => _apiClient = apiClient;
 
+        public async Task<IList<Reel>> GetAllReelsAsync()
+        {
+            var result = await _apiClient.GetAsync<List<Reel>>("api/reels");
+            return result ?? new List<Reel>();
+        }
+
         public async Task<IList<Reel>> GetUserReelsAsync(int userId)
         {
             var result = await _apiClient.GetAsync<List<Reel>>($"api/reels/users/{userId}");

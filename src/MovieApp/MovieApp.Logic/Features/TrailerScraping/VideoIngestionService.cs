@@ -217,5 +217,10 @@ namespace MovieApp.Logic.Features.TrailerScraping
         {
             return await this.repository.GetAllJobsAsync();
         }
+
+        public async Task<IList<Reel>> GetAllReelsAsync()
+        {
+            return await this.repository.GetAllReelsAsync();
+        }
     }
 }

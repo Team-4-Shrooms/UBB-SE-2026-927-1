@@ -15,5 +15,6 @@ namespace MovieApp.Logic.Features.TrailerScraping
         Task<ScrapeJob?> GetJobStatusAsync(int jobId);
         Task<ScrapeJob> RunScrapeJobAsync(Movie movie, int maxResults, Func<ScrapeJobLog, Task>? onLogEntry = null);
         Task<string> IngestVideoFromUrlAsync(string trailerUrl, int movieId);
+        Task<IList<Reel>> GetAllReelsAsync();
     }
 }

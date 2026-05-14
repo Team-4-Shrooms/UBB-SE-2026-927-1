@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using MovieApp.DataLayer.Models;
 using MovieApp.Logic.Features.TrailerScraping;
-using System.Text.Json;
 
 namespace MovieApp.Proxy.Services
 {
@@ -76,6 +77,20 @@ namespace MovieApp.Proxy.Services
             }
 
             return string.Empty;
+        }
+
+        public async Task<IList<Reel>> GetAllReelsAsync()
+        {
+            try
+            {
+                string key = "api/video-ingestion/reels";
+                var reels = await _apiClient.GetAsync<List<Reel>>(key);
+                return reels ?? new List<Reel>();
+            }
+            catch
+            {
+                return new List<Reel>();
+            }
         }
     }
 }

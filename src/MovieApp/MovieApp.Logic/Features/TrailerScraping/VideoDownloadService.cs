@@ -135,10 +135,12 @@ namespace MovieApp.Logic.Features.TrailerScraping
                     return null;
                 }
 
-                if (File.Exists(expectedFinalFile))
+                var actualFile = System.IO.Directory.GetFiles(this.downloadFolder, $"{uniqueFileName}.*").FirstOrDefault();
+
+                if (actualFile != null)
                 {
                     this.LastError = null;
-                    return expectedFinalFile;
+                    return actualFile;
                 }
 
                 this.LastError = "yt-dlp finished but the output MP4 file was not found.";

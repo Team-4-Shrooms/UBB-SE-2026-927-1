@@ -70,6 +70,16 @@ namespace MovieApp.DataLayer.Repositories
 
             await _context.SaveChangesAsync();
         }
+
+        /// <inheritdoc />
+        public async Task<IList<Reel>> GetAllReelsAsync()
+        {
+            return await _context.Reels
+                .Include(reel => reel.Movie)
+                .Include(reel => reel.CreatorUser)
+                .OrderByDescending(reel => reel.CreatedAt)
+                .ToListAsync();
+        }
     }
 }
 
