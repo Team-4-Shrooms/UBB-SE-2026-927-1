@@ -199,6 +199,8 @@ public static class WebApiDtoMappingExtensions
             WatchDurationSeconds = interaction.WatchDurationSeconds,
             WatchPercentage = interaction.WatchPercentage,
             ViewedAt = interaction.ViewedAt,
+            UserId = interaction.UserId,
+            ReelId = interaction.ReelId,
             User = interaction.User?.ToReferenceDto() ?? (userId.HasValue ? new UserReferenceDto { Id = userId.Value } : null),
             Reel = interaction.Reel?.ToReferenceDto() ?? (reelId.HasValue ? new ReelReferenceDto { Id = reelId.Value } : null),
         };
@@ -357,7 +359,20 @@ public static class WebApiDtoMappingExtensions
         };
     }
 
-    public static DashboardStatsDto ToDto(this DashboardStatsModel stats)
+    public static DashboardStatsDto ToDto(this MovieApp.DataLayer.Models.DashboardStatsModel stats)
+    {
+        return new DashboardStatsDto
+        {
+            TotalMovies = stats.TotalMovies,
+            TotalReels = stats.TotalReels,
+            TotalJobs = stats.TotalJobs,
+            RunningJobs = stats.RunningJobs,
+            CompletedJobs = stats.CompletedJobs,
+            FailedJobs = stats.FailedJobs,
+        };
+    }
+
+    public static DashboardStatsDto ToDto(this MovieApp.Logic.Features.TrailerScraping.DashboardStatsModel stats)
     {
         return new DashboardStatsDto
         {

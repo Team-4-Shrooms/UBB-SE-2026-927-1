@@ -7,8 +7,13 @@ namespace MovieApp.DataLayer.Models
         public decimal WatchDurationSeconds { get; set; }
         public decimal WatchPercentage { get; set; }
         public DateTime ViewedAt { get; set; }
+        public int UserId { get; set; }
+        public int ReelId { get; set; }
 
-        public User User { get; set; }
-        public Reel Reel { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
+        public virtual User User { get; set; }
+
+        [System.Text.Json.Serialization.JsonIgnore]
+        public virtual Reel Reel { get; set; }
     }
 }

@@ -9,16 +9,16 @@
         <div class="col-lg-8">
             <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5">
                 <div class="text-center mb-5">
-                    <h1 class="display-5 fw-bold mb-2">Sell Your Equipment</h1>
+                    <h1 class="display-5 fw-bold mb-2">List Your Gear</h1>
                     <p class="text-muted">Fill out the details below to list your item in the marketplace.</p>
                 </div>
 
-                <form asp-action="Sell" method="post" class="needs-validation">
+                <form asp-action="Sell" method="post" enctype="multipart/form-data" class="needs-validation">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
 
                     <div class="row g-4">
                         <div class="col-md-12">
-                            <label asp-for="Name" class="form-label fw-semibold">Item Name</label>
+                            <label asp-for="Name" class="form-label fw-semibold">Equipment Title</label>
                             <input asp-for="Name" class="form-control form-control-lg rounded-3 shadow-sm border-0 bg-light" placeholder="e.g. Pro Video Camera X1" />
                             <span asp-validation-for="Name" class="text-danger small"></span>
                         </div>
@@ -28,7 +28,7 @@
                             <select asp-for="Category" class="form-select form-select-lg rounded-3 shadow-sm border-0 bg-light">
                                 <option value="">Select Category</option>
                                 <option value="Cameras">Cameras</option>
-                                <option value="Audio">Audio</option>
+                                <option value="Microphones">Microphones</option>
                                 <option value="Lighting">Lighting</option>
                                 <option value="Accessories">Accessories</option>
                             </select>
@@ -40,9 +40,8 @@
                             <select asp-for="Condition" class="form-select form-select-lg rounded-3 shadow-sm border-0 bg-light">
                                 <option value="">Select Condition</option>
                                 <option value="New">New</option>
-                                <option value="Like New">Like New</option>
-                                <option value="Good">Good</option>
-                                <option value="Fair">Fair</option>
+                                <option value="Used - Like New">Used - Like New</option>
+                                <option value="Used - Good">Used - Good</option>
                             </select>
                             <span asp-validation-for="Condition" class="text-danger small"></span>
                         </div>
@@ -57,23 +56,36 @@
                             <label asp-for="Price" class="form-label fw-semibold">Price ($)</label>
                             <div class="input-group input-group-lg">
                                 <span class="input-group-text border-0 bg-light shadow-sm">$</span>
-                                <input asp-for="Price" type="number" step="0.01" class="form-control rounded-3 shadow-sm border-0 bg-light" placeholder="0.00" />
+                                <input asp-for="Price" type="number" step="0.01" min="0.01" class="form-control rounded-3 shadow-sm border-0 bg-light" placeholder="0.00" />
                             </div>
                             <span asp-validation-for="Price" class="text-danger small"></span>
                         </div>
 
-                        <div class="col-md-6">
-                            <label asp-for="ImageUrl" class="form-label fw-semibold">Image URL</label>
-                            <input asp-for="ImageUrl" class="form-control form-control-lg rounded-3 shadow-sm border-0 bg-light" placeholder="https://example.com/image.jpg" />
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Equipment Photo</label>
+                            <div class="upload-area rounded-3 d-flex flex-column align-items-center justify-content-center p-4 mb-2" id="uploadArea" onclick="document.getElementById('imageFileInput').click()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-image text-secondary mb-2" viewBox="0 0 16 16">
+                                    <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                                    <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/>
+                                </svg>
+                                <span id="fileNameLabel" class="text-secondary small">Click to select gear photo</span>
+                            </div>
+                            <input type="file" id="imageFileInput" name="ImageFile" accept=".jpg,.jpeg,.png,.webp" class="d-none" onchange="updateFileName(this)" />
+                            <span asp-validation-for="ImageFile" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label asp-for="ImageUrl" class="form-label fw-semibold">Or Image URL</label>
+                            <input asp-for="ImageUrl" class="form-control form-control-lg rounded-3 shadow-sm border-0 bg-light" placeholder="Paste link here..." />
                             <span asp-validation-for="ImageUrl" class="text-danger small"></span>
                         </div>
                     </div>
 
                     <div class="mt-5">
                         <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill py-3 shadow-sm sell-submit-btn">
-                            List Item Now
+                            SUBMIT LISTING
                         </button>
-                        <a asp-action="Index" class="btn btn-link w-100 mt-2 text-muted text-decoration-none">Cancel</a>
+                        <a asp-action="Index" class="btn btn-link w-100 mt-2 text-muted text-decoration-none">CANCEL / BACK</a>
                     </div>
                 </form>
             </div>
@@ -82,6 +94,17 @@
 </div>
 
 <style>
+    .upload-area {
+        background-color: #1a1a1a;
+        border: 2px dashed #6c757d;
+        cursor: pointer;
+        min-height: 120px;
+        transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+    .upload-area:hover {
+        border-color: #0d6efd;
+        background-color: #111;
+    }
     .form-control:focus, .form-select:focus {
         background-color: #fff !important;
         box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15) !important;
@@ -105,4 +128,10 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function updateFileName(input) {
+            var label = document.getElementById('fileNameLabel');
+            label.textContent = input.files.length > 0 ? input.files[0].name : 'Click to select gear photo';
+        }
+    </script>
 }

@@ -12,6 +12,6 @@ namespace MovieApp.Logic.Interfaces.Services
         Task<int[]> GetStarRatingBucketsAsync(int movieId);
         Task PostReviewAsync(int movieId, int userId, int rating, string? comment);
         Task<List<MovieReview>> GetReviewsForMovieAsync(int movieId);
+        Task<Dictionary<int, int>> GetReviewCountsAsync(IEnumerable<int> movieIds);
     }
 }
-

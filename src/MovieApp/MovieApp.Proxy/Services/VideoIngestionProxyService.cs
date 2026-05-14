@@ -41,30 +41,16 @@ namespace MovieApp.Proxy.Services
 
         public async Task<ScrapeJob> RunScrapeJobAsync(Movie movie, int maxResults, Func<ScrapeJobLog, Task>? onLogEntry = null)
         {
-            string key = "api/video-ingestion/run-scrape";
-            var response = await _apiClient.PostAsync<object, JsonElement>(key, new
+            return await _apiClient.PostAsync<object, ScrapeJob>("api/video-ingestion/run-scrape", new
             {
                 MovieId = movie.Id,
                 MaxResults = maxResults
             });
-
-            int jobId = response.GetProperty(JobProperty).GetInt32();
-
-            return new ScrapeJob
-            {
-                Id = jobId,
-                SearchQuery = movie.Title,
-                MaxResults = maxResults,
-                Status = PendingStatus,
-                StartedAt = DateTime.UtcNow,
-            };
         }
 
         public async Task<string> IngestVideoFromUrlAsync(string trailerUrl, int movieId)
         {
-            string key = "api/video-ingestion/ingest-url";
-
-            var result = await _apiClient.PostAsync<object, JsonElement>(key, new
+            var result = await _apiClient.PostAsync<object, JsonElement>("api/video-ingestion/ingest-url", new
             {
                 TrailerUrl = trailerUrl,
                 MovieId = movieId

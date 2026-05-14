@@ -11,6 +11,7 @@ using MovieApp.Logic.Features.ReelsFeed;
 using Windows.Media.Playback;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Microsoft.UI.Dispatching;
+using System.Diagnostics;
 
 namespace MovieApp.Features.ReelsFeed.Views
 {
@@ -305,10 +306,12 @@ namespace MovieApp.Features.ReelsFeed.Views
 
             try
             {
+                Debug.WriteLine($"liked in itemview {MockUserId}, {this.Reel.Id}");
                 await this.interactionService.ToggleLikeAsync(MockUserId, this.Reel.Id);
             }
-            catch
+            catch (Exception e)
             {
+                Debug.WriteLine(e.Message);
                 // Revert on failure
                 this.Reel.IsLiked = wasLiked;
                 this.Reel.LikeCount += wasLiked ? 1 : -1;

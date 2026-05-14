@@ -2,7 +2,6 @@
     x:Class="MovieApp.Features.ReelsFeed.Views.ReelItemView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:models="using:MovieApp.Core.Models"
     DoubleTapped="ReelItemView_DoubleTapped">
 
     <Grid Background="Black">

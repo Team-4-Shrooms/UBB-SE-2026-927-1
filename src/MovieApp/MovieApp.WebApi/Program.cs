@@ -94,7 +94,7 @@ builder.Services.AddScoped<ReviewRepository>();
 builder.Services.AddScoped<IReviewRepository>(sp => sp.GetRequiredService<ReviewRepository>());
 
 builder.Services.AddScoped<ScrapeJobRepository>();
-builder.Services.AddScoped<IScrapeRepository>(sp => sp.GetRequiredService<ScrapeJobRepository>());
+builder.Services.AddScoped<IScrapeJobRepository>(sp => sp.GetRequiredService<ScrapeJobRepository>());
 
 builder.Services.AddScoped<TransactionRepository>();
 builder.Services.AddScoped<ITransactionRepository>(sp => sp.GetRequiredService<TransactionRepository>());
@@ -114,6 +114,13 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IActiveSalesService, ActiveSalesService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IPersonalityMatchService, PersonalityMatchService>();
+builder.Services.AddScoped<IPreferenceService, PreferenceService>();
+builder.Services.AddScoped<IMovieTournamentService, MovieTournamentService>();
+builder.Services.AddScoped<IAudioLibraryService, AudioLibraryService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IScrapeJobService, ScrapeJobService>();
+builder.Services.AddScoped<IReelService, ReelService>();
 
 // Feature services
 builder.Services.AddScoped<IMovieCardFeedService, MovieCardFeedService>();
@@ -163,7 +170,7 @@ using (IServiceScope scope = app.Services.CreateScope())
         {
             // Use a short timeout so a locked __EFMigrationsHistory table (common after a
             // previous crash) fails fast instead of blocking startup for 30+ seconds.
-            context.Database.SetCommandTimeout(TimeSpan.FromSeconds(5));
+            context.Database.SetCommandTimeout(TimeSpan.FromSeconds(20));
             await context.Database.MigrateAsync();
         }
         catch (Exception migEx)

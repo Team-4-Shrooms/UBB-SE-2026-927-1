@@ -6,8 +6,9 @@ namespace MovieApp.DataLayer.Repositories
 {
     public sealed class InventoryRepository : IInventoryRepository
     {
-        private readonly MovieApp.DataLayer.Interfaces.IMovieAppDbContext _context;
-        public InventoryRepository(MovieApp.DataLayer.Interfaces.IMovieAppDbContext context)
+        private readonly Interfaces.IMovieAppDbContext _context;
+
+        public InventoryRepository(Interfaces.IMovieAppDbContext context)
         {
             _context = context;
         }
@@ -60,15 +61,50 @@ namespace MovieApp.DataLayer.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<Equipment>> GetOwnedEquipmentAsync(int userId)
+        {
+            List<int> ownedIds = await _context.Transactions
+                .Include(t => t.Equipment)
+                .Where(t => t.Buyer.Id == userId && t.Type == "EquipmentPurchase" && t.Equipment != null)
+                .Select(t => t.Equipment!.Id)
+                .ToListAsync();
+
+            return await _context.Equipment
+                .Where(e => ownedIds.Contains(e.Id))
+                .ToListAsync();
+        }
+
+        public async Task<Equipment?> GetEquipmentByIdAsync(int equipmentId)
+        {
+            return await _context.Equipment.FindAsync(equipmentId);
+        }
+
+        public async Task RemoveOwnedEquipmentAsync(int userId, int equipmentId)
+        {
+            Transaction? transaction = await _context.Transactions
+                .Include(t => t.Equipment)
+                .FirstOrDefaultAsync(t => t.Buyer.Id == userId && t.Equipment!.Id == equipmentId && t.Type == "EquipmentPurchase");
+
+            if (transaction != null)
+            {
+                _context.Transactions.Remove(transaction);
+            }
+
+            Equipment? equipment = await _context.Equipment.FindAsync(equipmentId);
+            if (equipment != null)
+            {
+                equipment.Status = EquipmentStatus.Available;
+            }
+        }
+
         public async Task AddTransactionAsync(Transaction transaction)
         {
             await _context.Transactions.AddAsync(transaction);
         }
+
         public async Task<int> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync();
         }
     }
-    
 }
-

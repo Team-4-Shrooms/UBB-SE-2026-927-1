@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MovieApp.DataLayer.Interfaces;
-using MovieApp.DataLayer.Interfaces.Repositories;
-using MovieApp.DataLayer.Models;
-using MovieApp.DataLayer.Repositories;
-using MovieApp.WebApi.Mappings;
 using MovieApp.WebDTOs.DTOs.RequestDTOs;
+using MovieApp.WebApi.Mappings;
+using MovieApp.DataLayer.Models;
+using MovieApp.Logic.Interfaces.Services;
 
 namespace MovieApp.WebApi.Endpoints;
 
@@ -14,20 +12,25 @@ namespace MovieApp.WebApi.Endpoints;
 [Route("api/scrape-jobs")]
 public sealed class ScrapeJobEndpointsController : ControllerBase
 {
-    private readonly IScrapeRepository _repository;
-    private readonly IMovieAppDbContext _context;
+    private readonly IScrapeJobService _scrapeJobService;
+    private readonly IMovieService _movieService;
+    private readonly IUserService _userService;
 
-    public ScrapeJobEndpointsController(IScrapeRepository repository, IMovieAppDbContext context)
+    public ScrapeJobEndpointsController(
+        IScrapeJobService scrapeJobService,
+        IMovieService movieService,
+        IUserService userService)
     {
-        _repository = repository;
-        _context = context;
+        _scrapeJobService = scrapeJobService;
+        _movieService = movieService;
+        _userService = userService;
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateJobAsync([FromBody] ScrapeJobRequestBody job)
     {
-        var createdJob = await _repository.CreateJobAsync(job.ToModel());
-        return Ok(createdJob);
+        var jobId = await _scrapeJobService.CreateJobAsync(job.ToModel());
+        return Ok(jobId);
     }
 
     [HttpPut("{jobId:int}")]
@@ -36,95 +39,99 @@ public sealed class ScrapeJobEndpointsController : ControllerBase
         ScrapeJob jobModel = job.ToModel();
         jobModel.Id = jobId;
 
-        await _repository.UpdateJobAsync(jobModel);
+        await _scrapeJobService.UpdateJobAsync(jobModel);
         return Ok();
     }
 
     [HttpPost("logs")]
     public async Task<IActionResult> AddLogEntryAsync([FromBody] AddLogEntryRequestBody log)
     {
-        ScrapeJob scrapeJob = await _context.ScrapeJobs.FindAsync(log.ScrapeJobId)
-            ?? throw new InvalidOperationException($"Scrape job {log.ScrapeJobId} not found.");
+        ScrapeJob? scrapeJob = await _scrapeJobService.GetJobByIdAsync(log.ScrapeJobId);
+        if (scrapeJob == null)
+        {
+            return NotFound($"Scrape job {log.ScrapeJobId} not found.");
+        }
 
         ScrapeJobLog logModel = log.ToModel();
         logModel.ScrapeJob = scrapeJob;
 
-        await _repository.AddLogEntryAsync(logModel);
+        await _scrapeJobService.AddLogEntryAsync(logModel);
         return Ok();
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAllJobsAsync()
     {
-        var jobs = await _repository.GetAllJobsAsync();
+        var jobs = await _scrapeJobService.GetAllJobsAsync();
         return Ok(jobs.Select(job => job.ToDto()));
     }
 
     [HttpGet("{jobId:int}/logs")]
     public async Task<IActionResult> GetLogsForJobAsync(int jobId)
     {
-        var logs = await _repository.GetLogsForJobAsync(jobId);
+        var logs = await _scrapeJobService.GetLogsForJobAsync(jobId);
         return Ok(logs.Select(log => log.ToDto()));
     }
 
     [HttpGet("logs")]
     public async Task<IActionResult> GetAllLogsAsync()
     {
-        var logs = await _repository.GetAllLogsAsync();
+        var logs = await _scrapeJobService.GetAllLogsAsync();
         return Ok(logs.Select(log => log.ToDto()));
     }
 
     [HttpGet("dashboard-stats")]
     public async Task<IActionResult> GetDashboardStatsAsync()
     {
-        return Ok((await _repository.GetDashboardStatsAsync()).ToDto());
+        return Ok((await _scrapeJobService.GetDashboardStatsAsync()).ToDto());
     }
 
     [HttpGet("search-movies")]
     public async Task<IActionResult> SearchMoviesByNameAsync([FromQuery] string partialName)
     {
-        var movies = await _repository.SearchMoviesByNameAsync(partialName);
+        var movies = await _scrapeJobService.SearchMoviesByNameAsync(partialName);
         return Ok(movies.Select(movie => movie.ToDto()));
     }
 
     [HttpGet("movie-id")]
     public async Task<IActionResult> FindMovieByTitleAsync([FromQuery] string title)
     {
-        return Ok(await _repository.FindMovieByTitleAsync(title));
+        return Ok(await _scrapeJobService.FindMovieByTitleAsync(title));
     }
 
     [HttpGet("reel-exists")]
     public async Task<IActionResult> ReelExistsByVideoUrlAsync([FromQuery] string videoUrl)
     {
-        return Ok(await _repository.ReelExistsByVideoUrlAsync(videoUrl));
+        return Ok(await _scrapeJobService.ReelExistsByVideoUrlAsync(videoUrl));
     }
 
     [HttpPost("reels")]
     public async Task<IActionResult> InsertScrapedReelAsync([FromBody] InsertReelRequestBody reel)
     {
-        Movie movie = await _context.Movies.FindAsync(reel.MovieId)
-            ?? throw new InvalidOperationException($"Movie {reel.MovieId} not found.");
-        User creatorUser = await _context.Users.FindAsync(reel.CreatorUserId)
-            ?? throw new InvalidOperationException($"User {reel.CreatorUserId} not found.");
+        Movie? movie = await _movieService.GetMovieByIdAsync(reel.MovieId);
+        if (movie == null) return NotFound($"Movie {reel.MovieId} not found.");
+
+        User? creatorUser = await _userService.GetUserByIdAsync(reel.CreatorUserId);
+        if (creatorUser == null) return NotFound($"User {reel.CreatorUserId} not found.");
 
         Reel reelModel = reel.ToModel();
         reelModel.Movie = movie;
         reelModel.CreatorUser = creatorUser;
 
-        return Ok(await _repository.InsertScrapedReelAsync(reelModel));
+        return Ok(await _scrapeJobService.InsertScrapedReelAsync(reelModel));
     }
 
     [HttpGet("movies")]
     public async Task<IActionResult> GetAllMoviesAsync()
     {
-        var movies = await _repository.GetAllMoviesAsync();
+        var movies = await _scrapeJobService.GetAllMoviesAsync();
         return Ok(movies.Select(movie => movie.ToDto()));
     }
 
     [HttpGet("reels")]
     public async Task<IActionResult> GetAllReelsAsync()
     {
-        var reels = await _repository.GetAllReelsAsync();
+        var reels = await _scrapeJobService.GetAllReelsAsync();
         return Ok(reels.Select(reel => reel.ToDto()));
     }
 }

@@ -13,11 +13,11 @@
 <div class="card box-shadow mb-4">
     <div class="card-body bg-light">
         <form asp-action="Index" method="get" class="row g-3 align-items-end">
-            <div class="col-md-5">
+            <div class="col-md-4">
                 <label class="form-label text-muted fw-bold">Search Title</label>
                 <input type="text" name="search" value="@Model.Filter.Search" class="form-control" placeholder="Search movies...">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label class="form-label text-muted fw-bold">Genre</label>
                 <select name="genre" class="form-select">
                     <option value="">All Genres</option>
@@ -37,6 +37,16 @@
             <div class="col-md-2">
                 <label class="form-label text-muted fw-bold">Min Rating</label>
                 <input type="number" step="0.1" min="0" max="10" name="minRating" value="@Model.Filter.MinRating" class="form-control" placeholder="e.g. 8.0">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label text-muted fw-bold">Sort By</label>
+                <select name="sort" class="form-select">
+                    <option value="" selected="@(Model.Filter.Sort == null)">Title (A–Z)</option>
+                    <option value="price_asc" selected="@(Model.Filter.Sort == "price_asc")">Price (Low to High)</option>
+                    <option value="price_desc" selected="@(Model.Filter.Sort == "price_desc")">Price (High to Low)</option>
+                    <option value="rating_desc" selected="@(Model.Filter.Sort == "rating_desc")">Rating (High to Low)</option>
+                    <option value="rating_asc" selected="@(Model.Filter.Sort == "rating_asc")">Rating (Low to High)</option>
+                </select>
             </div>
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary w-100">Filter</button>

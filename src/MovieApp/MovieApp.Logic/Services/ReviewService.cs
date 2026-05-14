@@ -54,6 +54,11 @@ namespace MovieApp.Logic.Services
         {
             return await _reviewRepo.GetReviewsForMovieAsync(movieId);
         }
+
+        public async Task<Dictionary<int, int>> GetReviewCountsAsync(IEnumerable<int> movieIds)
+        {
+            return await _reviewRepo.GetReviewCountsAsync(movieIds.ToList());
+        }
     }
 }
 
