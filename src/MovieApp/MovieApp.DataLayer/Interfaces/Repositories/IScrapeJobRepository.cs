@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using MovieApp.DataLayer.Models;
 
 namespace MovieApp.DataLayer.Interfaces.Repositories
@@ -97,5 +98,17 @@ namespace MovieApp.DataLayer.Interfaces.Repositories
         /// </summary>
         /// <returns>A list of all reels.</returns>
         Task<IList<Reel>> GetAllReelsAsync();
+
+        /// <summary>
+        /// Retrieves a movie by its unique ID.
+        /// </summary>
+        /// <param name="movieId"></param>
+        Task<Movie?> GetMovieByIdAsync(int movieId);
+
+        /// <summary>
+        /// Retrieves a user by their unique ID.
+        /// </summary>
+        /// <param name="userId"></param>
+        Task<User?> GetUserByIdAsync(int userId);
     }
 }

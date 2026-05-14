@@ -163,6 +163,18 @@ namespace MovieApp.DataLayer.Repositories
                 .OrderByDescending(reel => reel.CreatedAt)
                 .ToListAsync();
         }
+
+        /// <inheritdoc />
+        public async Task<Movie?> GetMovieByIdAsync(int movieId)
+        {
+            return await _context.Movies.FindAsync(movieId);
+        }
+
+        /// <inheritdoc />
+        public async Task<User?> GetUserByIdAsync(int userId)
+        {
+            return await _context.Users.FindAsync(userId);
+        }
     }
 }
 
