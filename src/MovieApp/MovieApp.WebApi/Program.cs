@@ -163,7 +163,7 @@ using (IServiceScope scope = app.Services.CreateScope())
         {
             // Use a short timeout so a locked __EFMigrationsHistory table (common after a
             // previous crash) fails fast instead of blocking startup for 30+ seconds.
-            context.Database.SetCommandTimeout(TimeSpan.FromSeconds(5));
+            context.Database.SetCommandTimeout(TimeSpan.FromSeconds(20));
             await context.Database.MigrateAsync();
         }
         catch (Exception migEx)

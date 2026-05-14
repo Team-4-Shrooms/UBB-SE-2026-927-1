@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using System.Linq;
+using System.Diagnostics;
 
 namespace MovieApp.DataLayer.Repositories
 {
@@ -27,6 +28,7 @@ namespace MovieApp.DataLayer.Repositories
         /// <inheritdoc />
         public async Task<bool> UserHasPreferencesAsync(int userId)
         {
+            Debug.WriteLine("preferencesrepo");
             return await _context.UserMoviePreferences
                 .AnyAsync(preference => preference.User.Id == userId);
         }
@@ -34,6 +36,7 @@ namespace MovieApp.DataLayer.Repositories
         /// <inheritdoc />
         public async Task<IList<Reel>> GetAllReelsAsync()
         {
+            Debug.WriteLine("debugging4");
             return await _context.Reels
                 .Include(reel => reel.Movie)
                 .Include(reel => reel.CreatorUser)
@@ -86,6 +89,7 @@ namespace MovieApp.DataLayer.Repositories
 
         public async Task<IList<Reel>> GetPersonalizedReelsAsync(int userId, int count)
         {
+            Debug.WriteLine("debugging2");
             var preferredMovieIds = await _context.UserMoviePreferences
             .Where(p => p.User.Id == userId && p.Score > 0)
             .Select(p => p.Movie.Id)

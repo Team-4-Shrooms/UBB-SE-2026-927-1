@@ -5,6 +5,7 @@ using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Repositories;
 using MovieApp.Logic.Features.ReelsFeed;
 using MovieApp.DataLayer.Interfaces.Repositories;
+using System.Diagnostics;
 
 namespace MovieApp.WebApi.Endpoints;
 
@@ -25,7 +26,9 @@ public sealed class RecommendationEndpointsController : ControllerBase
     [HttpGet("users/{userId:int}/has-preferences")]
     public async Task<IActionResult> UserHasPreferencesAsync(int userId)
     {
-        return Ok(await _repository.UserHasPreferencesAsync(userId));
+        var result = await _repository.UserHasPreferencesAsync(userId);
+        Debug.WriteLine(result);
+        return Ok(result);
     }
 
     [HttpGet("reels")]
