@@ -1,6 +1,5 @@
 using MovieApp.DataLayer.Models;
 using MovieApp.DataLayer.Interfaces.Repositories;
-using System.Diagnostics;
 
 namespace MovieApp.Logic.Features.ReelsFeed
 {
@@ -27,7 +26,6 @@ namespace MovieApp.Logic.Features.ReelsFeed
         /// <inheritdoc />
         public async Task ToggleLikeAsync(int userId, int reelId)
         {
-            Debug.WriteLine("liked in first service");
             UserReelInteraction existingInteraction = await this.interactionRepository.GetInteractionAsync(userId, reelId);
             bool wasLiked = existingInteraction?.IsLiked ?? false;
 

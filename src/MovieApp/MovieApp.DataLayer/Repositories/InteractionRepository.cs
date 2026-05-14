@@ -3,8 +3,6 @@ using MovieApp.DataLayer.Interfaces.Repositories;
 using MovieApp.DataLayer.Models;
 using System.Threading.Tasks;
 using System;
-using System.Diagnostics;
-
 namespace MovieApp.DataLayer.Repositories
 {
     /// <summary>
@@ -63,7 +61,6 @@ namespace MovieApp.DataLayer.Repositories
         /// <inheritdoc />
         public async Task ToggleLikeAsync(int userId, int reelId)
         {
-            Debug.WriteLine($"liked in repo");
             UserReelInteraction? existingInteraction = await GetInteractionAsync(userId, reelId);
 
             if (existingInteraction is null)
@@ -131,9 +128,10 @@ namespace MovieApp.DataLayer.Repositories
         public async Task<UserReelInteraction?> GetInteractionAsync(int userId, int reelId)
         {
             return await _context.UserReelInteractions
-                .Include(interaction => interaction.User)
-                .Include(interaction => interaction.Reel)
-                .FirstOrDefaultAsync(interaction => interaction.User.Id == userId && interaction.Reel.Id == reelId);
+                .Include(i => i.User)
+                .Include(i => i.Reel)
+                // Use the Foreign Key properties directly on the interaction object
+                .FirstOrDefaultAsync(i => i.UserId == userId && i.ReelId == reelId);
         }
 
         /// <inheritdoc />

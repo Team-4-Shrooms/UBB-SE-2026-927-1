@@ -89,6 +89,8 @@ public sealed class UserReelInteractionDto
     public decimal WatchDurationSeconds { get; set; }
     public decimal WatchPercentage { get; set; }
     public DateTime ViewedAt { get; set; }
+    public int UserId { get; set; }
+    public int ReelId { get; set; }
     public UserReferenceDto? User { get; set; }
     public ReelReferenceDto? Reel { get; set; }
 }
