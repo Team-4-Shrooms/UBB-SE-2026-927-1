@@ -9,11 +9,16 @@ namespace MovieApp.Web.Controllers
     public class TournamentController : Controller
     {
         private readonly ITournamentLogicService _tournamentLogicService;
+        private readonly IMovieTournamentService _movieTournamentService;
         private readonly ICurrentUserService _currentUserService;
 
-        public TournamentController(ITournamentLogicService tournamentLogicService, ICurrentUserService currentUserService)
+        public TournamentController(
+            ITournamentLogicService tournamentLogicService,
+            IMovieTournamentService movieTournamentService,
+            ICurrentUserService currentUserService)
         {
             _tournamentLogicService = tournamentLogicService;
+            _movieTournamentService = movieTournamentService;
             _currentUserService = currentUserService;
         }
 
@@ -24,16 +29,25 @@ namespace MovieApp.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Setup()
+        public async Task<IActionResult> Setup()
         {
-            return View(new TournamentSetupViewModel());
+            int available = await _movieTournamentService.GetTournamentPoolSizeAsync(_currentUserService.UserId);
+            return View(new TournamentSetupViewModel { AvailableCount = available });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Start(int poolSize)
         {
-            await _tournamentLogicService.StartTournamentAsync(_currentUserService.UserId, poolSize);
+            try
+            {
+                await _tournamentLogicService.StartTournamentAsync(_currentUserService.UserId, poolSize);
+            }
+            catch (HttpRequestException)
+            {
+                TempData["Error"] = $"Not enough rated movies to start a {poolSize}-movie tournament.";
+                return RedirectToAction(nameof(Setup));
+            }
             return RedirectToAction(nameof(Match));
         }
 

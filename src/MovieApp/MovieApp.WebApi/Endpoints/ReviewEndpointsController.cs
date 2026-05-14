@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MovieApp.DataLayer.Interfaces.Repositories;
 using MovieApp.Logic.Interfaces.Services;
 using MovieApp.WebApi.Mappings;
 using MovieApp.WebDTOs.DTOs.RequestDTOs;
@@ -13,12 +12,10 @@ namespace MovieApp.WebApi.Endpoints;
 public sealed class ReviewEndpointsController : ControllerBase
 {
     private readonly IReviewService _reviewService;
-    private readonly IReviewRepository _repository;
 
-    public ReviewEndpointsController(IReviewService reviewService, IReviewRepository repository)
+    public ReviewEndpointsController(IReviewService reviewService)
     {
         _reviewService = reviewService;
-        _repository = repository;
     }
 
     [HttpGet("movie/{movieId:int}")]
@@ -44,6 +41,6 @@ public sealed class ReviewEndpointsController : ControllerBase
     [HttpPost("counts")]
     public async Task<IActionResult> GetReviewCounts([FromBody] GetReviewCountsRequestBody request)
     {
-        return Ok(await _repository.GetReviewCountsAsync(request.MovieIds));
+        return Ok(await _reviewService.GetReviewCountsAsync(request.MovieIds));
     }
 }

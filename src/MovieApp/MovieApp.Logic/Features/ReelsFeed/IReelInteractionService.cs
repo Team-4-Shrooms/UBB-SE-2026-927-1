@@ -28,5 +28,9 @@ namespace MovieApp.Logic.Features.ReelsFeed
         /// Gets the total number of likes recorded for a reel.
         /// </summary>
         Task<int> GetLikeCountAsync(int reelId);
+        Task InsertInteractionAsync(UserReelInteraction interaction);
+        Task UpsertInteractionAsync(int userId, int reelId);
+        Task<int> GetReelMovieIdAsync(int reelId);
+        Task<IList<UserReelInteraction>> GetInteractionsForUserAsync(int userId);
     }
 }

@@ -22,9 +22,11 @@ public sealed class EventEndpointsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllEvents()
+    public async Task<IActionResult> GetAllEvents([FromQuery] int? movieId)
     {
-        var events = await _eventService.GetAvailableEventsAsync();
+        var events = movieId.HasValue
+            ? await _eventService.GetEventsByMovieIdAsync(movieId.Value)
+            : await _eventService.GetAvailableEventsAsync();
         return Ok(events.Select(movieEvent => movieEvent.ToDto()));
     }
 

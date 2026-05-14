@@ -61,5 +61,6 @@ namespace MovieApp.DataLayer.Interfaces.Repositories
         /// <param name="reelId">The ID of the reel.</param>
         /// <returns>The associated movie ID, or null if no movie is linked.</returns>
         Task<int?> GetReelMovieIdAsync(int reelId);
+        Task<IList<UserReelInteraction>> GetInteractionsForUserAsync(int userId);
     }
 }

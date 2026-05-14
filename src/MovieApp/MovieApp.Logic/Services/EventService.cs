@@ -23,6 +23,9 @@ namespace MovieApp.Logic.Services
         public async Task<List<MovieEvent>> GetAvailableEventsAsync() =>
             await _eventRepo.GetAllEventsAsync();
 
+        public async Task<List<MovieEvent>> GetEventsByMovieIdAsync(int movieId) =>
+            await _eventRepo.GetEventsByMovieIdAsync(movieId);
+
         public async Task PurchaseTicketAsync(int userId, int eventId)
         {
             var user = await _userRepo.GetUserByIdAsync(userId)

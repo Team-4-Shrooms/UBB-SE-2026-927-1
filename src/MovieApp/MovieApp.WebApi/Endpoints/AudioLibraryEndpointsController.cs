@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MovieApp.WebDTOs.DTOs.RequestDTOs;
 using MovieApp.WebApi.Mappings;
-using MovieApp.DataLayer.Repositories;
+using MovieApp.Logic.Interfaces.Services;
 using MovieApp.WebDTOs.DTOs;
 using MovieApp.WebApi.DTOs;
 
@@ -13,24 +13,24 @@ namespace MovieApp.WebApi.Endpoints;
 [Route("api/audio-library")]
 public sealed class AudioLibraryEndpointsController : ControllerBase
 {
-    private readonly AudioLibraryRepository _repository;
+    private readonly IAudioLibraryService _audioLibraryService;
 
-    public AudioLibraryEndpointsController(AudioLibraryRepository repository)
+    public AudioLibraryEndpointsController(IAudioLibraryService audioLibraryService)
     {
-        _repository = repository;
+        _audioLibraryService = audioLibraryService;
     }
 
     [HttpGet("tracks")]
     public async Task<IActionResult> GetAllTracksAsync()
     {
-        var tracks = await _repository.GetAllTracksAsync();
+        var tracks = await _audioLibraryService.GetAllTracksAsync();
         return Ok(tracks.Select(track => track.ToDto()));
     }
 
     [HttpGet("tracks/{musicTrackId:int}")]
     public async Task<IActionResult> GetTrackByIdAsync(int musicTrackId)
     {
-        MusicTrackDto? track = (await _repository.GetTrackByIdAsync(musicTrackId))?.ToDto();
+        MusicTrackDto? track = (await _audioLibraryService.GetTrackByIdAsync(musicTrackId))?.ToDto();
         return Ok(track);
     }
 }

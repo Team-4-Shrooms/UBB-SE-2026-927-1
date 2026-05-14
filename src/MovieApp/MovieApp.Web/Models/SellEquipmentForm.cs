@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace MovieApp.Web.Models
 {
@@ -21,8 +22,8 @@ namespace MovieApp.Web.Models
         [Range(0.01, 1000000, ErrorMessage = "Price must be between 0.01 and 1,000,000")]
         public decimal Price { get; set; }
 
-        [Required(ErrorMessage = "Image URL is required")]
-        [Url(ErrorMessage = "Please enter a valid URL")]
-        public string ImageUrl { get; set; } = string.Empty;
+        public IFormFile? ImageFile { get; set; }
+
+        public string? ImageUrl { get; set; }
     }
 }

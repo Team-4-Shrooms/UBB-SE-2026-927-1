@@ -20,6 +20,12 @@ namespace MovieApp.Proxy.Services
             return result ?? new List<MovieEvent>();
         }
 
+        public async Task<List<MovieEvent>> GetEventsByMovieIdAsync(int movieId)
+        {
+            var result = await _apiClient.GetAsync<List<MovieEvent>>($"api/events?movieId={movieId}");
+            return result ?? new List<MovieEvent>();
+        }
+
         public async Task PurchaseTicketAsync(int userId, int eventId)
         {
             await _apiClient.PostAsync($"api/events/{eventId}/purchase-ticket", new { userId });

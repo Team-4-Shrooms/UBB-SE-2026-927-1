@@ -20,8 +20,19 @@ namespace MovieApp.WebApi.Endpoints
         [HttpPost("{userId}/start")]
         public async Task<IActionResult> StartTournamentAsync(int userId, [FromQuery] int poolSize)
         {
-            await _tournamentLogicService.StartTournamentAsync(userId, poolSize);
-            return Ok();
+            try
+            {
+                await _tournamentLogicService.StartTournamentAsync(userId, poolSize);
+                return Ok();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost("{userId}/advance")]

@@ -44,6 +44,12 @@ namespace MovieApp.Logic.Services
             };
         }
 
+        public async Task AddProfileAsync(UserProfile profile)
+        {
+            await _profileRepo.AddProfileAsync(profile);
+            await _profileRepo.SaveChangesAsync();
+        }
+
         public async Task<decimal> GetUserBalanceAsync(int userId)
         {
             return await _userRepo.GetBalanceAsync(userId);

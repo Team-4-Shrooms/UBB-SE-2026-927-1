@@ -12,5 +12,6 @@ namespace MovieApp.Logic.Features.ReelsUpload
         Task<Reel> UploadVideoAsync(ReelUploadRequest request);
         Task<bool> ValidateVideoAsync(string localFilePath);
         Task<IList<Reel>> GetUserReelsAsync(int userId);
+        Task<Reel> InsertReelAsync(Reel reel);
     }
 }
