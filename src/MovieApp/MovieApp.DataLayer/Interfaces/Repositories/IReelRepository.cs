@@ -38,5 +38,10 @@ namespace MovieApp.DataLayer.Interfaces.Repositories
         /// </summary>
         /// <param name="reelId">The unique identifier of the reel to delete.</param>
         Task DeleteReelAsync(int reelId);
+
+        /// <summary>
+        /// Returns a list of all reels in the system, ordered by creation date descending.
+        /// </summary>
+        Task<IList<Reel>> GetAllReelsAsync();
     }
 }

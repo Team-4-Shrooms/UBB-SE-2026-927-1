@@ -157,36 +157,50 @@ namespace MovieApp.Features.TrailerScraping.ViewModels
         [RelayCommand(CanExecute = nameof(CanStartScrape))]
         private async Task StartScrapeAsync()
         {
-            if (this.SelectedMovie is null)
-            {
-                return;
-            }
+            if (this.SelectedMovie is null) return;
 
             this.IsScraping = true;
             this.StatusText = StatusScraping;
             this.StartScrapeCommand.NotifyCanExecuteChanged();
+            this.LogEntries.Clear();
 
             try
             {
-                await this.ingestionService.RunScrapeJobAsync(
-                    this.SelectedMovie,
-                    this.MaxResults,
-                    onLogEntry: async logEntry =>
+                var jobInfo = await this.ingestionService.RunScrapeJobAsync(this.SelectedMovie, this.MaxResults);
+
+                if (jobInfo == null || jobInfo.Id <= 0) return;
+
+                bool isJobFinished = false;
+                int lastLogCount = 0;
+
+                while (!isJobFinished)
+                {
+                    await Task.Delay(2000);
+
+                    var currentStatus = await this.ingestionService.GetJobStatusAsync(jobInfo.Id);
+                    if (currentStatus == null) continue;
+
+                    var newLogs = currentStatus.Logs.Skip(lastLogCount);
+
+                    foreach (var newLog in newLogs)
                     {
-#if !IS_TEST_PROJECT
                         Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread()?.TryEnqueue(() =>
                         {
-                            this.LogEntries.Insert(TopLogEntryIndex, logEntry);
+                            this.LogEntries.Insert(TopLogEntryIndex, newLog);
                         });
-#else
-                        this.LogEntries.Insert(TopLogEntryIndex, logEntry);
-#endif
-                        await Task.CompletedTask;
-                    });
+                    }
+
+                    lastLogCount = currentStatus.Logs.Count;
+
+                    if (currentStatus.Status == "completed" || currentStatus.Status == "failed")
+                    {
+                        isJobFinished = true;
+                    }
+                }
             }
             catch
             {
-                // Errors are already logged inside RunScrapeJobAsync
+                // Handle API failures
             }
             finally
             {
@@ -204,7 +218,6 @@ namespace MovieApp.Features.TrailerScraping.ViewModels
         {
             try
             {
-                // Compute job stats from the ingestion service
                 IList<ScrapeJob> jobs = await this.ingestionService.GetAllJobsAsync();
                 this.TotalJobs = jobs.Count;
                 this.RunningJobs = 0;
@@ -227,7 +240,6 @@ namespace MovieApp.Features.TrailerScraping.ViewModels
                     }
                 }
 
-                // Movie list from movie service
                 var movies = await this.movieService.GetAllMoviesAsync();
                 this.TotalMovies = movies.Count;
                 this.MovieTableItems.Clear();
@@ -236,9 +248,15 @@ namespace MovieApp.Features.TrailerScraping.ViewModels
                     this.MovieTableItems.Add(movie);
                 }
 
-                // Reels table not available via proxy; stubbed empty
-                this.TotalReels = 0;
+                var reels = await this.ingestionService.GetAllReelsAsync();
+
+                this.TotalReels = reels.Count;
                 this.ReelTableItems.Clear();
+
+                foreach (Reel reel in reels)
+                {
+                    this.ReelTableItems.Add(reel);
+                }
             }
             catch
             {
