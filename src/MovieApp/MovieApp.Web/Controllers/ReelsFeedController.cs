@@ -10,15 +10,18 @@ namespace MovieApp.Web.Controllers
         private readonly IRecommendationService _recommendationService;
         private readonly IReelInteractionService _interactionService;
         private readonly ICurrentUserService _currentUserService;
+        private readonly string _webApiBaseUrl;
 
         public ReelsFeedController(
             IRecommendationService recommendationService,
             IReelInteractionService interactionService,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService,
+            IConfiguration configuration)
         {
             _recommendationService = recommendationService;
             _interactionService = interactionService;
             _currentUserService = currentUserService;
+            _webApiBaseUrl = configuration["WebApi:BaseUrl"]!.TrimEnd('/');
         }
 
         [HttpGet]
@@ -31,19 +34,19 @@ namespace MovieApp.Web.Controllers
             var userInteractions = await _interactionService.GetInteractionsForUserAsync(userId);
 
             var likedReelIds = userInteractions
-                .Where(i => i.IsLiked)
-                .Select(i => i.ReelId)
+                .Where(interaction => interaction.IsLiked)
+                .Select(interaction => interaction.ReelId)
                 .ToHashSet();
 
-            var reels = rawReels.Select(r => new ReelDisplayItem
+            var reels = rawReels.Select(reel => new ReelDisplayItem
             {
-                Id = r.Id,
-                Title = r.Title,
-                VideoUrl = r.VideoUrl,
-                ThumbnailUrl = r.ThumbnailUrl,
-                Caption = r.Caption,
-                LikeCount = allLikeCounts.TryGetValue(r.Id, out var count) ? count : 0,
-                IsLikedByMe = likedReelIds.Contains(r.Id),
+                Id = reel.Id,
+                Title = reel.Title,
+                VideoUrl = reel.VideoUrl.StartsWith("/") ? _webApiBaseUrl + reel.VideoUrl : reel.VideoUrl,
+                ThumbnailUrl = reel.ThumbnailUrl,
+                Caption = reel.Caption,
+                LikeCount = allLikeCounts.TryGetValue(reel.Id, out var count) ? count : 0,
+                IsLikedByMe = likedReelIds.Contains(reel.Id),
             }).ToList();
 
             var viewModel = new ReelsFeedViewModel

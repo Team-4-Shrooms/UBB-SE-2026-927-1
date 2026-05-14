@@ -56,7 +56,7 @@ namespace MovieApp.WebApi.Endpoints
         public async Task<IActionResult> IngestUrl([FromBody] IngestUrlRequestBody body)
         {
             var result = await _ingestionService.IngestVideoFromUrlAsync(body.TrailerUrl, body.MovieId);
-            return Ok(new { Url = result });
+            return Ok(new { url = result });
         }
     }
 }

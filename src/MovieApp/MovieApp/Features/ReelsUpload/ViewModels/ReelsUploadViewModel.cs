@@ -1,11 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MovieApp.DataLayer.Models;
 using MovieApp.Logic.Interfaces.Services;
 using MovieApp.Logic.Features.ReelsUpload;
-using System.Runtime.InteropServices;
 
 namespace MovieApp.Features.ReelsUpload.ViewModels
 {
@@ -14,11 +17,15 @@ namespace MovieApp.Features.ReelsUpload.ViewModels
     /// </summary>
     public partial class ReelsUploadViewModel : ObservableObject
     {
-        //private readonly IAppWindowContext appWindowContext;
         private readonly IVideoStorageService videoStorageService;
         private readonly IMovieService movieService;
 
         private const string UntitledName = "Untitled Reel";
+        private const string VideoFileExtension = ".mp4";
+
+        private List<Movie> _allMovies = new List<Movie>();
+
+        public ObservableCollection<Movie> SuggestedMovies { get; }
 
         public ReelsUploadViewModel(
             IVideoStorageService videoStorageService,
@@ -27,9 +34,9 @@ namespace MovieApp.Features.ReelsUpload.ViewModels
             this.videoStorageService = videoStorageService;
             this.movieService = movieService;
             SuggestedMovies = new ObservableCollection<Movie>();
-        }
 
-        public ObservableCollection<Movie> SuggestedMovies { get; }
+            _ = LoadMoviesAsync();
+        }
 
         [ObservableProperty]
         private string pageTitle = "Reels Upload";
@@ -37,7 +44,6 @@ namespace MovieApp.Features.ReelsUpload.ViewModels
         [ObservableProperty]
         private string statusMessage = "Ready to upload.";
 
-        // TODO: Replace with actual authenticated user ID later
         private const int CurrentUserID = 1;
 
         [ObservableProperty]
@@ -52,7 +58,18 @@ namespace MovieApp.Features.ReelsUpload.ViewModels
         [ObservableProperty]
         private string localVideoFilePath = string.Empty;
 
-        private const string VideoFileExtension = ".mp4";
+        private async Task LoadMoviesAsync()
+        {
+            try
+            {
+                var movies = await movieService.GetAllMoviesAsync();
+                _allMovies = movies.ToList();
+            }
+            catch (Exception exception)
+            {
+                StatusMessage = $"Failed to load movies: {exception.Message}";
+            }
+        }
 
         [RelayCommand]
         private async Task SelectVideoFileAsync()
@@ -66,7 +83,12 @@ namespace MovieApp.Features.ReelsUpload.ViewModels
             Windows.Storage.StorageFile selectedMovieFile = await filePicker.PickSingleFileAsync();
             if (selectedMovieFile != null)
             {
-                LocalVideoFilePath = selectedMovieFile.Path;
+                string tempDirectory = Path.GetTempPath();
+                string tempFilePath = Path.Combine(tempDirectory, selectedMovieFile.Name);
+
+                File.Copy(selectedMovieFile.Path, tempFilePath, overwrite: true);
+
+                LocalVideoFilePath = tempFilePath;
             }
         }
 
@@ -95,16 +117,15 @@ namespace MovieApp.Features.ReelsUpload.ViewModels
 
             try
             {
-                bool isValid = await videoStorageService.ValidateVideoAsync(LocalVideoFilePath);
+                // FIX FOR PART 4: Validate locally instead of calling the proxy service
+                bool isValid = ValidateVideoLocally(LocalVideoFilePath);
 
-                // 1. If invalid, show error and STOP.
                 if (!isValid)
                 {
-                    StatusMessage = "Invalid file! Must be a non-empty MP4 file\nno longer than 60 seconds.";
+                    StatusMessage = "Invalid file! Must be a non-empty MP4 file.";
                     return;
                 }
 
-                // 2. If valid, proceed with the upload!
                 StatusMessage = "Uploading to Blob Storage & saving metadata...";
 
                 ReelUploadRequest request = new ReelUploadRequest
@@ -124,11 +145,19 @@ namespace MovieApp.Features.ReelsUpload.ViewModels
                 ReelCaption = string.Empty;
                 LinkedMovie = null;
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                string errorMessage = $"Upload Failed: {ex.Message}";
-                StatusMessage = errorMessage;
+                StatusMessage = $"Upload Failed: {exception.Message}";
             }
+        }
+
+        private bool ValidateVideoLocally(string localFilePath)
+        {
+            if (string.IsNullOrWhiteSpace(localFilePath) || !File.Exists(localFilePath))
+                return false;
+
+            string fileExtension = Path.GetExtension(localFilePath).ToLowerInvariant();
+            return fileExtension == VideoFileExtension;
         }
 
         [RelayCommand]
@@ -138,27 +167,22 @@ namespace MovieApp.Features.ReelsUpload.ViewModels
         }
 
         [RelayCommand]
-        private async Task SearchMovieAsync(string partialMovieName)
+        private void SearchMovie(string partialMovieName)
         {
+            SuggestedMovies.Clear();
+
             if (string.IsNullOrWhiteSpace(partialMovieName))
             {
-                SuggestedMovies.Clear();
                 return;
             }
 
-            try
-            {
-                System.Collections.Generic.List<Movie> searchResults = await movieService.SearchMoviesAsync(partialMovieName);
+            var filteredMovies = _allMovies
+                .Where(movie => movie.Title.Contains(partialMovieName, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
-                SuggestedMovies.Clear();
-                foreach (Movie movie in searchResults)
-                {
-                    SuggestedMovies.Add(movie);
-                }
-            }
-            catch (Exception ex)
+            foreach (Movie movie in filteredMovies)
             {
-                StatusMessage = $"Search Error: {ex.Message}";
+                SuggestedMovies.Add(movie);
             }
         }
     }

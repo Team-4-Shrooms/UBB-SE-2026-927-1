@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,26 +23,12 @@ namespace MovieApp.Logic.Features.TrailerScraping
         private const string MicrosoftFolderName = "Microsoft";
         private const string WinGetFolderName = "WinGet";
         private const string LinksFolderName = "Links";
-        private const string Mp4SearchPattern = "*.mp4";
         private const string Mp4FileFormat = "{0}.mp4";
-
-        private const string OutputTemplateFormat = "%(id)s.%(ext)s";
-        private const string YtDlpBaseArgumentsFormat = "--no-playlist --ffmpeg-location \"{0}\" -f \"bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best\" --merge-output-format mp4 -o \"{1}\" ";
-        private const string YtDlpDurationArgumentFormat = "--postprocessor-args \"ffmpeg:-t {0}\" ";
 
         private const string ErrorProcessStartFailed = "Failed to start yt-dlp process";
         private const string ErrorProcessTimeout = "yt-dlp process timed out after 5 minutes";
-        private const string ErrorExitCodeFormat = "yt-dlp exit code {0}: {1}";
-        private const string ErrorNoMp4FoundFormat = "yt-dlp succeeded but no MP4 file found. standardOutput: {0}";
+        private const string ErrorExitCodeFormat = "yt-dlp exit code {0}";
         private const string ErrorProcessExceptionFormat = "yt-dlp process error: {0}";
-
-        private const string MergerLogPrefix = "[Merger]";
-        private const string DownloadLogPrefix = "[download]";
-        private const string DestinationLogPrefix = "Destination:";
-        private const string AlreadyDownloadedLogSuffix = "has already been downloaded";
-        private const string AlreadyDownloadedReplacement = " has already been downloaded";
-        private const char LineBreakCharacter = '\n';
-        private const char QuoteCharacter = '"';
 
         private readonly string downloadFolder;
         private string ytDlpPath = YtDlpExecutableName;
@@ -65,16 +50,12 @@ namespace MovieApp.Logic.Features.TrailerScraping
 
         public Task EnsureDependenciesAsync()
         {
-            if (this.isInitialized)
-            {
-                return Task.CompletedTask;
-            }
+            if (this.isInitialized) return Task.CompletedTask;
 
             string wingetLinks = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                MicrosoftFolderName,
-                WinGetFolderName,
-                LinksFolderName);
+                MicrosoftFolderName, WinGetFolderName, LinksFolderName);
+
             string wingetYtDlp = Path.Combine(wingetLinks, YtDlpExecutableName);
             string wingetFfmpeg = Path.Combine(wingetLinks, FfmpegExecutableName);
 
@@ -86,15 +67,14 @@ namespace MovieApp.Logic.Features.TrailerScraping
                 return Task.CompletedTask;
             }
 
-            string localYtDlp = Path.Combine(this.downloadFolder, YtDlpExecutableName);
-            string localFfmpeg = Path.Combine(this.downloadFolder, FfmpegExecutableName);
+            string currentDir = AppDomain.CurrentDomain.BaseDirectory;
+            string localYtDlp = Path.Combine(currentDir, YtDlpExecutableName);
+            string localFfmpeg = Path.Combine(currentDir, FfmpegExecutableName);
 
             if (File.Exists(localYtDlp) && File.Exists(localFfmpeg))
             {
                 this.ytDlpPath = localYtDlp;
                 this.ffmpegPath = localFfmpeg;
-                this.isInitialized = true;
-                return Task.CompletedTask;
             }
 
             this.isInitialized = true;
@@ -105,15 +85,17 @@ namespace MovieApp.Logic.Features.TrailerScraping
         {
             await this.EnsureDependenciesAsync();
 
-            string outputTemplate = Path.Combine(this.downloadFolder, OutputTemplateFormat);
-            string processArguments = string.Format(YtDlpBaseArgumentsFormat, this.ffmpegPath, outputTemplate);
+            string uniqueFileName = Guid.NewGuid().ToString("N");
+            string outputTemplate = Path.Combine(this.downloadFolder, $"{uniqueFileName}.%(ext)s");
+            string expectedFinalFile = Path.Combine(this.downloadFolder, $"{uniqueFileName}.mp4");
 
+            string ffmpegArgs = "-nostdin -y";
             if (maxDurationSeconds > 0)
             {
-                processArguments += string.Format(YtDlpDurationArgumentFormat, maxDurationSeconds);
+                ffmpegArgs += $" -t {maxDurationSeconds}";
             }
 
-            processArguments += $"\"{youtubeUrl}\"";
+            string processArguments = $"--force-overwrites --no-playlist --no-progress --ffmpeg-location \"{this.ffmpegPath}\" -f \"bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best\" --merge-output-format mp4 --postprocessor-args \"ffmpeg:{ffmpegArgs}\" -o \"{outputTemplate}\" \"{youtubeUrl}\"";
 
             try
             {
@@ -122,8 +104,9 @@ namespace MovieApp.Logic.Features.TrailerScraping
                     FileName = this.ytDlpPath,
                     Arguments = processArguments,
                     UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
+                    RedirectStandardInput = false,
                     CreateNoWindow = true,
                 };
 
@@ -133,9 +116,6 @@ namespace MovieApp.Logic.Features.TrailerScraping
                     this.LastError = ErrorProcessStartFailed;
                     return null;
                 }
-
-                Task<string> standardOutputTask = downloadProcess.StandardOutput.ReadToEndAsync();
-                Task<string> standardErrorTask = downloadProcess.StandardError.ReadToEndAsync();
 
                 using CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(ProcessTimeoutMinutes));
                 try
@@ -149,23 +129,19 @@ namespace MovieApp.Logic.Features.TrailerScraping
                     return null;
                 }
 
-                string standardOutput = await standardOutputTask;
-                string standardError = await standardErrorTask;
-
                 if (downloadProcess.ExitCode != SuccessExitCode)
                 {
-                    this.LastError = string.Format(ErrorExitCodeFormat, downloadProcess.ExitCode, standardError);
+                    this.LastError = string.Format(ErrorExitCodeFormat, downloadProcess.ExitCode);
                     return null;
                 }
 
-                string? filePath = this.FindDownloadedFile(standardOutput);
-                if (filePath != null && File.Exists(filePath))
+                if (File.Exists(expectedFinalFile))
                 {
                     this.LastError = null;
-                    return filePath;
+                    return expectedFinalFile;
                 }
 
-                this.LastError = string.Format(ErrorNoMp4FoundFormat, standardOutput);
+                this.LastError = "yt-dlp finished but the output MP4 file was not found.";
                 return null;
             }
             catch (Exception exception)
@@ -178,55 +154,6 @@ namespace MovieApp.Logic.Features.TrailerScraping
         public string GetExpectedFilePath(string videoId)
         {
             return Path.Combine(this.downloadFolder, string.Format(Mp4FileFormat, videoId));
-        }
-
-        private string? FindDownloadedFile(string standardOutput)
-        {
-            foreach (string line in standardOutput.Split(LineBreakCharacter))
-            {
-                string trimmedLine = line.Trim();
-
-                if (trimmedLine.StartsWith(MergerLogPrefix) && trimmedLine.Contains(QuoteCharacter))
-                {
-                    int firstQuoteIndex = trimmedLine.IndexOf(QuoteCharacter) + 1;
-                    int lastQuoteIndex = trimmedLine.LastIndexOf(QuoteCharacter);
-                    if (lastQuoteIndex > firstQuoteIndex)
-                    {
-                        string path = trimmedLine[firstQuoteIndex..lastQuoteIndex];
-                        if (File.Exists(path)) return path;
-                    }
-                }
-
-                if (trimmedLine.StartsWith(DownloadLogPrefix))
-                {
-                    string remainingLine = trimmedLine[DownloadLogPrefix.Length..].Trim();
-
-                    if (remainingLine.StartsWith(DestinationLogPrefix))
-                    {
-                        string path = remainingLine[DestinationLogPrefix.Length..].Trim();
-                        if (File.Exists(path)) return path;
-                    }
-
-                    if (remainingLine.EndsWith(AlreadyDownloadedLogSuffix))
-                    {
-                        string path = remainingLine.Replace(AlreadyDownloadedReplacement, string.Empty).Trim();
-                        if (File.Exists(path)) return path;
-                    }
-                }
-            }
-
-            try
-            {
-                FileInfo newestFile = new DirectoryInfo(this.downloadFolder)
-                    .GetFiles(Mp4SearchPattern)
-                    .OrderByDescending(file => file.LastWriteTimeUtc)
-                    .FirstOrDefault();
-                return newestFile?.FullName;
-            }
-            catch
-            {
-                return null;
-            }
         }
     }
 }
