@@ -25,6 +25,7 @@
 					<div class="reel-item">
 						<video loop autoplay playsinline muted
 							   onplay="this.startTime = Date.now()"
+							   ontimeupdate="updateProgress(@reel.Id, this)"
 							   onpause="handleWatch(@reel.Id, this, '@Url.Action("RecordWatch", "ReelsFeed")')"
 							   onended="handleWatch(@reel.Id, this, '@Url.Action("RecordWatch", "ReelsFeed")')">
 							<source src="@reel.VideoUrl" type="video/mp4">
@@ -32,10 +33,10 @@
 
 						<!-- Sidebar Actions -->
 						<div class="side-actions">
-							<button id="like-btn-@reel.Id" 
-									class="action-btn" 
+							<button id="like-btn-@reel.Id"
+									class="action-btn @(reel.IsLikedByMe ? "btn-danger-active" : "")"
 									onclick="toggleLike(@reel.Id, '@Url.Action("Like", "ReelsFeed")')">
-								<i class="bi bi-heart-fill"></i>
+								<i class="@(reel.IsLikedByMe ? "bi bi-heart-fill" : "bi bi-heart")"></i>
 								<span id="like-count-@reel.Id">@reel.LikeCount</span>
 							</button>
 						</div>
@@ -43,6 +44,11 @@
 						<!-- Text Overlay -->
 						<div class="video-overlay">
 							<p>@reel.Caption</p>
+						</div>
+
+						<!-- Progress bar -->
+						<div class="reel-progress">
+							<div class="reel-progress-fill" id="progress-@reel.Id"></div>
 						</div>
 					</div>
 		}

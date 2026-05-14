@@ -26,29 +26,30 @@ namespace MovieApp.Web.Controllers
         {
             var userId = _currentUserService.UserId;
 
-            // 1. Get the reels from the recommendation service
             var rawReels = await _recommendationService.GetRecommendedReelsAsync(userId, 20);
+            var allLikeCounts = await _recommendationService.GetAllLikeCountsAsync();
+            var userInteractions = await _interactionService.GetInteractionsForUserAsync(userId);
 
-            // 2. Map to ViewModel using the InteractionService for each item
-            var reelTasks = rawReels.Select(async r => new ReelDisplayItem
+            var likedReelIds = userInteractions
+                .Where(i => i.IsLiked)
+                .Select(i => i.ReelId)
+                .ToHashSet();
+
+            var reels = rawReels.Select(r => new ReelDisplayItem
             {
                 Id = r.Id,
                 Title = r.Title,
                 VideoUrl = r.VideoUrl,
                 ThumbnailUrl = r.ThumbnailUrl,
                 Caption = r.Caption,
-
-                // Use the service to get the actual count from the DB
-                LikeCount = await _interactionService.GetLikeCountAsync(r.Id),
-
-                // Use the service to check if THIS user liked it
-                //IsLikedByCurrentUser = await _interactionService.IsLikedByUserAsync(userId, r.Id)
-            });
+                LikeCount = allLikeCounts.TryGetValue(r.Id, out var count) ? count : 0,
+                IsLikedByMe = likedReelIds.Contains(r.Id),
+            }).ToList();
 
             var viewModel = new ReelsFeedViewModel
             {
                 CurrentPage = page,
-                Reels = (await Task.WhenAll(reelTasks)).ToList()
+                Reels = reels
             };
 
             return View(viewModel);
@@ -57,11 +58,13 @@ namespace MovieApp.Web.Controllers
         [HttpPost]
         public async Task<JsonResult> Like(int reelId)
         {
-            await _interactionService.ToggleLikeAsync(_currentUserService.UserId, reelId);
+            var userId = _currentUserService.UserId;
+            await _interactionService.ToggleLikeAsync(userId, reelId);
 
             var newCount = await _interactionService.GetLikeCountAsync(reelId);
+            var interaction = await _interactionService.GetInteractionAsync(userId, reelId);
 
-            return Json(new { likeCount = newCount });
+            return Json(new { likeCount = newCount, isLiked = interaction?.IsLiked ?? false });
         }
 
         [HttpPost]

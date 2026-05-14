@@ -1,19 +1,18 @@
 
 window.toggleLike = function (id, url) {
     if (typeof $ === 'undefined') {
-        console.error("jQuery is still not loaded!");
+        console.error("jQuery is not loaded!");
         return;
     }
 
     $.post(url, { reelId: id }, function (data) {
         const countElem = document.getElementById('like-count-' + id);
         const btnElem = document.getElementById('like-btn-' + id);
+        const iconElem = btnElem ? btnElem.querySelector('i') : null;
 
         if (countElem) countElem.innerText = data.likeCount;
-        if (btnElem) {
-            btnElem.classList.toggle('btn-outline-light');
-            btnElem.classList.toggle('btn-danger');
-        }
+        if (btnElem) btnElem.classList.toggle('btn-danger-active', data.isLiked);
+        if (iconElem) iconElem.className = data.isLiked ? 'bi bi-heart-fill' : 'bi bi-heart';
     }).fail(function () {
         console.error("Failed to update like for reel:", id);
     });
@@ -27,6 +26,12 @@ window.handleWatch = function (id, videoElement, url) {
 
     recordWatch(id, url, Math.round(duration), Math.round(percentage));
     videoElement.startTime = Date.now();
+};
+
+window.updateProgress = function (id, video) {
+    if (!video.duration) return;
+    const fill = document.getElementById('progress-' + id);
+    if (fill) fill.style.width = ((video.currentTime / video.duration) * 100) + '%';
 };
 
 function recordWatch(id, url, duration, percentage) {

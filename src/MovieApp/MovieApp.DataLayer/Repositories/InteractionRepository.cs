@@ -3,8 +3,6 @@ using MovieApp.DataLayer.Interfaces.Repositories;
 using MovieApp.DataLayer.Models;
 using System.Threading.Tasks;
 using System;
-using System.Diagnostics;
-
 namespace MovieApp.DataLayer.Repositories
 {
     /// <summary>
@@ -63,7 +61,6 @@ namespace MovieApp.DataLayer.Repositories
         /// <inheritdoc />
         public async Task ToggleLikeAsync(int userId, int reelId)
         {
-            Debug.WriteLine($"liked in repo");
             UserReelInteraction? existingInteraction = await GetInteractionAsync(userId, reelId);
 
             if (existingInteraction is null)
@@ -137,8 +134,7 @@ namespace MovieApp.DataLayer.Repositories
                 .FirstOrDefaultAsync(i => i.UserId == userId && i.ReelId == reelId);
         }
 
-        /// <inheritdoc />System.NullReferenceException: 'Object reference not set to an instance of an object.'
-
+        /// <inheritdoc />
         public async Task<int> GetLikeCountAsync(int reelId)
         {
             return await _context.UserReelInteractions

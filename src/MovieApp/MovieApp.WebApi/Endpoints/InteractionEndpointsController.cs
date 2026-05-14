@@ -6,8 +6,6 @@ using MovieApp.WebApi.Mappings;
 using MovieApp.DataLayer.Models;
 using MovieApp.Logic.Interfaces.Services;
 using MovieApp.Logic.Features.ReelsFeed;
-using System.Diagnostics;
-
 namespace MovieApp.WebApi.Endpoints;
 
 [Authorize]
@@ -60,7 +58,6 @@ public sealed class InteractionEndpointsController : ControllerBase
     [HttpPut("users/{userId:int}/reels/{reelId:int}/like")]
     public async Task<IActionResult> ToggleLikeAsync(int userId, int reelId)
     {
-        Debug.WriteLine($"liked in controller");
         await _interactionService.ToggleLikeAsync(userId, reelId);
         return Ok();
     }

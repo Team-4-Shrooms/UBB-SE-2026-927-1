@@ -199,6 +199,8 @@ public static class WebApiDtoMappingExtensions
             WatchDurationSeconds = interaction.WatchDurationSeconds,
             WatchPercentage = interaction.WatchPercentage,
             ViewedAt = interaction.ViewedAt,
+            UserId = interaction.UserId,
+            ReelId = interaction.ReelId,
             User = interaction.User?.ToReferenceDto() ?? (userId.HasValue ? new UserReferenceDto { Id = userId.Value } : null),
             Reel = interaction.Reel?.ToReferenceDto() ?? (reelId.HasValue ? new ReelReferenceDto { Id = reelId.Value } : null),
         };
